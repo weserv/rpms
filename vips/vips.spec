@@ -36,10 +36,10 @@
 %if %{with libheif}
 Name:		vips-full
 # Keep vips-full release > vips release
-Release:	3%{?dist}
+Release:	4%{?dist}
 %else
 Name:		vips
-Release:	2%{?dist}
+Release:	3%{?dist}
 %endif
 Version:	%{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:	C/C++ library for processing large images
@@ -61,7 +61,6 @@ BuildRequires:	pkgconfig(orc-0.4)
 BuildRequires:	pkgconfig(lcms2)
 BuildRequires:	pkgconfig(pangoft2)
 BuildRequires:	pkgconfig(zlib)
-BuildRequires:	pkgconfig(spng) >= 0.6
 BuildRequires:	pkgconfig(libpng) >= 1.2.9
 BuildRequires:	pkgconfig(libtiff-4)
 # Ensure we use libwebp7 on EL-7
@@ -79,20 +78,12 @@ BuildRequires:	pkgconfig(spng) >= 0.6
 BuildRequires:	pkgconfig(libheif) >= 1.3
 %endif
 %if %{with libimagequant}
-#BuildRequires:	pkgconfig(imagequant) TODO only in 2.12+
-BuildRequires:	libimagequant-devel
+BuildRequires:	pkgconfig(imagequant) >= 2.11.10
 %endif
 BuildRequires:	giflib-devel
-BuildRequires:	pkgconfig(gthread-2.0)
 
 BuildRequires:	gcc-c++
 BuildRequires:	pkgconfig gettext
-
-%if %{with libheif}
-Conflicts:      vips         < %{version}-%{release}
-Provides:       vips         = %{version}-%{release}
-Provides:       vips%{?_isa} = %{version}-%{release}
-%endif
 
 
 %description
@@ -108,9 +99,6 @@ against VIPS.
 Summary:	Development files for %{name}
 Requires:	libjpeg-devel%{?_isa} libtiff-devel%{?_isa} zlib-devel%{?_isa}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-%if %{with libheif}
-Conflicts:  vips-devel < %{version}-%{release}
-%endif
 # for consistency, same version at buildtime and runtime
 %if 0%{?fedora} >= 30 || 0%{?rhel} >= 7
 Requires:	ImageMagick-devel
@@ -128,9 +116,6 @@ contains a C++ API and development documentation.
 %package tools
 Summary:	Command-line tools for %{name}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-%if %{with libheif}
-Conflicts:  vips-tools < %{version}-%{release}
-%endif
 
 %description tools
 The %{name}-tools package contains command-line tools for working with VIPS.
@@ -141,9 +126,6 @@ The %{name}-tools package contains command-line tools for working with VIPS.
 Summary:	Documentation for %{name}
 BuildRequires: swig gtk-doc
 Conflicts:	%{name} < %{version}-%{release}, %{name} > %{version}-%{release}
-%if %{with libheif}
-Conflicts:  vips-doc < %{version}-%{release}
-%endif
 
 %description doc
 The %{name}-doc package contains extensive documentation about VIPS in both
@@ -249,6 +231,12 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Sun Jan  3 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.5-3
+- Ensure package does not provide disabled dependencies
+- Remove duplicated dependency on libspng
+- Requires pkgconfig(imagequant) instead of libimagequant-devel
+- Remove dependency on deprecated gthread-2.0
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.5-2
 - Import from remirepo
 - Disable fftw3, OpenEXR, matio, cfitsio, openslide
