@@ -1,10 +1,10 @@
 %global rav1e_version 0.4.0
-%global rav1e_prever alpha
+#global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
 Name:           rav1e
 Version:        %{rav1e_version}%{?rav1e_prever:~%{rav1e_prever}}
-Release:        0.3%{?dist}
+Release:        1%{?dist}
 Summary:        Fastest and safest AV1 encoder
 
 # Upstream license specification: BSD-2-Clause
@@ -82,6 +82,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Mon Jan 18 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.4.0-1
+- Update to 0.4.0
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.4.0~alpha-0.3
 - Import from Fedora
 - Build with nasm and cargo-c from weserv repo
