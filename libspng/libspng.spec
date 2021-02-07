@@ -1,6 +1,6 @@
 Name:           libspng
-Version:        0.6.1
-Release:        2%{?dist}
+Version:        0.6.2
+Release:        1%{?dist}
 Summary:        Simple, modern libpng alternative
 
 License:        BSD
@@ -53,6 +53,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/spng.pc
 
 %changelog
+* Sun Feb  7 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.2-1
+- Update to 0.6.2
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.1-2
 - Import from Fedora
 
