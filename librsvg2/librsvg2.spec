@@ -12,8 +12,8 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.50.2
-Release:        2%{?dist}
+Version:        2.50.3
+Release:        1%{?dist}
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/LibRsvg
@@ -134,6 +134,9 @@ rm -vrf %{buildroot}%{_datadir}/doc
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Sun Feb  7 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.3-1
+- Update to 2.50.3
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.2-2
 - Import from Fedora
 - Build against cairo, harfbuzz from weserv repo
