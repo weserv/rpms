@@ -1,6 +1,6 @@
 Name:           libheif
-Version:        1.10.0
-Release:        2%{?dist}
+Version:        1.11.0
+Release:        1%{?dist}
 Summary:        HEIF file format decoder and encoder
 
 License:        LGPLv3+ and MIT
@@ -75,6 +75,9 @@ find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 
 
 %changelog
+* Sun Feb  7 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.11.0-1
+- Update to 1.11.0
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.10.0-2
 - Import from rpmfusion
 - Disable x265
