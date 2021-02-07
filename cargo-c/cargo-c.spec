@@ -1,7 +1,7 @@
 %bcond_without check
 
 Name:           cargo-c
-Version:        0.7.0
+Version:        0.7.2
 Release:        1%{?dist}
 Summary:        Helper program to build and install c-like libraries
 
@@ -45,6 +45,9 @@ Helper program to build and install c-like libraries.
 %endif
 
 %changelog
+* Sun Feb  7 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.7.2-1
+- Update to 0.7.2
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.7.0-1
 - Import from Fedora
 - Update to 0.7.0
