@@ -7,12 +7,12 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.10
-%global vips_version %{vips_version_base}.6
+%global vips_version_base 8.11
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
+%global vips_prever gmodulized
 #global vips_tarver %%{vips_version}%%{?vips_prever:-%%{vips_prever}}
-%global vips_tarver %{vips_version}
+%global vips_tarver b748678d96341809ec3d13cbc92d332f7e8dc1f1
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -34,20 +34,14 @@
 
 %bcond_without             libheif
 
-%if %{with libheif}
-Name:		vips-full
-# Keep vips-full release > vips release
-Release:	2%{?dist}
-%else
 Name:		vips
-Release:	1%{?dist}
-%endif
+Release:	2%{?dist}
 Version:	%{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:	C/C++ library for processing large images
 
 License:	LGPLv2+
 URL:		https://libvips.github.io/libvips/
-Source0:	https://github.com/libvips/libvips/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
+Source0:	https://github.com/kleisauke/libvips/archive/%{vips_tarver}.tar.gz
 
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(expat)
@@ -75,9 +69,6 @@ BuildRequires:	pkgconfig(libjpeg)
 %if %{with libspng}
 BuildRequires:	pkgconfig(spng) >= 0.6
 %endif
-%if %{with libheif}
-BuildRequires:	pkgconfig(libheif) >= 1.3
-%endif
 %if %{with libimagequant}
 BuildRequires:	pkgconfig(imagequant) >= 2.11.10
 %endif
@@ -85,6 +76,10 @@ BuildRequires:	giflib-devel
 
 BuildRequires:	gcc-c++
 BuildRequires:	pkgconfig gettext
+
+# Filter private shared
+%{?filter_provides_in: %filter_provides_in %{_libdir}/vips-plugins-%{vips_version_base}/.*$}
+%{?filter_setup}
 
 
 %description
@@ -114,6 +109,28 @@ libraries necessary for developing programs using VIPS. It also
 contains a C++ API and development documentation.
 
 
+%if %{with libheif}
+%package heif
+Summary: HEIF plugin for VIPS
+BuildRequires:	pkgconfig(libheif) >= 1.3
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description heif
+This package contains a plugin for VIPS which makes it possible to
+save and load HEIC/AVIF files from VIPS and packages that depend upon it.
+%endif
+
+
+%package openslide
+Summary: OpenSlide plugin for VIPS
+BuildRequires:	pkgconfig(openslide) >= 3.3.0
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description openslide
+This package contains a plugin for VIPS which makes it possible to
+load OpenSlide files from VIPS and packages that depend upon it.
+
+
 %package tools
 Summary:	Command-line tools for %{name}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
@@ -135,7 +152,9 @@ HTML and PDF formats.
 
 
 %prep
-%setup -q -n vips-%{vips_version}
+%setup -q -n libvips-%{vips_tarver}
+
+NOCONFIGURE=1 ./autogen.sh
 
 # make the version string consistent for multiarch
 export FAKE_BUILD_DATE=$(date -r %{SOURCE0})
@@ -155,7 +174,7 @@ export CFLAGS="%{optflags} -ftree-vectorize"
 export CXXFLAGS="%{optflags} -ftree-vectorize"
 %configure \
 %if %{with libheif}
-    --with-heif \
+    --with-heif=module \
 %else
     --without-heif \
 %endif
@@ -170,7 +189,6 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     --without-libspng \
 %endif
     --without-fftw \
-    --without-openslide \
     --without-pdfium \
     --without-cfitsio \
     --without-OpenEXR \
@@ -209,6 +227,10 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %license COPYING
 %{_libdir}/*.so.%{vips_soname_major}*
 %{_libdir}/girepository-1.0
+%if %{with libheif}
+%exclude %{_libdir}/vips-plugins-%{vips_version_base}/vips-heif.so
+%endif
+%exclude %{_libdir}/vips-plugins-%{vips_version_base}/vips-openslide.so
 
 
 %files devel
@@ -218,6 +240,13 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %{_datadir}/gir-1.0
 %{_datadir}/gtk-doc
 
+%if %{with libheif}
+%files heif
+%{_libdir}/vips-plugins-%{vips_version_base}/vips-heif.so
+%endif
+
+%files openslide
+%{_libdir}/vips-plugins-%{vips_version_base}/vips-openslide.so
 
 %files tools
 %{_bindir}/*
@@ -232,11 +261,17 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Sat Mar 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.11.0~gmodulized-2
+- Filter privates modules from provides
+
 * Sat Mar 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.6-1
 - Update to 8.10.6
 
 * Sat Feb 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.5-4
 - Build against ImageMagick6 and new soname from remirepo
+
+* Sun Feb 14 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.11.0~gmodulized-1
+- Add support for libheif and OpenSlide in an optional subpackage
 
 * Sun Jan  3 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.5-3
 - Ensure package does not provide disabled dependencies
