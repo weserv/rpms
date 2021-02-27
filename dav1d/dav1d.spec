@@ -1,5 +1,5 @@
 Name:           dav1d
-Version:        0.8.1
+Version:        0.8.2
 Release:        1%{?dist}
 Summary:        AV1 cross-platform Decoder
 
@@ -35,7 +35,7 @@ Development files for dav1d, the AV1 cross-platform Decoder.
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-%meson
+%meson -Dxxhash_muxer=disabled
 %meson_build
 %ninja_build -C %{_vpath_builddir} doc/html
 
@@ -60,6 +60,10 @@ Development files for dav1d, the AV1 cross-platform Decoder.
 %{_libdir}/pkgconfig/dav1d.pc
 
 %changelog
+* Sat Feb 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.8.2-1
+- Disable optional xxh3 based muxer
+- Update to 0.8.2
+
 * Sun Jan  3 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.8.1-1
 - Update to 0.8.1
 
