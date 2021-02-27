@@ -36,10 +36,10 @@
 %if %{with libheif}
 Name:		vips-full
 # Keep vips-full release > vips release
-Release:	4%{?dist}
+Release:	5%{?dist}
 %else
 Name:		vips
-Release:	3%{?dist}
+Release:	4%{?dist}
 %endif
 Version:	%{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:	C/C++ library for processing large images
@@ -50,7 +50,7 @@ Source0:	https://github.com/libvips/libvips/releases/download/v%{vips_version}%{
 
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(expat)
-%if 0%{?fedora} >= 30 || 0%{?rhel} >= 7
+%if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
 BuildRequires:	ImageMagick-devel
 %else
 # Ensure we use version 6 (same as imagick ext).
@@ -100,7 +100,7 @@ Summary:	Development files for %{name}
 Requires:	libjpeg-devel%{?_isa} libtiff-devel%{?_isa} zlib-devel%{?_isa}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
 # for consistency, same version at buildtime and runtime
-%if 0%{?fedora} >= 30 || 0%{?rhel} >= 7
+%if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
 Requires:	ImageMagick-devel
 %else
 # Ensure we use version 6 (same as imagick ext).
@@ -231,6 +231,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Sat Feb 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.5-4
+- Build against ImageMagick6 and new soname from remirepo
+
 * Sun Jan  3 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.5-3
 - Ensure package does not provide disabled dependencies
 - Remove duplicated dependency on libspng
