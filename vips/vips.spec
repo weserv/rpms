@@ -8,10 +8,11 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.10
-%global vips_version %{vips_version_base}.5
+%global vips_version %{vips_version_base}.6
 %global vips_soname_major 42
 #global vips_prever rc1
-%global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
+#global vips_tarver %%{vips_version}%%{?vips_prever:-%%{vips_prever}}
+%global vips_tarver %{vips_version}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -36,10 +37,10 @@
 %if %{with libheif}
 Name:		vips-full
 # Keep vips-full release > vips release
-Release:	5%{?dist}
+Release:	2%{?dist}
 %else
 Name:		vips
-Release:	4%{?dist}
+Release:	1%{?dist}
 %endif
 Version:	%{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:	C/C++ library for processing large images
@@ -231,6 +232,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Sat Mar 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.6-1
+- Update to 8.10.6
+
 * Sat Feb 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.5-4
 - Build against ImageMagick6 and new soname from remirepo
 
