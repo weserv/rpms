@@ -1,6 +1,6 @@
 Name:           harfbuzz
-Version:        2.7.4
-Release:        2%{?dist}
+Version:        2.8.0
+Release:        1%{?dist}
 Summary:        Text shaping library
 
 License:        MIT
@@ -90,6 +90,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/libharfbuzz-icu.so.*
 
 %changelog
+* Sat Mar 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.8.0-1
+- Update to 2.8.0
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.7.4-2
 - Import from Fedora
 - Build against cairo from weserv repo
