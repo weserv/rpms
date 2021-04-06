@@ -1,11 +1,13 @@
+%global libspng_tarver 24110bb4a0487db83287fabfbcff45550db42774
+
 Name:           libspng
-Version:        0.6.2
+Version:        0.6.3~24110bb
 Release:        1%{?dist}
 Summary:        Simple, modern libpng alternative
 
 License:        BSD
 URL:            https://libspng.org/
-Source0:        https://github.com/randy408/libspng/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/randy408/libspng/archive/%{libspng_tarver}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -29,7 +31,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{libspng_tarver}
 
 %build
 %meson -Ddev_build=true
@@ -53,6 +55,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/spng.pc
 
 %changelog
+* Tue Apr  6 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.3~24110bb-1
+- Update to 0.6.3 (from master branch)
+
 * Sun Feb  7 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.2-1
 - Update to 0.6.2
 
