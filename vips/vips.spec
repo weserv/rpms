@@ -7,12 +7,12 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.10
-%global vips_version %{vips_version_base}.6
+%global vips_version_base 8.11
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
+%global vips_prever 3551706
 #global vips_tarver %%{vips_version}%%{?vips_prever:-%%{vips_prever}}
-%global vips_tarver %{vips_version}
+%global vips_tarver 355170655d5c534d8b55dc1ed9ab7b15ab785df8
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -47,7 +47,7 @@ Summary:	C/C++ library for processing large images
 
 License:	LGPLv2+
 URL:		https://libvips.github.io/libvips/
-Source0:	https://github.com/libvips/libvips/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
+Source0:	https://github.com/kleisauke/libvips/archive/%{vips_tarver}.tar.gz
 
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(expat)
@@ -135,7 +135,9 @@ HTML and PDF formats.
 
 
 %prep
-%setup -q -n vips-%{vips_version}
+%setup -q -n libvips-%{vips_tarver}
+
+NOCONFIGURE=1 ./autogen.sh
 
 # make the version string consistent for multiarch
 export FAKE_BUILD_DATE=$(date -r %{SOURCE0})
@@ -232,6 +234,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Tue Apr 20 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.11.0~3551706-1
+- Test reuse-threads branch
+
 * Sat Mar 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.6-1
 - Update to 8.10.6
 
