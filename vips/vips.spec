@@ -10,9 +10,9 @@
 %global vips_version_base 8.11
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever 3551706
+%global vips_prever 3f8a021
 #global vips_tarver %%{vips_version}%%{?vips_prever:-%%{vips_prever}}
-%global vips_tarver 355170655d5c534d8b55dc1ed9ab7b15ab785df8
+%global vips_tarver 3f8a02177f985206c67fed63959c84dee3118997
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -32,15 +32,17 @@
 %bcond_with                libspng
 %endif
 
+%bcond_without             im6
 %bcond_without             libheif
+%bcond_without             poppler
 
 %if %{with libheif}
 Name:		vips-full
 # Keep vips-full release > vips release
-Release:	2%{?dist}
+Release:	3%{?dist}
 %else
 Name:		vips
-Release:	1%{?dist}
+Release:	2%{?dist}
 %endif
 Version:	%{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:	C/C++ library for processing large images
@@ -51,11 +53,13 @@ Source0:	https://github.com/kleisauke/libvips/archive/%{vips_tarver}.tar.gz
 
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(expat)
+%if %{with im6}
 %if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
 BuildRequires:	ImageMagick-devel
 %else
 # Ensure we use version 6 (same as imagick ext).
 BuildRequires:	ImageMagick6-devel
+%endif
 %endif
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 BuildRequires:	pkgconfig(orc-0.4)
@@ -70,7 +74,9 @@ BuildRequires:	pkgconfig(libwebp) > 1
 BuildRequires:	pkgconfig(libexif)
 BuildRequires:	pkgconfig(libgsf-1)
 BuildRequires:	pkgconfig(librsvg-2.0) >= 2.50.0
+%if %{with poppler}
 BuildRequires:	pkgconfig(poppler-glib)
+%endif
 BuildRequires:	pkgconfig(libjpeg)
 %if %{with libspng}
 BuildRequires:	pkgconfig(spng) >= 0.6
@@ -100,12 +106,14 @@ against VIPS.
 Summary:	Development files for %{name}
 Requires:	libjpeg-devel%{?_isa} libtiff-devel%{?_isa} zlib-devel%{?_isa}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
+%if %{with im6}
 # for consistency, same version at buildtime and runtime
 %if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
 Requires:	ImageMagick-devel
 %else
 # Ensure we use version 6 (same as imagick ext).
 Requires:	ImageMagick6-devel
+%endif
 %endif
 
 %description devel
@@ -171,6 +179,16 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %else
     --without-libspng \
 %endif
+%if %{with im6}
+    --with-magick \
+%else
+    --without-magick \
+%endif
+%if %{with poppler}
+    --with-poppler \
+%else
+    --without-poppler \
+%endif
     --without-fftw \
     --without-openslide \
     --without-pdfium \
@@ -234,6 +252,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Mon Apr 26 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.11.0~3f8a021-2
+- Update to kleisauke/libvips@3f8a021
+
 * Tue Apr 20 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.11.0~3551706-1
 - Test reuse-threads branch
 
