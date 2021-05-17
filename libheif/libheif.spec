@@ -1,5 +1,5 @@
 Name:           libheif
-Version:        1.11.0
+Version:        1.12.0
 Release:        1%{?dist}
 Summary:        HEIF file format decoder and encoder
 
@@ -75,6 +75,9 @@ find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 
 
 %changelog
+* Mon May 17 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.12.0-1
+- Update to 1.12.0
+
 * Sun Feb  7 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.11.0-1
 - Update to 1.11.0
 
