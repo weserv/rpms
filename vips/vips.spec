@@ -7,12 +7,11 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.10
-%global vips_version %{vips_version_base}.6
+%global vips_version_base 8.11
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
-#global vips_tarver %%{vips_version}%%{?vips_prever:-%%{vips_prever}}
-%global vips_tarver %{vips_version}
+%global vips_prever rc1
+%global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -32,16 +31,13 @@
 %bcond_with                libspng
 %endif
 
+%bcond_without             im6
+%bcond_with                im7
+%bcond_with                gm
 %bcond_without             libheif
 
-%if %{with libheif}
-Name:		vips-full
-# Keep vips-full release > vips release
-Release:	2%{?dist}
-%else
 Name:		vips
 Release:	1%{?dist}
-%endif
 Version:	%{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:	C/C++ library for processing large images
 
@@ -51,12 +47,6 @@ Source0:	https://github.com/libvips/libvips/releases/download/v%{vips_version}%{
 
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(expat)
-%if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
-BuildRequires:	ImageMagick-devel
-%else
-# Ensure we use version 6 (same as imagick ext).
-BuildRequires:	ImageMagick6-devel
-%endif
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 BuildRequires:	pkgconfig(orc-0.4)
 BuildRequires:	pkgconfig(lcms2)
@@ -70,21 +60,28 @@ BuildRequires:	pkgconfig(libwebp) > 1
 BuildRequires:	pkgconfig(libexif)
 BuildRequires:	pkgconfig(libgsf-1)
 BuildRequires:	pkgconfig(librsvg-2.0) >= 2.50.0
-BuildRequires:	pkgconfig(poppler-glib)
 BuildRequires:	pkgconfig(libjpeg)
 %if %{with libspng}
 BuildRequires:	pkgconfig(spng) >= 0.6
 %endif
-%if %{with libheif}
-BuildRequires:	pkgconfig(libheif) >= 1.3
-%endif
 %if %{with libimagequant}
 BuildRequires:	pkgconfig(imagequant) >= 2.11.10
 %endif
-BuildRequires:	giflib-devel
 
 BuildRequires:	gcc-c++
 BuildRequires:	pkgconfig gettext
+
+%if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
+Suggests:   %{name}-heif
+# im6 is temporarily recommended for smooth upgrade from 8.10
+# user can remove / replace with alternative
+Recommends: %{name}-magick-im6
+Recommends: %{name}-openslide
+Recommends: %{name}-poppler
+%else
+Requires:   %{name}-openslide
+Requires:   %{name}-poppler
+%endif
 
 
 %description
@@ -95,18 +92,21 @@ with color.
 This package should be installed if you want to use a program compiled
 against VIPS.
 
+Additional image formats are supported in additional optional packages:
+* %{name}-heif
+* %{name}-openslide
+* %{name}-poppler
+* %{name}-magick-im6 using ImageMagick version 6
+* %{name}-magick-im7 using ImageMagick version 7
+* %{name}-magick-gm  using GraphicsMagick
+
+
 
 %package devel
 Summary:	Development files for %{name}
 Requires:	libjpeg-devel%{?_isa} libtiff-devel%{?_isa} zlib-devel%{?_isa}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-# for consistency, same version at buildtime and runtime
-%if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
-Requires:	ImageMagick-devel
-%else
-# Ensure we use version 6 (same as imagick ext).
-Requires:	ImageMagick6-devel
-%endif
+Obsoletes:  vips-full-devel < 8.11
 
 %description devel
 The %{name}-devel package contains the header files and
@@ -117,6 +117,7 @@ contains a C++ API and development documentation.
 %package tools
 Summary:	Command-line tools for %{name}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
+Obsoletes:  vips-full-tools < 8.11
 
 %description tools
 The %{name}-tools package contains command-line tools for working with VIPS.
@@ -127,10 +128,82 @@ The %{name}-tools package contains command-line tools for working with VIPS.
 Summary:	Documentation for %{name}
 BuildRequires: swig gtk-doc
 Conflicts:	%{name} < %{version}-%{release}, %{name} > %{version}-%{release}
+Obsoletes:  vips-full-doc < 8.11
 
 %description doc
 The %{name}-doc package contains extensive documentation about VIPS in both
 HTML and PDF formats.
+%endif
+
+%if %{with libheif}
+%package heif
+Summary:	   heif support for %{name}
+BuildRequires: pkgconfig(libheif) >= 1.3
+Requires:      %{name} = %{version}-%{release}
+Obsoletes:     vips-full < 8.11
+
+%description heif
+The %{name}-heif package contains the heif module.
+%endif
+
+%package openslide
+Summary:	   openslide support for %{name}
+BuildRequires: pkgconfig(openslide) >= 3.3.0
+Requires:      %{name} = %{version}-%{release}
+
+%description openslide
+The %{name}-openslide package contains the openslide module.
+
+%package poppler
+Summary:	   poppler support for %{name}
+BuildRequires: pkgconfig(poppler-glib)
+Requires:      %{name} = %{version}-%{release}
+
+%description poppler
+The %{name}-poppler package contains the poppler module.
+
+%if %{with im6}
+%package magick-im6
+Summary:	   magick support for %{name} using ImageMagick6
+%if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
+BuildRequires: ImageMagick-devel
+%else
+# Ensure we use version 6 (same as imagick ext).
+BuildRequires: ImageMagick6-devel
+%endif
+Requires:      %{name} = %{version}-%{release}
+Provides:      %{name}-magick = %{version}-%{release}
+Conflicts:     %{name}-magick-im7
+Conflicts:     %{name}-magick-gm
+
+%description magick-im6
+The %{name}-magick-im6 package contains the magick module using ImageMagick6.
+%endif
+
+%if %{with im7}
+%package magick-im7
+Summary:	   magick support for %{name} using ImageMagick7
+BuildRequires: ImageMagick7-devel
+Requires:      %{name} = %{version}-%{release}
+Provides:      %{name}-magick = %{version}-%{release}
+Conflicts:     %{name}-magick-im6
+Conflicts:     %{name}-magick-gm
+
+%description magick-im7
+The %{name}-magick-im7 package contains the magick module using ImageMagick7.
+%endif
+
+%if %{with gm}
+%package magick-gm
+Summary:	   magick support for %{name} using ImageMagick7
+BuildRequires: GraphicsMagick-devel
+Requires:      %{name} = %{version}-%{release}
+Provides:      %{name}-magick = %{version}-%{release}
+Conflicts:     %{name}-magick-im6
+Conflicts:     %{name}-magick-im7
+
+%description magick-gm
+The %{name}-magick-gm contains the magick module using GraphicsMagick.
 %endif
 
 
@@ -155,7 +228,7 @@ export CFLAGS="%{optflags} -ftree-vectorize"
 export CXXFLAGS="%{optflags} -ftree-vectorize"
 %configure \
 %if %{with libheif}
-    --with-heif \
+    --with-heif=module \
 %else
     --without-heif \
 %endif
@@ -169,8 +242,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %else
     --without-libspng \
 %endif
+    --without-libjxl \
+    --without-libopenjp2 \
     --without-fftw \
-    --without-openslide \
     --without-pdfium \
     --without-cfitsio \
     --without-OpenEXR \
@@ -178,6 +252,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     --without-matio \
 %if %{with doc}
     --enable-gtk-doc \
+%endif
+%if %{with gm}
+    --with-magickpackage=GraphicsMagick \
 %endif
     --disable-static
 make %{?_smp_mflags}
@@ -209,6 +286,7 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %license COPYING
 %{_libdir}/*.so.%{vips_soname_major}*
 %{_libdir}/girepository-1.0
+%dir %{_libdir}/vips-modules-%{vips_version_base}
 
 
 %files devel
@@ -231,7 +309,38 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %endif
 
 
+%files openslide
+%{_libdir}/vips-modules-%{vips_version_base}/vips-openslide.so
+
+%files poppler
+%{_libdir}/vips-modules-%{vips_version_base}/vips-poppler.so
+
+%if %{with libheif}
+%files heif
+%{_libdir}/vips-modules-%{vips_version_base}/vips-heif.so
+%endif
+
+%if %{with im6}
+%files magick-im6
+%{_libdir}/vips-modules-%{vips_version_base}/vips-magick.so
+%endif
+
+%if %{with im7}
+%files magick-im7
+%{_libdir}/vips-modules-%{vips_version_base}/vips-magick.so
+%endif
+
+%if %{with gm}
+%files magick-gm
+%{_libdir}/vips-modules-%{vips_version_base}/vips-magick.so
+%endif
+
+
 %changelog
+* Sat Jun  5 2021 Remi Collet <remi@remirepo.net> - 8.11.0~rc1-1
+- update to 8.11.0rc1
+- split modules in sub-packages
+
 * Sat Mar 27 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.10.6-1
 - Update to 8.10.6
 
