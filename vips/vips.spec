@@ -10,7 +10,7 @@
 %global vips_version_base 8.11
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc1
+#global vips_prever rc1
 %global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
@@ -31,10 +31,14 @@
 %bcond_with                libspng
 %endif
 
+# 2 builds needed to get the full stack
+# --without im6 --with im7
+# --without im6 --with gm
+
 %bcond_without             im6
 %bcond_with                im7
 %bcond_with                gm
-%bcond_without             libheif
+%bcond_without             heif
 
 Name:		vips
 Release:	1%{?dist}
@@ -135,7 +139,7 @@ The %{name}-doc package contains extensive documentation about VIPS in both
 HTML and PDF formats.
 %endif
 
-%if %{with libheif}
+%if %{with heif}
 %package heif
 Summary:	   heif support for %{name}
 BuildRequires: pkgconfig(libheif) >= 1.3
@@ -227,7 +231,7 @@ sed -i 's|sys_lib_dlsearch_path_spec="|sys_lib_dlsearch_path_spec="/%{_lib} %{_l
 export CFLAGS="%{optflags} -ftree-vectorize"
 export CXXFLAGS="%{optflags} -ftree-vectorize"
 %configure \
-%if %{with libheif}
+%if %{with heif}
     --with-heif=module \
 %else
     --without-heif \
@@ -315,7 +319,7 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %files poppler
 %{_libdir}/vips-modules-%{vips_version_base}/vips-poppler.so
 
-%if %{with libheif}
+%if %{with heif}
 %files heif
 %{_libdir}/vips-modules-%{vips_version_base}/vips-heif.so
 %endif
@@ -337,6 +341,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Thu Jun 10 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.11.0-1
+- Update to 8.11.0
+
 * Sat Jun  5 2021 Remi Collet <remi@remirepo.net> - 8.11.0~rc1-1
 - update to 8.11.0rc1
 - split modules in sub-packages
