@@ -4,7 +4,7 @@
 
 Name:           rav1e
 Version:        %{rav1e_version}%{?rav1e_prever:~%{rav1e_prever}}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Fastest and safest AV1 encoder
 
 # Upstream license specification: BSD-2-Clause
@@ -19,7 +19,7 @@ Source1:        https://rpms.weserv.nl/sources/%{name}-%{rav1e_tarver}-vendor.ta
 
 BuildRequires:  cargo-c
 BuildRequires:  nasm >= 2.14.0
-BuildRequires:  rust-toolset >= 1.44.1
+BuildRequires:  rust-toolset >= 1.49.0
 
 %description
 Fastest and safest AV1 encoder.
@@ -82,6 +82,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Tue Jul  6 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.4.1-2
+- Rebuilt with Rust 1.49.0 and cargo-c 0.8.1
+
 * Tue Apr  6 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.4.1-1
 - Update to 0.4.1
 
