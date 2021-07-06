@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.11
-%global vips_version %{vips_version_base}.0
+%global vips_version %{vips_version_base}.2
 %global vips_soname_major 42
 #global vips_prever rc1
 %global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -31,6 +31,16 @@
 %bcond_with                libspng
 %endif
 
+%if 0%{?fedora} >= 34
+%bcond_without             openjpeg2
+%else
+# disabled by default
+# as vips pulls poppler (libopenjpeg) and IM (libopenjp2)
+# so vips segfaults in various place
+# also see https://github.com/libvips/libvips/pull/2305
+%bcond_with                openjpeg2
+%endif
+
 # 2 builds needed to get the full stack
 # --without im6 --with im7
 # --without im6 --with gm
@@ -40,40 +50,47 @@
 %bcond_with                gm
 %bcond_without             heif
 
-Name:		vips
-Release:	1%{?dist}
-Version:	%{vips_version}%{?vips_prever:~%{vips_prever}}
-Summary:	C/C++ library for processing large images
+Name:           vips
+Release:        2%{?dist}
+Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
+Summary:        C/C++ library for processing large images
 
-License:	LGPLv2+
-URL:		https://libvips.github.io/libvips/
-Source0:	https://github.com/libvips/libvips/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
+License:        LGPLv2+
+URL:            https://libvips.github.io/libvips/
+Source0:        https://github.com/libvips/libvips/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
 
-BuildRequires:	pkgconfig(glib-2.0)
-BuildRequires:	pkgconfig(expat)
-BuildRequires:	pkgconfig(gobject-introspection-1.0)
-BuildRequires:	pkgconfig(orc-0.4)
-BuildRequires:	pkgconfig(lcms2)
-BuildRequires:	pkgconfig(pangoft2)
-BuildRequires:	pkgconfig(zlib)
-BuildRequires:	pkgconfig(libpng) >= 1.2.9
-BuildRequires:	pkgconfig(libtiff-4)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(expat)
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  pkgconfig(orc-0.4)
+BuildRequires:  pkgconfig(lcms2)
+BuildRequires:  pkgconfig(pangoft2)
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  pkgconfig(libpng) >= 1.2.9
+BuildRequires:  pkgconfig(libtiff-4)
 # Ensure we use libwebp7 on EL-7
 # upstream requires 0.6
-BuildRequires:	pkgconfig(libwebp) > 1
-BuildRequires:	pkgconfig(libexif)
-BuildRequires:	pkgconfig(libgsf-1)
-BuildRequires:	pkgconfig(librsvg-2.0) >= 2.50.0
-BuildRequires:	pkgconfig(libjpeg)
+BuildRequires:  pkgconfig(libwebp) > 1
+BuildRequires:  pkgconfig(libexif)
+BuildRequires:  pkgconfig(libgsf-1)
+BuildRequires:  pkgconfig(librsvg-2.0) >= 2.50.0
+BuildRequires:  pkgconfig(libjpeg)
 %if %{with libspng}
-BuildRequires:	pkgconfig(spng) >= 0.6
+BuildRequires:  pkgconfig(spng) >= 0.6
+%endif
+%if %{with openjpeg2}
+BuildRequires:  pkgconfig(libopenjp2) >= 2.4
 %endif
 %if %{with libimagequant}
-BuildRequires:	pkgconfig(imagequant) >= 2.11.10
+BuildRequires: pkgconfig(imagequant) >= 2.11.10
 %endif
 
-BuildRequires:	gcc-c++
-BuildRequires:	pkgconfig gettext
+BuildRequires:  gcc-c++
+BuildRequires:  pkgconfig gettext
+
+# Not available as system library
+# and altered by vips upstream
+Provides:       bundled(libnsgif)
 
 %if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
 Suggests:   %{name}-heif
@@ -107,9 +124,9 @@ Additional image formats are supported in additional optional packages:
 
 
 %package devel
-Summary:	Development files for %{name}
-Requires:	libjpeg-devel%{?_isa} libtiff-devel%{?_isa} zlib-devel%{?_isa}
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:    Development files for %{name}
+Requires:   libjpeg-devel%{?_isa} libtiff-devel%{?_isa} zlib-devel%{?_isa}
+Requires:   %{name}%{?_isa} = %{version}-%{release}
 Obsoletes:  vips-full-devel < 8.11
 
 %description devel
@@ -119,8 +136,8 @@ contains a C++ API and development documentation.
 
 
 %package tools
-Summary:	Command-line tools for %{name}
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:    Command-line tools for %{name}
+Requires:   %{name}%{?_isa} = %{version}-%{release}
 Obsoletes:  vips-full-tools < 8.11
 
 %description tools
@@ -129,10 +146,11 @@ The %{name}-tools package contains command-line tools for working with VIPS.
 
 %if %{with doc}
 %package doc
-Summary:	Documentation for %{name}
-BuildRequires: swig gtk-doc
-Conflicts:	%{name} < %{version}-%{release}, %{name} > %{version}-%{release}
-Obsoletes:  vips-full-doc < 8.11
+Summary:       Documentation for %{name}
+BuildRequires: gtk-doc
+BuildRequires: doxygen
+Conflicts:     %{name} < %{version}-%{release}, %{name} > %{version}-%{release}
+Obsoletes:     vips-full-doc < 8.11
 
 %description doc
 The %{name}-doc package contains extensive documentation about VIPS in both
@@ -141,73 +159,82 @@ HTML and PDF formats.
 
 %if %{with heif}
 %package heif
-Summary:	   heif support for %{name}
+Summary:       Heif support for %{name}
 BuildRequires: pkgconfig(libheif) >= 1.3
-Requires:      %{name} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 Obsoletes:     vips-full < 8.11
 
 %description heif
-The %{name}-heif package contains the heif module.
+The %{name}-heif package contains the Heif module for VIPS.
 %endif
 
 %package openslide
-Summary:	   openslide support for %{name}
+Summary:       OpenSlide support for %{name}
 BuildRequires: pkgconfig(openslide) >= 3.3.0
-Requires:      %{name} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
 %description openslide
-The %{name}-openslide package contains the openslide module.
+The %{name}-openslide package contains the OpenSlide module for VIPS.
 
 %package poppler
-Summary:	   poppler support for %{name}
+Summary:       Poppler support for %{name}
 BuildRequires: pkgconfig(poppler-glib)
-Requires:      %{name} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
 %description poppler
-The %{name}-poppler package contains the poppler module.
+The %{name}-poppler package contains the Poppler module for VIPS.
 
 %if %{with im6}
 %package magick-im6
-Summary:	   magick support for %{name} using ImageMagick6
+Summary:       Magick support for %{name} using ImageMagick6
 %if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
 BuildRequires: ImageMagick-devel
 %else
 # Ensure we use version 6 (same as imagick ext).
 BuildRequires: ImageMagick6-devel
 %endif
-Requires:      %{name} = %{version}-%{release}
-Provides:      %{name}-magick = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+%if 0%{?fedora} >= 35
+Obsoletes:     %{name}-magick         < %{version}-%{release}
+%endif
+Provides:      %{name}-magick         = %{version}-%{release}
+Provides:      %{name}-magick%{?_isa} = %{version}-%{release}
 Conflicts:     %{name}-magick-im7
 Conflicts:     %{name}-magick-gm
 
 %description magick-im6
-The %{name}-magick-im6 package contains the magick module using ImageMagick6.
+The %{name}-magick-im6 package contains the Magick module for VIPS
+using ImageMagick version 6.
 %endif
 
 %if %{with im7}
 %package magick-im7
-Summary:	   magick support for %{name} using ImageMagick7
+Summary:       Magick support for %{name} using ImageMagick7
 BuildRequires: ImageMagick7-devel
-Requires:      %{name} = %{version}-%{release}
-Provides:      %{name}-magick = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+Provides:      %{name}-magick         = %{version}-%{release}
+Provides:      %{name}-magick%{?_isa} = %{version}-%{release}
 Conflicts:     %{name}-magick-im6
 Conflicts:     %{name}-magick-gm
 
 %description magick-im7
-The %{name}-magick-im7 package contains the magick module using ImageMagick7.
+The %{name}-magick-im7 package contains the Magick module for VIPS
+using ImageMagick version 7.
 %endif
 
 %if %{with gm}
 %package magick-gm
-Summary:	   magick support for %{name} using ImageMagick7
+Summary:       Magick support for %{name} using GraphicsMagick
 BuildRequires: GraphicsMagick-devel
-Requires:      %{name} = %{version}-%{release}
-Provides:      %{name}-magick = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+Provides:      %{name}-magick         = %{version}-%{release}
+Provides:      %{name}-magick%{?_isa} = %{version}-%{release}
 Conflicts:     %{name}-magick-im6
 Conflicts:     %{name}-magick-im7
 
 %description magick-gm
-The %{name}-magick-gm contains the magick module using GraphicsMagick.
+The %{name}-magick-gm contains the Magick module for VIPS
+using GraphicsMagick.
 %endif
 
 
@@ -217,7 +244,7 @@ The %{name}-magick-gm contains the magick module using GraphicsMagick.
 # make the version string consistent for multiarch
 export FAKE_BUILD_DATE=$(date -r %{SOURCE0})
 sed -i "s/\\(VIPS_VERSION_STRING=\\)\$VIPS_VERSION-\`date\`/\\1\"\$VIPS_VERSION-$FAKE_BUILD_DATE\"/g" \
-	configure
+   configure
 unset FAKE_BUILD_DATE
 
 # Avoid setting RPATH to /usr/lib64 on 64-bit builds
@@ -240,6 +267,11 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     --with-imagequant \
 %else
     --without-imagequant \
+%endif
+%if %{with openjpeg2}
+    --with-libopenjp2 \
+%else
+    --without-libopenjp2 \
 %endif
 %if %{with libspng}
     --with-libspng \
@@ -275,6 +307,10 @@ rm -rf %{buildroot}%{_datadir}/doc/vips
 sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipsprofile
 %endif
 
+%if %{with doc}
+mv cplusplus/html cplusplus_html
+%endif
+
 # locale stuff
 %find_lang vips%{vips_version_base}
 
@@ -286,7 +322,7 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %files -f vips%{vips_version_base}.lang
-%doc AUTHORS NEWS THANKS ChangeLog
+%doc AUTHORS NEWS THANKS README.md ChangeLog
 %license COPYING
 %{_libdir}/*.so.%{vips_soname_major}*
 %{_libdir}/girepository-1.0
@@ -309,6 +345,7 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %if %{with doc}
 %files doc
 %doc doc/html
+%doc cplusplus_html
 %license COPYING
 %endif
 
@@ -341,6 +378,27 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Mon Jul  5 2021 Remi Collet <remi@remirepo.net> - 8.11.2-2
+- rebuild with latest changes from Fedora
+
+* Mon Jul 05 2021 Benjamin Gilbert <bgilbert@backtick.net> - 8.11.2-2
+- Add doxygen C++ docs to vips-devel
+- Use arch-specific Requires in plugin subpackages
+- Provide bundled(libnsgif)
+- Drop some redundant version restrictions
+
+* Sun Jul  4 2021 Remi Collet <remi@remirepo.net> - 8.11.2-1
+- update to 8.11.2
+- drop patch merged (and improved) upstream
+
+* Tue Jun 15 2021 Remi Collet <remi@remirepo.net> - 8.11.1-1
+- update to 8.11.1
+
+* Tue Jun 15 2021 Remi Collet <remi@remirepo.net> - 8.11.0-1.2
+- test build for fix for bad prefix guess from
+  https://github.com/libvips/libvips/pull/2308
+- only use openjpeg2 >= 2.4 (Fedora >= 34)
+
 * Thu Jun 10 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.11.0-1
 - Update to 8.11.0
 
