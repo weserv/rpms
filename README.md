@@ -1,6 +1,6 @@
 # rpms.weserv.nl
 
-Spec files and patches used for building libvips and dependencies that are not included (or outdated) in CentOS or EPEL.
+Spec files and patches used for building libvips and dependencies that are not included (or outdated) in RHEL (and it's derivatives).
 
 ## Building the RPMs
 
