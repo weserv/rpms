@@ -1,7 +1,7 @@
 %bcond_without check
 
 Name:           cargo-c
-Version:        0.7.2
+Version:        0.8.1
 Release:        1%{?dist}
 Summary:        Helper program to build and install c-like libraries
 
@@ -14,7 +14,7 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 # Created using cargo-vendor
 Source1:        https://rpms.weserv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
-BuildRequires:  rust-toolset >= 1.44.1
+BuildRequires:  rust-toolset >= 1.49.0
 
 %description
 Helper program to build and install c-like libraries.
@@ -45,6 +45,9 @@ Helper program to build and install c-like libraries.
 %endif
 
 %changelog
+* Tue Jul  6 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.8.1-1
+- Update to 0.8.1
+
 * Sun Feb  7 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.7.2-1
 - Update to 0.7.2
 
