@@ -13,7 +13,7 @@
 Name:           librsvg2
 Summary:        An SVG library based on cairo
 Version:        2.50.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/LibRsvg
@@ -134,8 +134,11 @@ rm -vrf %{buildroot}%{_datadir}/doc
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Thu Aug 12 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.5-3
+- Rebuild with Rust 1.52.1
+
 * Tue Jul  6 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.5-2
-- Rebuilt with Rust 1.49.0
+- Rebuild with Rust 1.49.0
 
 * Mon May 17 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.5-1
 - Update to 2.50.5
