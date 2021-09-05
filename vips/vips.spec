@@ -7,11 +7,11 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.11
-%global vips_version %{vips_version_base}.2
+%global vips_version_base 8.12
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
-%global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
+%global vips_prever 99724e6
+%global vips_tarver 99724e60977b6db70666015e66962df3ce4f6376
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -51,13 +51,13 @@
 %bcond_without             heif
 
 Name:           vips
-Release:        2%{?dist}
+Release:        1%{?dist}
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
 URL:            https://libvips.github.io/libvips/
-Source0:        https://github.com/libvips/libvips/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
+Source0:        https://github.com/libvips/libvips/archive/%{vips_tarver}.tar.gz
 
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(expat)
@@ -84,6 +84,7 @@ BuildRequires:  pkgconfig(libopenjp2) >= 2.4
 %if %{with libimagequant}
 BuildRequires: pkgconfig(imagequant) >= 2.11.10
 %endif
+BuildRequires:  pkgconfig(cgif)
 
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig gettext
@@ -239,7 +240,9 @@ using GraphicsMagick.
 
 
 %prep
-%setup -q -n vips-%{vips_version}
+%setup -q -n libvips-%{vips_tarver}
+
+NOCONFIGURE=1 ./autogen.sh
 
 # make the version string consistent for multiarch
 export FAKE_BUILD_DATE=$(date -r %{SOURCE0})
@@ -292,6 +295,7 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %if %{with gm}
     --with-magickpackage=GraphicsMagick \
 %endif
+    --disable-magicksave \
     --disable-static
 make %{?_smp_mflags}
 
@@ -378,6 +382,9 @@ mv cplusplus/html cplusplus_html
 
 
 %changelog
+* Sun Sep  5 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0~99724e6-1
+- Test libvips 8.12 with cgif
+
 * Mon Jul  5 2021 Remi Collet <remi@remirepo.net> - 8.11.2-2
 - rebuild with latest changes from Fedora
 

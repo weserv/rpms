@@ -39,6 +39,7 @@ Build the RPM as a non-root user from your home directory:
     spectool -g -R rpmbuild/SPECS/harfbuzz.spec
     spectool -g -R rpmbuild/SPECS/librsvg2.spec
     spectool -g -R rpmbuild/SPECS/libspng.spec
+    spectool -g -R rpmbuild/SPECS/cgif.spec
     spectool -g -R rpmbuild/SPECS/vips.spec
     ```
 
@@ -54,5 +55,6 @@ Build the RPM as a non-root user from your home directory:
     rpmbuild -ba rpmbuild/SPECS/harfbuzz.spec
     rpmbuild -ba rpmbuild/SPECS/librsvg2.spec
     rpmbuild -ba rpmbuild/SPECS/libspng.spec
+    rpmbuild -ba rpmbuild/SPECS/cgif.spec
     rpmbuild -ba rpmbuild/SPECS/vips.spec
     ```
