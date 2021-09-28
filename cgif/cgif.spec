@@ -1,8 +1,8 @@
-%global cgif_version 0.0.0
-%global cgif_prever 80bd8fb
-%global cgif_tarver 80bd8fb500dd3ac108c2b8dcc1dcfa9dd597323b
+%global cgif_version 0.0.1
+%global cgif_prever f414411
+%global cgif_tarver f414411976a7dc559663b7bd9cd53cc061bed0fc
 
-Name:           cgif
+Name:           libcgif
 Version:        %{cgif_version}%{?cgif_prever:~%{cgif_prever}}
 Release:        1%{?dist}
 Summary:        A fast and lightweight GIF encoder
@@ -17,22 +17,16 @@ BuildRequires:  meson
 %description
 CGIF is a fast and lightweight C library for creating GIF images.
 
-%package     -n libcgif
-Summary:        Library files for %{name}
-
-%description -n libcgif
-Library files for %{name}, the fast and lightweight GIF encoder.
-
-%package     -n libcgif-devel
+%package        devel
 Summary:        Development files for %{name}
-Requires:       libcgif%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description -n libcgif-devel
-The libcgif-devel package contains libraries and header files for
+%description    devel
+The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -p1 -n %{name}-%{cgif_tarver}
+%autosetup -p1 -n cgif-%{cgif_tarver}
 
 %build
 %meson -Dtests=true
@@ -44,15 +38,20 @@ developing applications that use %{name}.
 %check
 %meson_test
 
-%files -n libcgif
+%files
 %license LICENSE
 %doc README.md
-%{_libdir}/libcgif.so
+%{_libdir}/libcgif.so.0*
 
-%files -n libcgif-devel
+%files devel
 %{_includedir}/cgif.h
+%{_libdir}/libcgif.so
 %{_libdir}/pkgconfig/cgif.pc
 
 %changelog
+* Tue Sep 28 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1~f414411-1
+- Update to dloebl/cgif@f414411
+- Change package name to libcgif
+
 * Sun Sep  5 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.0~99724e6-1
 - Initial package
