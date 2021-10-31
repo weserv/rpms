@@ -10,8 +10,8 @@
 %global vips_version_base 8.12
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever b2527da
-%global vips_tarver b2527da53143a38bca96f4a3371ccd0856c0268b
+%global vips_prever 5f101b4
+%global vips_tarver 5f101b4f2e99df5577346e560cc703871e4ba65f
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -51,7 +51,7 @@
 %bcond_without             heif
 
 Name:           vips
-Release:        5%{?dist}
+Release:        6%{?dist}
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:        C/C++ library for processing large images
 
@@ -383,6 +383,9 @@ mv cplusplus/html cplusplus_html
 
 
 %changelog
+* Sun Oct 31 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0~5f101b4-6
+- Update to libvips/libvips@5f101b4
+
 * Tue Oct 19 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0~b2527da-5
 - Update to libvips/libvips@b2527da
 
