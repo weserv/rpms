@@ -1,0 +1,38 @@
+From d06b26cc12c730e309c0e41ddd1af91d2d2b1640 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Sat, 6 Nov 2021 18:46:13 +0100
+Subject: [PATCH] Prefer to use `ngx_module_incs` for the include path
+
+---
+ config                           | 1 +
+ third_party/nginx/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/config b/config
+index 26027dc..5499ad6 100644
+--- a/config
++++ b/config
+@@ -10,6 +10,7 @@ fi
+ ngx_addon_name=ngx_weserv_module
+ ngx_module_type=HTTP_AUX_FILTER
+ ngx_module_name=$ngx_addon_name
++ngx_module_incs="$ngx_addon_dir/include"
+ ngx_module_deps=" \
+   $ngx_addon_dir/src/nginx/alloc.h \
+   $ngx_addon_dir/src/nginx/environment.h \
+diff --git a/third_party/nginx/CMakeLists.txt b/third_party/nginx/CMakeLists.txt
+index 80248c0..46f55a2 100644
+--- a/third_party/nginx/CMakeLists.txt
++++ b/third_party/nginx/CMakeLists.txt
+@@ -8,7 +8,7 @@ list(APPEND NGX_CONFIGURE_OPTS
+         #--with-debug
+         "--with-cc=${CMAKE_C_COMPILER}"
+         "--with-cpp=${CMAKE_CXX_COMPILER}"
+-        "--with-cc-opt=-I${PROJECT_SOURCE_DIR}/include ${CUSTOM_NGX_CC_OPT}"
++        "--with-cc-opt=${CUSTOM_NGX_CC_OPT}"
+         "--with-ld-opt=-L${PROJECT_SOURCE_DIR}/lib -Wl,-rpath,${PROJECT_SOURCE_DIR}/lib ${CUSTOM_NGX_LD_OPT}"
+         )
+ 
+-- 
+2.33.1
+

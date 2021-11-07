@@ -10,6 +10,7 @@ Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
 BuildRequires:  nasm >= 2.14.0
 BuildRequires:  doxygen
+BuildRequires:  graphviz
 BuildRequires:  meson >= 0.47.0
 
 Requires:       libdav1d%{?_isa} = %{version}-%{release}
@@ -75,7 +76,6 @@ Development files for dav1d, the AV1 cross-platform Decoder.
 
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.8.0-2
 - Import from Fedora
-- Drop graphviz dependency
 - Build with nasm from weserv repo
 
 * Sat Dec 05 2020 Robert-André Mauchin <zebob.m@gmail.com> - 0.8.0-1

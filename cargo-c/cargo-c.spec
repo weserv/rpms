@@ -15,6 +15,7 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        https://rpms.weserv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 BuildRequires:  rust-toolset >= 1.52.1
+BuildRequires:  pkgconfig(openssl) >= 1.0.1
 
 %description
 Helper program to build and install c-like libraries.

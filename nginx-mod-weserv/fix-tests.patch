@@ -1,0 +1,25 @@
+From cea98fa86a36018c6d58e5bc7e13fec42931c1fe Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Sat, 6 Nov 2021 22:27:46 +0100
+Subject: [PATCH] Reduce blur sigma within timeout unit test
+
+---
+ test/api/exceptions/unit-timeout.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/api/exceptions/unit-timeout.cpp b/test/api/exceptions/unit-timeout.cpp
+index ea9e613..56f71a4 100644
+--- a/test/api/exceptions/unit-timeout.cpp
++++ b/test/api/exceptions/unit-timeout.cpp
+@@ -7,7 +7,7 @@ using Catch::Matchers::Contains;
+ TEST_CASE("process timeout", "[timeout]") {
+     SECTION("image") {
+         auto test_image = fixtures->input_jpg;
+-        auto params = "blur=1000";
++        auto params = "blur=100";
+         auto config = Config();
+         config.process_timeout = 1;
+ 
+-- 
+2.33.1
+

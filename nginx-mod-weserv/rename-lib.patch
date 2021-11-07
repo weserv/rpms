@@ -1,0 +1,111 @@
+From 435ac07c77ecb364d0398f9a03196d88111d2127 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Sat, 6 Nov 2021 19:27:36 +0100
+Subject: [PATCH] Use weserv as project, CLI and shared library name
+
+---
+ CMakeLists.txt   |  6 +++---
+ config           |  2 +-
+ docker/README.md | 18 +++++++++---------
+ 3 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8b6823d..b218d3a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ # Note: The FetchContent module was added in CMake 3.11
+ cmake_minimum_required(VERSION 3.11)
+ 
+-project(imagesweserv
++project(weserv
+         VERSION 5.0.0
+         DESCRIPTION "Image cache and resize service"
+         LANGUAGES
+@@ -20,7 +20,7 @@ option(ENABLE_SANITIZER "Build with clang sanitizer" OFF)
+ option(ENABLE_CLANG_TIDY "Enable source code checking using clang-tidy" OFF)
+ option(BUILD_TOOLS "Whether or not to build the tools" OFF)
+ option(BUILD_TESTS "Whether or not to build the tests" OFF)
+-option(INSTALL_NGX_MODULE "Install nginx along with the imagesweserv module" ON)
++option(INSTALL_NGX_MODULE "Build and install nginx along with the weserv module" ON)
+ 
+ # Set a default build type if none was specified
+ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+@@ -84,7 +84,7 @@ if (NOT mpark_variant_FOUND)
+     add_subdirectory(third_party/variant)
+ endif()
+ 
+-# Create a shared imagesweserv library
++# Create the shared API library
+ add_subdirectory(src/api)
+ 
+ if (BUILD_TOOLS)
+diff --git a/config b/config
+index 5499ad6..b78c520 100644
+--- a/config
++++ b/config
+@@ -37,7 +37,7 @@ ngx_module_srcs=" \
+   $ngx_addon_dir/src/nginx/uri_parser.cpp \
+   $ngx_addon_dir/src/nginx/util.cpp \
+ "
+-ngx_module_libs="-lstdc++ -limagesweserv"
++ngx_module_libs="-lstdc++ -lweserv"
+ 
+ . auto/module
+ 
+diff --git a/docker/README.md b/docker/README.md
+index 75dc897..2559632 100644
+--- a/docker/README.md
++++ b/docker/README.md
+@@ -6,7 +6,7 @@ This document describes how to use images.weserv.nl with Docker.
+ 
+ 1. Pull and run the `ghcr.io/weserv/images` container.
+    ```bash
+-   docker run -d -p 8080:80 --shm-size=1gb --name=imagesweserv ghcr.io/weserv/images:5.x
++   docker run -d -p 8080:80 --shm-size=1gb --name=weserv ghcr.io/weserv/images:5.x
+    ```
+    (this maps TCP port 80 in the container to port 8080 on the Docker host)
+ 
+@@ -23,7 +23,7 @@ This document describes how to use images.weserv.nl with Docker.
+ 
+ 2. Run the container (same as above, but using the recently built tag).
+    ```bash
+-   docker run -d -p 8080:80 --shm-size=1gb --name=imagesweserv weserv/images
++   docker run -d -p 8080:80 --shm-size=1gb --name=weserv weserv/images
+    ```
+ 
+ 3. Visit [`http://localhost:8080/`](http://localhost:8080/).
+@@ -34,23 +34,23 @@ This document describes how to use images.weserv.nl with Docker.
+ 
+ ```bash
+ # bash commands
+-docker exec -it imagesweserv bash
++docker exec -it weserv bash
+ 
+ # Check nginx configuration for correct syntax
+-docker exec imagesweserv nginx -t
++docker exec weserv nginx -t
+ 
+ # Reload the nginx configuration file
+-docker exec imagesweserv nginx -s reload
++docker exec weserv nginx -s reload
+ 
+ # Update RPM packages
+-docker exec imagesweserv dnf update -y
++docker exec weserv dnf update -y
+ 
+ # Retrieve an IP Address
+-docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -f name=imagesweserv -q)
+-docker inspect $(docker ps -f name=imagesweserv -q) | grep IPAddress
++docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -f name=weserv -q)
++docker inspect $(docker ps -f name=weserv -q) | grep IPAddress
+ 
+ # Access to logs
+-docker logs imagesweserv
++docker logs weserv
+ 
+ # Check CPU consumption
+ docker stats
+-- 
+2.33.1
+

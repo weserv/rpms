@@ -1,0 +1,48 @@
+From bd37dd8bbb082500960dbe0e4d967fb7c8aad809 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Sat, 6 Nov 2021 19:41:30 +0100
+Subject: [PATCH] Add a pkg-config file of the API library
+
+---
+ src/api/CMakeLists.txt |  9 +++++++++
+ src/api/weserv.pc.in   | 11 +++++++++++
+ 2 files changed, 20 insertions(+)
+ create mode 100644 src/api/weserv.pc.in
+
+diff --git a/src/api/CMakeLists.txt b/src/api/CMakeLists.txt
+index c5ddfb3..7e956ce 100644
+--- a/src/api/CMakeLists.txt
++++ b/src/api/CMakeLists.txt
+@@ -99,3 +99,12 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+         FILES_MATCHING PATTERN "*.h"
+         )
++
++# Add a pkg-config file
++configure_file("${CMAKE_CURRENT_SOURCE_DIR}/weserv.pc.in"
++        "weserv.pc" @ONLY
++        )
++
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/weserv.pc"
++        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
++        )
+diff --git a/src/api/weserv.pc.in b/src/api/weserv.pc.in
+new file mode 100644
+index 0000000..b9076e6
+--- /dev/null
++++ b/src/api/weserv.pc.in
+@@ -0,0 +1,11 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
++includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
++
++Name: weserv
++Description: API library of the Nginx weserv module
++Version: @PROJECT_VERSION@
++Requires.private: vips-cpp >= 8.9.0
++Libs: -L${libdir} -lweserv
++Cflags: -I${includedir}
+-- 
+2.33.1
+
