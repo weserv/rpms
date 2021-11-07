@@ -57,7 +57,7 @@ API library of %{name}.
 # Ensure nginx finds the shared API library during module build
 export RPM_LD_FLAGS="${RPM_LD_FLAGS} -L$(realpath lib)"
 
-%nginx_modconfigure
+%nginx_modconfigure --with-http_ssl_module
 %nginx_modbuild
 
 %check
@@ -94,6 +94,7 @@ popd
 %changelog
 * Sun Nov  7 2021  Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-2.20211104gitc2e3749
 - Add patch to warn when nginx was configured without --with-http_ssl_module
+- Ensure module is configured with SSL support
 
 * Sun Nov  7 2021  Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20211104gitc2e3749
 - Initial packaging
