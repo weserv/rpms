@@ -1,0 +1,48 @@
+From 652383811deb4e45c8cf3780ae5b0f958db2bbf5 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Sun, 7 Nov 2021 15:26:20 +0100
+Subject: [PATCH] Warn if nginx was configured without --with-http_ssl_module
+
+---
+ config             | 8 ++++++++
+ src/nginx/http.cpp | 5 ++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/config b/config
+index b78c520..3e9f701 100644
+--- a/config
++++ b/config
+@@ -7,6 +7,14 @@ END
+     exit 1
+ fi
+ 
++if [ $HTTP_SSL != YES ]; then
++cat << END
++
++$0: warning: NGINX configured without --with-http_ssl_module, SSL support is disabled within the Weserv module.
++
++END
++fi
++
+ ngx_addon_name=ngx_weserv_module
+ ngx_module_type=HTTP_AUX_FILTER
+ ngx_module_name=$ngx_addon_name
+diff --git a/src/nginx/http.cpp b/src/nginx/http.cpp
+index ff5b877..d201491 100644
+--- a/src/nginx/http.cpp
++++ b/src/nginx/http.cpp
+@@ -39,9 +39,8 @@ Status ngx_weserv_upstream_set_url(ngx_pool_t *pool,
+     ngx_memzero(&parsed_url, sizeof(parsed_url));
+ 
+     // Recognize the URL scheme.
+-    // only if NGINX has been compiled with NGX_HTTP_SSL support, try to
+-    // recognize a https:// scheme because the ssl related fields are not
+-    // defined otherwise.
++    // Try to recognize a https:// scheme only if NGINX has been compiled with
++    // SSL support, because the SSL related fields are not defined otherwise.
+     if (url.len > http.len &&
+         ngx_strncasecmp(url.data, http.data, http.len) == 0) {
+         upstream->schema = http;
+-- 
+2.33.1
+

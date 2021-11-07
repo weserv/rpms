@@ -6,7 +6,7 @@
 
 Name:           nginx-mod-weserv
 Version:        5.0.0
-Release:        1.%{commitdate}git%{shortcommit}%{?dist}
+Release:        2.%{commitdate}git%{shortcommit}%{?dist}
 Summary:        Nginx weserv module
 
 License:        BSD
@@ -17,6 +17,7 @@ Patch0:         nginx-include-path.patch
 Patch1:         rename-lib.patch
 Patch2:         add-pc-file.patch
 Patch3:         fix-tests.patch
+Patch4:         warn-if-no-ssl.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
@@ -91,5 +92,8 @@ popd
 
 
 %changelog
+* Sun Nov  7 2021  Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-2.20211104gitc2e3749
+- Add patch to warn when nginx was configured without --with-http_ssl_module
+
 * Sun Nov  7 2021  Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20211104gitc2e3749
 - Initial packaging
