@@ -1,8 +1,20 @@
 %bcond_without check
 
+# libgit2-sys expects to use its bundled library, which is sometimes just a
+# snapshot of libgit2's master branch.  This can mean the FFI declarations
+# won't match our released libgit2.so, e.g. having changed struct fields.
+# So, be careful if you toggle this...
+%bcond_without bundled_libgit2
+
+%if 0%{?rhel}
+%bcond_without bundled_libssh2
+%else
+%bcond_with bundled_libssh2
+%endif
+
 Name:           cargo-c
 Version:        0.9.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Helper program to build and install c-like libraries
 
 # Upstream license specification: MIT
@@ -15,6 +27,26 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        https://rpms.weserv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 BuildRequires:  rust-toolset >= 1.52.1
+# needed by curl-sys
+BuildRequires:  pkgconfig(libcurl)
+# needed by openssl-sys
+BuildRequires:  pkgconfig(openssl) >= 1.0.1
+
+%if %{with bundled_libgit2}
+Provides:       bundled(libgit2) = 1.2.0
+%else
+BuildRequires:  pkgconfig(libgit2) >= 1.1.0
+%endif
+
+%if %{with bundled_libssh2}
+Provides:       bundled(libssh2) = 1.10.0~dev
+%else
+# needs libssh2_userauth_publickey_frommemory
+BuildRequires:  pkgconfig(libssh2) >= 1.6.0
+%endif
+
+# It only supports being called as a subcommand, e.g. "cargo cbuild"
+Requires:       cargo
 
 %description
 Helper program to build and install c-like libraries.
@@ -34,6 +66,17 @@ Helper program to build and install c-like libraries.
 %cargo_prep -V 1
 
 %build
+
+%if %{without bundled_libgit2}
+# convince libgit2-sys to use the distro libgit2
+export LIBGIT2_SYS_USE_PKG_CONFIG=1
+%endif
+
+%if %{without bundled_libssh2}
+# convince libssh2-sys to use the distro libssh2
+export LIBSSH2_SYS_USE_PKG_CONFIG=1
+%endif
+
 %cargo_build
 
 %install
@@ -45,6 +88,9 @@ Helper program to build and install c-like libraries.
 %endif
 
 %changelog
+* Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.2-2
+- Add missing requirements
+
 * Thu Aug 12 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.2-1
 - Update to 0.9.2
 
