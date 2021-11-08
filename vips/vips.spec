@@ -7,11 +7,13 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.11
-%global vips_version %{vips_version_base}.2
+%global vips_version_base 8.12
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
-%global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
+
+%global commit 296fd9992541ff242c4bdc297a9864bd965bdbd5
+%global commitdate 20211107
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -51,13 +53,13 @@
 %bcond_without             heif
 
 Name:           vips
-Release:        2%{?dist}
-Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
+Release:        1.%{commitdate}git%{shortcommit}%{?dist}
+Version:        %{vips_version}
 Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
-URL:            https://libvips.github.io/libvips/
-Source0:        https://github.com/libvips/libvips/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
+URL:            https://github.com/libvips/libvips
+Source0:        %{url}/archive/%{commit}/libvips-%{shortcommit}.tar.gz
 
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(expat)
@@ -84,6 +86,7 @@ BuildRequires:  pkgconfig(libopenjp2) >= 2.4
 %if %{with libimagequant}
 BuildRequires: pkgconfig(imagequant) >= 2.11.10
 %endif
+BuildRequires:  pkgconfig(cgif)
 
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig gettext
@@ -239,7 +242,9 @@ using GraphicsMagick.
 
 
 %prep
-%setup -q -n vips-%{vips_version}
+%autosetup -n libvips-%{commit} -p1
+
+NOCONFIGURE=1 ./autogen.sh
 
 # make the version string consistent for multiarch
 export FAKE_BUILD_DATE=$(date -r %{SOURCE0})
@@ -288,10 +293,12 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     --without-matio \
 %if %{with doc}
     --enable-gtk-doc \
+    --enable-doxygen \
 %endif
 %if %{with gm}
     --with-magickpackage=GraphicsMagick \
 %endif
+    --disable-magicksave \
     --disable-static
 make %{?_smp_mflags}
 
@@ -378,6 +385,9 @@ mv cplusplus/html cplusplus_html
 
 
 %changelog
+* Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0-1.20211107git296fd99
+- Test libvips 8.12 with cgif
+
 * Mon Jul  5 2021 Remi Collet <remi@remirepo.net> - 8.11.2-2
 - rebuild with latest changes from Fedora
 
