@@ -1,60 +1,38 @@
 # rpms.weserv.nl
 
-Spec files and patches used for building libvips and dependencies that are not included (or outdated) in RHEL (and it's derivatives).
+Spec files and patches used for building libvips and dependencies in RHEL 8 (and it's derivatives).
 
-## Building the RPMs
+## Build instructions
 
-Build the RPM as a non-root user from your home directory:
+Build the libvips RPM within a Docker container:
 
 * Clone this repository.
     ```bash
     git clone https://github.com/weserv/rpms.git
+    cd rpms/
     ```
 
-* Install build requirements.
+* Build the container locally.
     ```bash
-    sudo dnf install rpmdevtools mock epel-rpm-macros rust-toolset
+    docker build -t weserv/rpms .
     ```
 
-* Set up your `rpmbuild` directory tree.
+* Create rpmbuild working directory and change the ownership to the builder user (uid 1000).
     ```bash
-    rpmdev-setuptree
+    mkdir ~/rpmbuild
+    chown -R 1000:1000 ~/rpmbuild
     ```
 
-* Link the spec files and patches.
+* Build the source RPM.
     ```bash
-    ln -s $HOME/rpms/*/*.spec $HOME/rpmbuild/SPECS/
-    ln -s $HOME/rpms/*/*.patch $HOME/rpmbuild/SOURCES/
+    docker run --cap-add=SYS_ADMIN -v $(pwd):/rpms -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
+       mock --buildsrpm -r el8-wsrv-x86_64 --enable-network -D '_disable_source_fetch 0' --resultdir=/rpmbuild/SRPMS \
+         --spec=/rpms/vips/vips.spec --sources=/rpms/vips
     ```
 
-* Download remote source files.
+* Build the RPM.
     ```bash
-    spectool -g -R rpmbuild/SPECS/nasm.spec
-    spectool -g -R rpmbuild/SPECS/dav1d.spec
-    spectool -g -R rpmbuild/SPECS/cargo-c.spec
-    spectool -g -R rpmbuild/SPECS/rav1e.spec
-    spectool -g -R rpmbuild/SPECS/libde265.spec
-    spectool -g -R rpmbuild/SPECS/libheif.spec
-    spectool -g -R rpmbuild/SPECS/cairo.spec
-    spectool -g -R rpmbuild/SPECS/harfbuzz.spec
-    spectool -g -R rpmbuild/SPECS/librsvg2.spec
-    spectool -g -R rpmbuild/SPECS/libspng.spec
-    spectool -g -R rpmbuild/SPECS/cgif.spec
-    spectool -g -R rpmbuild/SPECS/vips.spec
-    ```
-
-* Build the RPMs.
-    ```bash
-    rpmbuild -ba rpmbuild/SPECS/nasm.spec
-    rpmbuild -ba rpmbuild/SPECS/dav1d.spec
-    rpmbuild -ba rpmbuild/SPECS/cargo-c.spec
-    rpmbuild -ba rpmbuild/SPECS/rav1e.spec
-    rpmbuild -ba rpmbuild/SPECS/libde265.spec
-    rpmbuild -ba rpmbuild/SPECS/libheif.spec
-    rpmbuild -ba rpmbuild/SPECS/cairo.spec
-    rpmbuild -ba rpmbuild/SPECS/harfbuzz.spec
-    rpmbuild -ba rpmbuild/SPECS/librsvg2.spec
-    rpmbuild -ba rpmbuild/SPECS/libspng.spec
-    rpmbuild -ba rpmbuild/SPECS/cgif.spec
-    rpmbuild -ba rpmbuild/SPECS/vips.spec
+    docker run --cap-add=SYS_ADMIN -v $HOME/rpmbuild:/rpmbuild weserv/rpms sh -c '\
+      mock --rebuild -r el8-wsrv-x86_64 --resultdir=/rpmbuild/RPMS/"{{target_arch}}"/ \
+        $(find /rpmbuild/SRPMS -type f -name "vips*.src.rpm")'
     ```
