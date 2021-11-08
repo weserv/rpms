@@ -1,10 +1,10 @@
-%global rav1e_version 0.4.1
+%global rav1e_version 0.5.0
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
 Name:           rav1e
 Version:        %{rav1e_version}%{?rav1e_prever:~%{rav1e_prever}}
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        Fastest and safest AV1 encoder
 
 # Upstream license specification: BSD-2-Clause
@@ -16,8 +16,6 @@ Source0:        %{url}/archive/v%{rav1e_tarver}/%{name}-%{rav1e_tarver}.tar.gz
 # Use vendored crate dependencies so we can build offline.
 # Created using cargo-vendor
 Source1:        https://rpms.weserv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.xz
-# Patch from https://github.com/xiph/rav1e/pull/2758.patch
-Patch0:         2758.patch
 
 BuildRequires:  cargo-c
 BuildRequires:  nasm >= 2.14.0
@@ -84,6 +82,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.5.0-1
+- Update to 0.5.0
+
 * Thu Aug 12 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.4.1-3
 - Fix artifacts using fix from
   https://github.com/xiph/rav1e/pull/2758
