@@ -1,10 +1,10 @@
 # rpms.weserv.nl
 
-Spec files and patches used for building libvips and dependencies in RHEL 8 (and it's derivatives).
+Spec files and patches used for building the nginx weserv module and dependencies in RHEL 8 (and it's derivatives).
 
 ## Build instructions
 
-Build the libvips RPM within a Docker container:
+Build the `nginx-mod-weserv` RPM within a Docker container:
 
 * Clone this repository.
     ```bash
@@ -27,12 +27,12 @@ Build the libvips RPM within a Docker container:
     ```bash
     docker run --cap-add=SYS_ADMIN -v $(pwd):/rpms -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
        mock --buildsrpm -r el8-wsrv-x86_64 --enable-network -D '_disable_source_fetch 0' --resultdir=/rpmbuild/SRPMS \
-         --spec=/rpms/vips/vips.spec --sources=/rpms/vips
+         --spec=/rpms/nginx-mod-weserv/nginx-mod-weserv.spec --sources=/rpms/nginx-mod-weserv
     ```
 
 * Build the RPM.
     ```bash
     docker run --cap-add=SYS_ADMIN -v $HOME/rpmbuild:/rpmbuild weserv/rpms sh -c '\
       mock --rebuild -r el8-wsrv-x86_64 --resultdir=/rpmbuild/RPMS/"{{target_arch}}"/ \
-        $(find /rpmbuild/SRPMS -type f -name "vips*.src.rpm")'
+        $(find /rpmbuild/SRPMS -type f -name "nginx-mod-weserv*.src.rpm")'
     ```
