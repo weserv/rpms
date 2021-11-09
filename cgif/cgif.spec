@@ -1,4 +1,4 @@
-%global cgif_version 0.0.1
+%global cgif_version 0.0.2
 
 Name:           cgif
 Version:        %{cgif_version}
@@ -47,5 +47,8 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/cgif.pc
 
 %changelog
+* Tue Nov  9 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.2-1
+- Update to 0.0.2
+
 * Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1-1
 - Initial package
