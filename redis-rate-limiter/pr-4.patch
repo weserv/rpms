@@ -1,0 +1,247 @@
+From 9d663aa98d8fc702ebb479259973f7a2daa2b53d Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 15 Feb 2021 16:37:34 +0100
+Subject: [PATCH 1/4] Increase the precision of the theoretical arrival times
+
+From microseconds to nanoseconds.
+---
+ ratelimit.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/ratelimit.c b/ratelimit.c
+index f384380..a30aa60 100644
+--- a/ratelimit.c
++++ b/ratelimit.c
+@@ -21,9 +21,23 @@
+  */
+ 
+ #include <stdlib.h>
+-#include <sys/time.h>
++#include <time.h>
+ #include "redismodule.h"
+ 
++/* nanoseconds per second */
++#define NSEC_PER_SEC 1000000000LL
++
++/* miliseconds per second */
++#define MSEC_PER_SEC 1000LL
++
++/* get_nanos returns the nanosecond-precise time of the realtime clock.
++ */
++static long long get_nanos() {
++  struct timespec ts;
++  clock_gettime(CLOCK_REALTIME, &ts);
++  return ((long long) ts.tv_sec) * NSEC_PER_SEC + ts.tv_nsec;
++}
++
+ /* rater_limit checks whether a particular key has exceeded a rate limit.
+  * burst defines the maximum amount permitted in a single instant while
+  * count_per_period / period_in_sec defines the maximum sustained rate.
+@@ -49,17 +63,15 @@ static long long rater_limit(long long tat, long long burst,
+    * spaced events. If you like leaky buckets, think of it as how frequently
+    * the bucket leaks one unit. */
+   long long emission_interval =
+-      (long long)(((double)period_in_sec / count_per_period) * 1000000LL);
++      (long long) ((double) (period_in_sec * NSEC_PER_SEC) / count_per_period);
+ 
+   /* delay_variation_tolerance is our flexibility:
+    * How far can you deviate from the nominal equally spaced schedule?
+    * If you like leaky buckets, think about it as the size of your bucket. */
+   long long delay_variation_tolerance = emission_interval * (burst + 1);
+ 
+-  /* current time in microseconds to increase precision */
+-  struct timeval tv;
+-  gettimeofday(&tv, NULL);
+-  long long now = ((long long)tv.tv_sec) * 1000000LL + tv.tv_usec;
++  /* current time in nanoseconds to increase precision. */
++  long long now = get_nanos();
+ 
+   /* tat refers to the theoretical arrival time that would be expected
+    * from equally spaced requests at exactly the rate limit. */
+@@ -83,7 +95,7 @@ static long long rater_limit(long long tat, long long burst,
+     *limited = 1;
+     *ttl = tat - now;
+     if (increment <= delay_variation_tolerance) {
+-      *retry_after = -diff / 1000000LL;
++      *retry_after = -diff / NSEC_PER_SEC;
+     }
+   } else {
+     *ttl = new_tat - now;
+@@ -94,7 +106,7 @@ static long long rater_limit(long long tat, long long burst,
+     *remaining = next / emission_interval;
+   }
+ 
+-  *ttl = *ttl / 1000000LL;
++  *ttl = *ttl / NSEC_PER_SEC;
+ 
+   return new_tat;
+ }
+@@ -164,15 +176,15 @@ int RaterLimit_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
+   /* After all that preamble, do the Cell-Rate Limiting calculations. */
+   long long limited = 0, limit = 0, remaining = 0, retry_after = 0, ttl = 0;
+   long long new_tat =
+-      rater_limit(tat, burst, count_per_period, period_in_sec, quantity, &limited,
+-                  &limit, &remaining, &retry_after, &ttl);
++      rater_limit(tat, burst, count_per_period, period_in_sec, quantity,
++                  &limited, &limit, &remaining, &retry_after, &ttl);
+ 
+   /* If there is a new theoretical arrival time, store it back on the key. */
+   if (new_tat > 0) {
+     RedisModuleString *new_tat_str =
+         RedisModule_CreateStringFromLongLong(ctx, new_tat);
+     RedisModule_StringSet(key, new_tat_str);
+-    RedisModule_SetExpire(key, ttl * 1000);
++    RedisModule_SetExpire(key, ttl * MSEC_PER_SEC);
+     RedisModule_FreeString(ctx, new_tat_str);
+   }
+ 
+
+From b8ed7bf645f82aa71f9739e133f362a1ce8d7733 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 15 Feb 2021 16:41:47 +0100
+Subject: [PATCH 2/4] Ensure TTL is returned in milliseconds instead of seconds
+
+Resolves #1.
+---
+ ratelimit.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/ratelimit.c b/ratelimit.c
+index a30aa60..86df909 100644
+--- a/ratelimit.c
++++ b/ratelimit.c
+@@ -27,6 +27,9 @@
+ /* nanoseconds per second */
+ #define NSEC_PER_SEC 1000000000LL
+ 
++/* microseconds per second */
++#define USEC_PER_SEC 1000000LL
++
+ /* miliseconds per second */
+ #define MSEC_PER_SEC 1000LL
+ 
+@@ -106,7 +109,7 @@ static long long rater_limit(long long tat, long long burst,
+     *remaining = next / emission_interval;
+   }
+ 
+-  *ttl = *ttl / NSEC_PER_SEC;
++  *ttl = *ttl / USEC_PER_SEC;
+ 
+   return new_tat;
+ }
+@@ -184,7 +187,7 @@ int RaterLimit_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
+     RedisModuleString *new_tat_str =
+         RedisModule_CreateStringFromLongLong(ctx, new_tat);
+     RedisModule_StringSet(key, new_tat_str);
+-    RedisModule_SetExpire(key, ttl * MSEC_PER_SEC);
++    RedisModule_SetExpire(key, ttl);
+     RedisModule_FreeString(ctx, new_tat_str);
+   }
+ 
+@@ -200,7 +203,7 @@ int RaterLimit_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
+   /* Retry after this many of seconds to get through or -1 if not limited. */
+   RedisModule_ReplyWithLongLong(ctx, retry_after);
+   /* Amount of seconds to wait until both the burst and the rate restarts. */
+-  RedisModule_ReplyWithLongLong(ctx, ttl);
++  RedisModule_ReplyWithLongLong(ctx, ttl / MSEC_PER_SEC);
+ 
+   return REDISMODULE_OK;
+ }
+
+From 6731045e02104ef603217cc9d0eb2665818d5739 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 15 Feb 2021 16:55:22 +0100
+Subject: [PATCH 3/4] Allow to use a monotonic clock to prevent timing issues
+
+CLOCK_REALTIME is affected by discontinuous jumps in the system
+time, including incremental adjustments performed by NTP.
+---
+ Makefile    |  8 ++++++--
+ ratelimit.c | 20 ++++++++++++++++++--
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index fe77ec3..edcc983 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,13 +3,17 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+ 
+ # Compile flags for linux / osx
+ ifeq ($(uname_S),Linux)
+-	SHOBJ_CFLAGS ?= -W -Wall -fno-common -g -ggdb -std=c99 -O2
++	SHOBJ_CFLAGS ?= -W -Wall -fno-common -g -ggdb -std=gnu99 -O2
+ 	SHOBJ_LDFLAGS ?= -shared
+ else
+-	SHOBJ_CFLAGS ?= -W -Wall -dynamic -fno-common -g -ggdb -std=c99 -O2
++	SHOBJ_CFLAGS ?= -W -Wall -dynamic -fno-common -g -ggdb -std=gnu99 -O2
+ 	SHOBJ_LDFLAGS ?= -bundle -undefined dynamic_lookup -macosx_version_min 10.12
+ endif
+ 
++ifeq ($(USE_MONOTONIC_CLOCK),1)
++	SHOBJ_CFLAGS += -DUSE_MONOTONIC_CLOCK
++endif
++
+ .SUFFIXES: .c .so .xo .o
+ 
+ all: ratelimit.so
+diff --git a/ratelimit.c b/ratelimit.c
+index 86df909..468a7a1 100644
+--- a/ratelimit.c
++++ b/ratelimit.c
+@@ -24,6 +24,20 @@
+ #include <time.h>
+ #include "redismodule.h"
+ 
++/* Users can decide what's more important to them:
++ *  1. the ability to maintain existing limits when a failover process is
++ *     initiated by Redis Sentinel.
++ *  2. incorrect rate-limits due to changes in the system time-of-day clock.
++ *
++ * By default, we prefer to use the realtime clock (1) rather than the monotonic
++ * clock (2).
++ */
++#ifdef USE_MONOTONIC_CLOCK
++#define RATE_LIMITER_CLOCK CLOCK_MONOTONIC
++#else /*!USE_MONOTONIC_CLOCK*/
++#define RATE_LIMITER_CLOCK CLOCK_REALTIME
++#endif /*USE_MONOTONIC_CLOCK*/
++
+ /* nanoseconds per second */
+ #define NSEC_PER_SEC 1000000000LL
+ 
+@@ -33,11 +47,13 @@
+ /* miliseconds per second */
+ #define MSEC_PER_SEC 1000LL
+ 
+-/* get_nanos returns the nanosecond-precise time of the realtime clock.
++/* get_nanos returns the nanosecond-precise time of the specified clock
++ * (RATE_LIMITER_CLOCK). This clock could be either a realtime clock (default)
++ * or a monotonic clock, depending on the requirements of the user.
+  */
+ static long long get_nanos() {
+   struct timespec ts;
+-  clock_gettime(CLOCK_REALTIME, &ts);
++  clock_gettime(RATE_LIMITER_CLOCK, &ts);
+   return ((long long) ts.tv_sec) * NSEC_PER_SEC + ts.tv_nsec;
+ }
+ 
+
+From 34692c446bd119c6baf82d2a97ed6d0d81f8a4e4 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 15 Feb 2021 16:57:38 +0100
+Subject: [PATCH 4/4] Fix broken link
+
+---
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index 5bf169b..73e2710 100644
+--- a/README.md
++++ b/README.md
+@@ -118,4 +118,4 @@ This is free software under the terms of MIT the license (see the file
+ `LICENSE` for details).
+ 
+ [gcra]: https://en.wikipedia.org/wiki/Generic_cell_rate_algorithm
+-[redis-modules]: https://github.com/antirez/redis/blob/unstable/src/modules/INTRO.md
++[redis-modules]: https://redis.io/topics/modules-intro
