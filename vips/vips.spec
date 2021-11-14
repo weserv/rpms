@@ -10,10 +10,8 @@
 %global vips_version_base 8.12
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-
-%global commit 296fd9992541ff242c4bdc297a9864bd965bdbd5
-%global commitdate 20211107
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global vips_prever rc1
+%global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -53,13 +51,13 @@
 %bcond_without             heif
 
 Name:           vips
-Release:        1.%{commitdate}git%{shortcommit}%{?dist}
-Version:        %{vips_version}
+Release:        1%{?dist}
+Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
 Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
 URL:            https://github.com/libvips/libvips
-Source0:        %{url}/archive/%{commit}/libvips-%{shortcommit}.tar.gz
+Source0:        %{url}/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
 
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(expat)
@@ -84,7 +82,7 @@ BuildRequires:  pkgconfig(spng) >= 0.6
 BuildRequires:  pkgconfig(libopenjp2) >= 2.4
 %endif
 %if %{with libimagequant}
-BuildRequires: pkgconfig(imagequant) >= 2.11.10
+BuildRequires:  pkgconfig(imagequant) >= 2.11.10
 %endif
 BuildRequires:  pkgconfig(cgif)
 
@@ -242,9 +240,7 @@ using GraphicsMagick.
 
 
 %prep
-%autosetup -n libvips-%{commit} -p1
-
-NOCONFIGURE=1 ./autogen.sh
+%setup -q -n vips-%{vips_version}
 
 # make the version string consistent for multiarch
 export FAKE_BUILD_DATE=$(date -r %{SOURCE0})
@@ -385,6 +381,9 @@ mv cplusplus/html cplusplus_html
 
 
 %changelog
+* Sun Nov 14 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0~rc1-1
+- Update to 8.12.0-rc1
+
 * Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0-1.20211107git296fd99
 - Test libvips 8.12 with cgif
 
