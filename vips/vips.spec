@@ -10,7 +10,7 @@
 %global vips_version_base 8.12
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc1
+#global vips_prever rc1
 %global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
@@ -21,13 +21,11 @@
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             libimagequant
-%else
-%bcond_with                libimagequant
-%endif
-
-%if 0%{?fedora} || 0%{?rhel} >= 8
+%bcond_without             libcgif
 %bcond_without             libspng
 %else
+%bcond_with                libimagequant
+%bcond_with                libcgif
 %bcond_with                libspng
 %endif
 
@@ -74,7 +72,7 @@ BuildRequires:  pkgconfig(libwebp) > 1
 BuildRequires:  pkgconfig(libexif)
 BuildRequires:  pkgconfig(libgsf-1)
 BuildRequires:  pkgconfig(librsvg-2.0) >= 2.50.0
-BuildRequires:  pkgconfig(libjpeg)
+BuildRequires:  pkgconfig(libjpeg) > 1.5.3
 %if %{with libspng}
 BuildRequires:  pkgconfig(spng) >= 0.6
 %endif
@@ -84,7 +82,9 @@ BuildRequires:  pkgconfig(libopenjp2) >= 2.4
 %if %{with libimagequant}
 BuildRequires:  pkgconfig(imagequant) >= 2.11.10
 %endif
+%if %{with libcgif}
 BuildRequires:  pkgconfig(cgif)
+%endif
 
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig gettext
@@ -94,14 +94,11 @@ BuildRequires:  pkgconfig gettext
 Provides:       bundled(libnsgif)
 
 %if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
-Suggests:   %{name}-heif
-# im6 is temporarily recommended for smooth upgrade from 8.10
-# user can remove / replace with alternative
-Recommends: %{name}-magick-im6
-Recommends: %{name}-openslide
+Suggests:   %{name}-openslide
+Suggests:   %{name}-magick-im6
+Recommends: %{name}-heif
 Recommends: %{name}-poppler
 %else
-Requires:   %{name}-openslide
 Requires:   %{name}-poppler
 %endif
 
@@ -126,9 +123,7 @@ Additional image formats are supported in additional optional packages:
 
 %package devel
 Summary:    Development files for %{name}
-Requires:   libjpeg-devel%{?_isa} libtiff-devel%{?_isa} zlib-devel%{?_isa}
 Requires:   %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:  vips-full-devel < 8.11
 
 %description devel
 The %{name}-devel package contains the header files and
@@ -139,7 +134,6 @@ contains a C++ API and development documentation.
 %package tools
 Summary:    Command-line tools for %{name}
 Requires:   %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:  vips-full-tools < 8.11
 
 %description tools
 The %{name}-tools package contains command-line tools for working with VIPS.
@@ -151,7 +145,6 @@ Summary:       Documentation for %{name}
 BuildRequires: gtk-doc
 BuildRequires: doxygen
 Conflicts:     %{name} < %{version}-%{release}, %{name} > %{version}-%{release}
-Obsoletes:     vips-full-doc < 8.11
 
 %description doc
 The %{name}-doc package contains extensive documentation about VIPS in both
@@ -163,7 +156,6 @@ HTML and PDF formats.
 Summary:       Heif support for %{name}
 BuildRequires: pkgconfig(libheif) >= 1.3
 Requires:      %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:     vips-full < 8.11
 
 %description heif
 The %{name}-heif package contains the Heif module for VIPS.
@@ -188,14 +180,9 @@ The %{name}-poppler package contains the Poppler module for VIPS.
 %if %{with im6}
 %package magick-im6
 Summary:       Magick support for %{name} using ImageMagick6
-%if 0%{?fedora} >= 99 || 0%{?rhel} >= 99
-BuildRequires: ImageMagick-devel
-%else
-# Ensure we use version 6 (same as imagick ext).
 BuildRequires: ImageMagick6-devel
-%endif
 Requires:      %{name}%{?_isa} = %{version}-%{release}
-%if 0%{?fedora} >= 35
+%if 0%{?fedora} >= 34
 Obsoletes:     %{name}-magick         < %{version}-%{release}
 %endif
 Provides:      %{name}-magick         = %{version}-%{release}
@@ -240,6 +227,17 @@ using GraphicsMagick.
 
 
 %prep
+%if %{with gm}
+%if %{with im7}
+: Cannot enable GraphicsMagick and ImageMagick7
+exit 1
+%endif
+%if %{with im6}
+: Cannot enable GraphicsMagick and ImageMagick6
+exit 1
+%endif
+%endif
+
 %setup -q -n vips-%{vips_version}
 
 # make the version string consistent for multiarch
@@ -269,6 +267,11 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %else
     --without-imagequant \
 %endif
+%if %{with libcgif}
+    --with-cgif \
+%else
+    --without-cgif \
+%endif
 %if %{with openjpeg2}
     --with-libopenjp2 \
 %else
@@ -288,8 +291,8 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     --without-nifti \
     --without-matio \
 %if %{with doc}
-    --enable-gtk-doc \
     --enable-doxygen \
+    --enable-gtk-doc \
 %endif
 %if %{with gm}
     --with-magickpackage=GraphicsMagick \
@@ -316,12 +319,6 @@ mv cplusplus/html cplusplus_html
 
 # locale stuff
 %find_lang vips%{vips_version_base}
-
-
-%if 0%{?fedora} < 28 && 0%{?rhel} < 8
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-%endif
 
 
 %files -f vips%{vips_version_base}.lang
@@ -381,6 +378,17 @@ mv cplusplus/html cplusplus_html
 
 
 %changelog
+* Sun Nov 21 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0-1
+- Update to 8.12.0
+- Enable libcgif usage
+- Build against libjpeg-turbo-official
+- Sync with remirepo
+- Suggests vips-openslide/vips-magick-im6 package instead of recommends
+- Recommend vips-heif package
+- Remove vips-full obsoletes
+- Remove redundant devel requires
+- Remove redundant ldconfig post and postun
+
 * Sun Nov 14 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0~rc1-1
 - Update to 8.12.0-rc1
 
