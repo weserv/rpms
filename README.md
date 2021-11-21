@@ -32,7 +32,7 @@ Build the `nginx-mod-weserv` RPM within a Docker container:
 
 * Build the RPM.
     ```bash
-    docker run --cap-add=SYS_ADMIN -v $HOME/rpmbuild:/rpmbuild weserv/rpms sh -c '\
+    docker run --cap-add=SYS_ADMIN -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
       mock --rebuild -r el8-wsrv-x86_64 --resultdir=/rpmbuild/RPMS/"{{target_arch}}"/ \
-        $(find /rpmbuild/SRPMS -type f -name "nginx-mod-weserv*.src.rpm")'
+        /rpmbuild/SRPMS/nginx-mod-weserv-5.0.0-1.20211121git6e45d95.el8.wsrv.src.rpm
     ```
