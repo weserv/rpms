@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.12
-%global vips_version %{vips_version_base}.0
+%global vips_version %{vips_version_base}.1
 %global vips_soname_major 42
 #global vips_prever rc1
 %global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -378,6 +378,9 @@ mv cplusplus/html cplusplus_html
 
 
 %changelog
+* Sun Dec 12 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.1-1
+- Update to 8.12.1
+
 * Sun Nov 21 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.0-1
 - Update to 8.12.0
 - Enable libcgif usage
