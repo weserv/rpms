@@ -1,7 +1,7 @@
 %global nginx_modname weserv
 
-%global commit 25a9b9ded58f01ecf63f0088c00a7ecff25f2062
-%global commitdate 20220126
+%global commit c4d9a260d2b88109abcef771e5cf51105c39c603
+%global commitdate 20220213
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -86,6 +86,9 @@ popd
 
 
 %changelog
+* Sun Feb 13 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20220213gitc4d9a26
+- Update to weserv/images@c4d9a26
+
 * Thu Jan 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20220126git25a9b9d
 - Update to weserv/images@25a9b9d
 
