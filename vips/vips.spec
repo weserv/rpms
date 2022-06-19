@@ -7,11 +7,11 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.12
-%global vips_version %{vips_version_base}.2
+%global vips_version_base 8.13
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
-%global vips_tarver %{vips_version}%{?vips_prever:-%{vips_prever}}
+%global vips_prever rc1
+%global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
@@ -29,7 +29,7 @@
 %bcond_with                libspng
 %endif
 
-%if 0%{?fedora} >= 34
+%if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
 %bcond_without             openjpeg2
 %else
 # disabled by default
@@ -49,14 +49,17 @@
 %bcond_without             heif
 
 Name:           vips
-Release:        1%{?dist}
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
+Release:        1%{?dist}
 Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
 URL:            https://github.com/libvips/libvips
-Source0:        %{url}/releases/download/v%{vips_version}%{?vips_prever:-%{vips_prever}}/vips-%{vips_tarver}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{vips_tagver}.tar.gz
 
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  meson
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
@@ -64,7 +67,6 @@ BuildRequires:  pkgconfig(orc-0.4)
 BuildRequires:  pkgconfig(lcms2)
 BuildRequires:  pkgconfig(pangoft2)
 BuildRequires:  pkgconfig(zlib)
-BuildRequires:  pkgconfig(libpng) >= 1.2.9
 BuildRequires:  pkgconfig(libtiff-4)
 # Ensure we use libwebp7 on EL-7
 # upstream requires 0.6
@@ -74,7 +76,9 @@ BuildRequires:  pkgconfig(libgsf-1)
 BuildRequires:  pkgconfig(librsvg-2.0) >= 2.50.0
 BuildRequires:  pkgconfig(libjpeg) > 1.5.3
 %if %{with libspng}
-BuildRequires:  pkgconfig(spng) >= 0.6
+BuildRequires:  pkgconfig(spng) >= 0.7
+%else
+BuildRequires:  pkgconfig(libpng) >= 1.2.9
 %endif
 %if %{with openjpeg2}
 BuildRequires:  pkgconfig(libopenjp2) >= 2.4
@@ -86,11 +90,7 @@ BuildRequires:  pkgconfig(imagequant) >= 2.11.10
 BuildRequires:  pkgconfig(cgif)
 %endif
 
-BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig gettext
-
 # Not available as system library
-# and altered by vips upstream
 Provides:       bundled(libnsgif)
 
 %if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
@@ -238,88 +238,60 @@ exit 1
 %endif
 %endif
 
-%setup -q -n vips-%{vips_version}
-
-# make the version string consistent for multiarch
-export FAKE_BUILD_DATE=$(date -r %{SOURCE0})
-sed -i "s/\\(VIPS_VERSION_STRING=\\)\$VIPS_VERSION-\`date\`/\\1\"\$VIPS_VERSION-$FAKE_BUILD_DATE\"/g" \
-   configure
-unset FAKE_BUILD_DATE
-
-# Avoid setting RPATH to /usr/lib64 on 64-bit builds
-# The DIE_RPATH_DIE trick breaks the build wrt gobject-introspection
-sed -i 's|sys_lib_dlsearch_path_spec="|sys_lib_dlsearch_path_spec="/%{_lib} %{_libdir} |' configure
-
+%setup -q -n libvips-%{vips_tagver}
 
 %build
 # Upstream recommends enabling auto-vectorization of inner loops:
-# https://github.com/jcupitt/libvips/pull/212#issuecomment-68177930
+# https://github.com/libvips/libvips/pull/212#issuecomment-68177930
 export CFLAGS="%{optflags} -ftree-vectorize"
 export CXXFLAGS="%{optflags} -ftree-vectorize"
-%configure \
-%if %{with heif}
-    --with-heif=module \
-%else
-    --without-heif \
+%meson \
+%if %{without heif}
+    -Dheif=disabled \
 %endif
-%if %{with libimagequant}
-    --with-imagequant \
-%else
-    --without-imagequant \
+%if %{without libimagequant}
+    -Dimagequant=disabled \
 %endif
-%if %{with libcgif}
-    --with-cgif \
-%else
-    --without-cgif \
+%if %{without libcgif}
+    -Dcgif=disabled \
 %endif
-%if %{with openjpeg2}
-    --with-libopenjp2 \
-%else
-    --without-libopenjp2 \
+%if %{without openjpeg2}
+    -Dopenjpeg=disabled \
 %endif
-%if %{with libspng}
-    --with-libspng \
-%else
-    --without-libspng \
+%if %{without libspng}
+    -Dspng=disabled \
 %endif
-    --without-libjxl \
-    --without-libopenjp2 \
-    --without-fftw \
-    --without-pdfium \
-    --without-cfitsio \
-    --without-OpenEXR \
-    --without-nifti \
-    --without-matio \
 %if %{with doc}
-    --enable-doxygen \
-    --enable-gtk-doc \
+    -Ddoxygen=true \
+    -Dgtk_doc=true \
 %endif
 %if %{with gm}
-    --with-magickpackage=GraphicsMagick \
+    -Dmagick-package=GraphicsMagick \
 %endif
-    --disable-magicksave \
-    --disable-static
-make %{?_smp_mflags}
+    -Dmagick-features=load \
+    -Dcfitsio=disabled \
+    -Dfftw=disabled \
+    -Djpeg-xl=disabled \
+    -Dmatio=disabled \
+    -Dnifti=disabled \
+    -Dopenexr=disabled \
+    -Dpdfium=disabled \
+    %{nil}
 
+%meson_build
 
 %install
-make install DESTDIR=%{buildroot}
-find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
-
-# delete doc (we will get it later with %%doc)
-rm -rf %{buildroot}%{_datadir}/doc/vips
+%meson_install
 
 %if 0%{?fedora} >= 29 || 0%{?rhel} >= 8
 sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipsprofile
 %endif
 
-%if %{with doc}
-mv cplusplus/html cplusplus_html
-%endif
-
 # locale stuff
 %find_lang vips%{vips_version_base}
 
+%check
+%meson_test
 
 %files -f vips%{vips_version_base}.lang
 %doc AUTHORS NEWS THANKS README.md ChangeLog
@@ -334,7 +306,6 @@ mv cplusplus/html cplusplus_html
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
 %{_datadir}/gir-1.0
-%{_datadir}/gtk-doc
 
 
 %files tools
@@ -344,8 +315,8 @@ mv cplusplus/html cplusplus_html
 
 %if %{with doc}
 %files doc
-%doc doc/html
-%doc cplusplus_html
+%{_datadir}/gtk-doc
+%{_docdir}/vips-doc/html
 %license COPYING
 %endif
 
@@ -378,6 +349,14 @@ mv cplusplus/html cplusplus_html
 
 
 %changelog
+* Sun Jun 19 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.0~rc1-1
+- Update to 8.13.0-rc1
+- Migrate build to Meson
+- Enable openjpeg2 usage on RHEL >= 9
+- Increase minimum required version of libspng to 0.7 for PNG write support
+- Remove libpng in favor of libspng (if possible)
+- Remove gtk-doc docs from vips-devel
+
 * Wed Jan 26 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.12.2-1
 - Update to 8.12.2
 
