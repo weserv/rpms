@@ -1,7 +1,7 @@
 %global nginx_modname weserv
 
-%global commit 4a6dd2129ca5325eaf2ac81eb12262acf63457a3
-%global commitdate 20220619
+%global commit 8df5dbca6a8f9321d4be15124a39c615dd3022ba
+%global commitdate 20220703
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -47,9 +47,6 @@ API library of %{name}.
        -DBUILD_TOOLS=ON
 %cmake_build
 
-# Ensure nginx finds the shared API library during module build
-export RPM_LD_FLAGS="${RPM_LD_FLAGS} -L$(realpath lib)"
-
 %nginx_modconfigure --with-http_ssl_module
 %nginx_modbuild
 
@@ -85,6 +82,9 @@ popd
 
 
 %changelog
+* Sun Jul  3 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20220703git8df5dbc
+- Update to weserv/images@8df5dbc
+
 * Sun Jun 19 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20220619git4a6dd21
 - Update to weserv/images@4a6dd21
 
