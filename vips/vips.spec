@@ -10,7 +10,7 @@
 %global vips_version_base 8.13
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc1
+%global vips_prever rc2
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
@@ -48,6 +48,8 @@
 %bcond_with                gm
 %bcond_without             heif
 
+%bcond_without             tests
+
 Name:           vips
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
 Release:        1%{?dist}
@@ -55,11 +57,12 @@ Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
 URL:            https://github.com/libvips/libvips
-Source0:        %{url}/archive/refs/tags/v%{vips_tagver}.tar.gz
+Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_tagver}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  meson
+BuildRequires:  gettext
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
@@ -88,6 +91,10 @@ BuildRequires:  pkgconfig(imagequant) >= 2.11.10
 %endif
 %if %{with libcgif}
 BuildRequires:  pkgconfig(cgif)
+%endif
+%if %{with tests}
+# bc command used in test suite
+BuildRequires:  bc
 %endif
 
 # Not available as system library
@@ -238,7 +245,7 @@ exit 1
 %endif
 %endif
 
-%setup -q -n libvips-%{vips_tagver}
+%setup -q -n vips-%{vips_version}
 
 %build
 # Upstream recommends enabling auto-vectorization of inner loops:
@@ -290,8 +297,10 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 # locale stuff
 %find_lang vips%{vips_version_base}
 
+%if %{with tests}
 %check
 %meson_test
+%endif
 
 %files -f vips%{vips_version_base}.lang
 %doc AUTHORS NEWS THANKS README.md ChangeLog
@@ -349,6 +358,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Sat Jul 16 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.0~rc2-1
+- Update to 8.13.0-rc2
+
 * Sun Jun 19 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.0~rc1-1
 - Update to 8.13.0-rc1
 - Migrate build to Meson
