@@ -1,7 +1,7 @@
 %global module ratelimit
 
-%global commit 3d31d9b9b16528222d4650378b81c0569f736d21
-%global commitdate 20190128
+%global commit de3bced7e9038d9fb80d2e0c51d648e3ae0b5178
+%global commitdate 20220715
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           redis-rate-limiter
@@ -12,9 +12,6 @@ Summary:        Implementation of the GCR Algorithm in C as a Redis Module
 License:        MIT
 URL:            https://github.com/onsigntv/redis-rate-limiter
 Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
-
-# https://github.com/onsigntv/redis-rate-limiter/pull/4
-Patch0:         pr-4.patch
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -49,5 +46,9 @@ install -pDm755 %{module}.so %{buildroot}%{redis_modules_dir}/%{module}.so
 
 
 %changelog
+* Sat Jul 16 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1-1.20220715gitde3bced
+- Update to onsigntv/redis-rate-limiter@de3bced
+- Drop patch merged upstream
+
 * Tue Nov  9 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1-1.20190128git3d31d9b
 - Initial package
