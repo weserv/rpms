@@ -1,4 +1,8 @@
-%global rav1e_version 0.5.0
+# Use bundled deps as we don't ship the exact right versions for all the
+# required rust libraries
+%global bundled_rust_deps 1
+
+%global rav1e_version 0.5.1
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
@@ -14,12 +18,12 @@ URL:            https://github.com/xiph/rav1e
 Source0:        %{url}/archive/v%{rav1e_tarver}/%{name}-%{rav1e_tarver}.tar.gz
 
 # Use vendored crate dependencies so we can build offline.
-# Created using cargo-vendor
+# Created using "cargo vendor"
 Source1:        https://rpms.weserv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.xz
 
 BuildRequires:  cargo-c
 BuildRequires:  nasm >= 2.14.0
-BuildRequires:  rust-toolset >= 1.52.1
+BuildRequires:  rust-packaging
 
 %description
 Fastest and safest AV1 encoder.
@@ -41,8 +45,18 @@ developing applications that use %{name}.
 %prep
 %autosetup -p1 -n %{name}-%{rav1e_tarver}
 
-# Source1 is vendored dependencies
-%cargo_prep -V 1
+%if 0%{?bundled_rust_deps}
+# Use the vendored dependencies in Source1
+%{__tar} -xoaf %{SOURCE1}
+%define cargo_registry $(pwd)/vendor
+%endif
+
+%cargo_prep
+
+%if ! 0%{?bundled_rust_deps}
+%generate_buildrequires
+%cargo_generate_buildrequires
+%endif
 
 %build
 %cargo_build
@@ -64,8 +78,11 @@ developing applications that use %{name}.
     --pkgconfigdir=%{_libdir}/pkgconfig \
     --library-type=cdylib
 
-%post   -n librav1e0 -p /sbin/ldconfig
-%postun -n librav1e0 -p /sbin/ldconfig
+%if 0%{?bundled_rust_deps}
+rm -rf %{buildroot}/%{_builddir}/%{name}-%{version}/vendor/
+%endif
+
+%ldconfig_scriptlets -n librav1e0
 
 %files
 %{_bindir}/rav1e
@@ -82,6 +99,10 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.5.1-1
+- Update to 0.5.1
+- Switch to %%ldconfig_scriptlets
+
 * Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.5.0-1
 - Update to 0.5.0
 
