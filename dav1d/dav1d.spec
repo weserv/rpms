@@ -1,17 +1,18 @@
 Name:           dav1d
-Version:        0.9.2
+Version:        1.0.0
 Release:        1%{?dist}
 Summary:        AV1 cross-platform Decoder
 
 License:        BSD
 URL:            https://code.videolan.org/videolan/dav1d
-Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.bz2
+Source0:        https://download.videolan.org/pub/videolan/dav1d/%{version}/dav1d-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  nasm >= 2.14.0
 BuildRequires:  doxygen
 BuildRequires:  graphviz
-BuildRequires:  meson >= 0.47.0
+BuildRequires:  meson >= 0.49.0
+BuildRequires:  pkgconfig(libxxhash)
 
 Requires:       libdav1d%{?_isa} = %{version}-%{release}
 
@@ -36,7 +37,7 @@ Development files for dav1d, the AV1 cross-platform Decoder.
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-%meson -Dxxhash_muxer=disabled
+%meson -Denable_docs=true
 %meson_build
 %ninja_build -C %{_vpath_builddir} doc/html
 
@@ -52,15 +53,19 @@ Development files for dav1d, the AV1 cross-platform Decoder.
 
 %files -n libdav1d
 %license COPYING doc/PATENTS
-%{_libdir}/libdav1d.so.5*
+%{_libdir}/libdav1d.so.6*
 
 %files -n libdav1d-devel
-%doc %{_host_alias}/doc/html
+%doc %{_vpath_builddir}/doc/html
 %{_includedir}/dav1d/
 %{_libdir}/libdav1d.so
 %{_libdir}/pkgconfig/dav1d.pc
 
 %changelog
+* Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.0-1
+- Update to 1.0.0
+- Enable optional xxh3 based muxer
+
 * Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.2-1
 - Update to 0.9.2
 
