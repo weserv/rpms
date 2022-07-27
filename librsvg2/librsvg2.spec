@@ -12,17 +12,17 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.50.5
-Release:        3%{?dist}
+Version:        2.54.4
+Release:        1%{?dist}
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.54/librsvg-%{version}.tar.xz
 
 BuildRequires:  chrpath
 BuildRequires:  gcc
-BuildRequires:  git-core
 BuildRequires:  gobject-introspection-devel
+BuildRequires:  make
 BuildRequires:  pkgconfig(cairo) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-gobject) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-png) >= %{cairo_version}
@@ -36,6 +36,7 @@ BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pangoft2)
 BuildRequires:  vala
+BuildRequires:  /usr/bin/rst2man
 %if 0%{?bundled_rust_deps}
 BuildRequires:  cargo
 BuildRequires:  rust
@@ -67,28 +68,25 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package provides extra utilities based on the librsvg library.
 
 %prep
-%autosetup -n librsvg-%{version} -p1 -Sgit
+%autosetup -n librsvg-%{version} -p1
+
 %if 0%{?bundled_rust_deps}
 # Use the bundled deps
 %else
 # No bundled deps
 rm -vrf vendor .cargo Cargo.lock
-pushd rsvg_internals
-  %cargo_prep
-  mv .cargo ..
-popd
+%cargo_prep
 %endif
 
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
-pushd rsvg_internals >/dev/null
-  %cargo_generate_buildrequires
-popd >/dev/null
+%cargo_generate_buildrequires
 %endif
 
 %build
 %configure --disable-static  \
            --disable-gtk-doc \
+           --docdir=%{_pkgdocdir} \
            --enable-introspection \
            --enable-vala
 %make_build
@@ -97,17 +95,15 @@ popd >/dev/null
 %make_install
 find %{buildroot} -type f -name '*.la' -print -delete
 
-%find_lang librsvg
-
 # Remove lib64 rpaths
 chrpath --delete %{buildroot}%{_bindir}/rsvg-convert
 chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
 
-# we install own docs
-rm -vrf %{buildroot}%{_datadir}/doc
+# Not useful in this package.
+rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 
-%files -f librsvg.lang
-%doc CONTRIBUTING.md README.md
+%files
+%doc code-of-conduct.md CONTRIBUTING.md README.md
 %license COPYING.LIB
 %{_libdir}/librsvg-2.so.*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
@@ -125,15 +121,17 @@ rm -vrf %{buildroot}%{_datadir}/doc
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/librsvg-2.0.vapi
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/rsvg-2.0
 
 %files tools
 %{_bindir}/rsvg-convert
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.54.4-1
+- Update to 2.54.4
+- Disable gtk-doc support as gi-docgen is not available in EPEL 9
+  (rhbz#2072649)
+
 * Thu Aug 12 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.5-3
 - Rebuild with Rust 1.52.1
 
