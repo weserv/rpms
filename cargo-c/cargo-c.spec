@@ -1,3 +1,7 @@
+# Use bundled deps as we don't ship the exact right versions for all the
+# required rust libraries
+%global bundled_rust_deps 1
+
 %bcond_without check
 
 # libgit2-sys expects to use its bundled library, which is sometimes just a
@@ -13,8 +17,8 @@
 %endif
 
 Name:           cargo-c
-Version:        0.9.2
-Release:        2%{?dist}
+Version:        0.9.9
+Release:        1%{?dist}
 Summary:        Helper program to build and install c-like libraries
 
 # Upstream license specification: MIT
@@ -23,17 +27,17 @@ URL:            https://github.com/lu-zero/cargo-c
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Use vendored crate dependencies so we can build offline.
-# Created using cargo-vendor
+# Created using "cargo vendor"
 Source1:        https://rpms.weserv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
-BuildRequires:  rust-toolset >= 1.52.1
+BuildRequires:  rust-packaging
 # needed by curl-sys
 BuildRequires:  pkgconfig(libcurl)
 # needed by openssl-sys
 BuildRequires:  pkgconfig(openssl) >= 1.0.1
 
 %if %{with bundled_libgit2}
-Provides:       bundled(libgit2) = 1.2.0
+Provides:       bundled(libgit2) = 1.3.0
 %else
 BuildRequires:  pkgconfig(libgit2) >= 1.1.0
 %endif
@@ -51,19 +55,21 @@ Requires:       cargo
 %description
 Helper program to build and install c-like libraries.
 
-%files
-%license LICENSE
-%doc README.md
-%{_bindir}/cargo-cbuild
-%{_bindir}/cargo-cinstall
-%{_bindir}/cargo-ctest
-%{_bindir}/cargo-capi
-
 %prep
 %autosetup -p1 -n %{name}-%{version}
 
-# Source1 is vendored dependencies
-%cargo_prep -V 1
+%if 0%{?bundled_rust_deps}
+# Use the vendored dependencies in Source1
+%{__tar} -xoaf %{SOURCE1}
+%define cargo_registry $(pwd)/vendor
+%endif
+
+%cargo_prep
+
+%if ! 0%{?bundled_rust_deps}
+%generate_buildrequires
+%cargo_generate_buildrequires
+%endif
 
 %build
 
@@ -79,15 +85,30 @@ export LIBSSH2_SYS_USE_PKG_CONFIG=1
 
 %cargo_build
 
-%install
-%cargo_install
-
 %if %{with check}
 %check
 %cargo_test
 %endif
 
+%install
+%cargo_install
+
+%if 0%{?bundled_rust_deps}
+rm -rf %{buildroot}/%{_builddir}/%{name}-%{version}/vendor/
+%endif
+
+%files
+%license LICENSE
+%doc README.md
+%{_bindir}/cargo-cbuild
+%{_bindir}/cargo-cinstall
+%{_bindir}/cargo-ctest
+%{_bindir}/cargo-capi
+
 %changelog
+* Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.9-1
+- Update to 0.9.9
+
 * Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.2-2
 - Add missing requirements
 
