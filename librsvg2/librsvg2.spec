@@ -12,13 +12,18 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.54.4
+Version:        2.55.0
 Release:        1%{?dist}
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.54/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.55/librsvg-%{version}.tar.xz
 
+# Use vendored crate dependencies so we can build offline.
+# Created using "cargo vendor"
+Source1:        https://rpms.weserv.nl/sources/%{name}-%{version}-vendor.tar.xz
+
+BuildRequires:  rust-packaging
 BuildRequires:  chrpath
 BuildRequires:  gcc
 BuildRequires:  gobject-introspection-devel
@@ -37,12 +42,6 @@ BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pangoft2)
 BuildRequires:  vala
 BuildRequires:  /usr/bin/rst2man
-%if 0%{?bundled_rust_deps}
-BuildRequires:  cargo
-BuildRequires:  rust
-%else
-BuildRequires:  rust-packaging
-%endif
 
 Requires:       cairo%{?_isa} >= %{cairo_version}
 Requires:       cairo-gobject%{?_isa} >= %{cairo_version}
@@ -68,15 +67,20 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package provides extra utilities based on the librsvg library.
 
 %prep
-%autosetup -n librsvg-%{version} -p1
+%autosetup -p1 -n librsvg-%{version}
 
 %if 0%{?bundled_rust_deps}
-# Use the bundled deps
-%else
-# No bundled deps
-rm -vrf vendor .cargo Cargo.lock
-%cargo_prep
+# Use the vendored dependencies in Source1
+%{__tar} -xoaf %{SOURCE1}
+%define cargo_registry $(pwd)/vendor
 %endif
+
+%cargo_prep
+
+# Ensure we build without --locked, as %%cargo_prep removes
+# the lock file (Cargo.lock), allowing more wiggle room when
+# providing Rust dependencies.
+sed -i 's/--locked //g' Makefile.in
 
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
@@ -84,11 +88,14 @@ rm -vrf vendor .cargo Cargo.lock
 %endif
 
 %build
+
+# Replace bare `cargo` with the one used by %%cargo_* macros
 %configure --disable-static  \
            --disable-gtk-doc \
            --docdir=%{_pkgdocdir} \
            --enable-introspection \
-           --enable-vala
+           --enable-vala \
+           CARGO="%{__cargo}"
 %make_build
 
 %install
@@ -127,6 +134,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Thu Aug  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.55.0-1
+- Update to 2.55.0
+
 * Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.54.4-1
 - Update to 2.54.4
 - Disable gtk-doc support as gi-docgen is not available in EPEL 9
