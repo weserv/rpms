@@ -1,6 +1,6 @@
 # rpms.weserv.nl
 
-Spec files and patches used for building the nginx weserv module and dependencies in RHEL 9 (and it's derivatives).
+Spec files and patches used for building the nginx weserv module and dependencies in RHEL 9 (and its derivatives).
 
 ## Build instructions
 
