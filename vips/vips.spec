@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.13
-%global vips_version %{vips_version_base}.0
+%global vips_version %{vips_version_base}.2
 %global vips_soname_major 42
 #global vips_prever rc2
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -358,6 +358,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Tue Oct  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.2-1
+- Update to 8.13.2
+
 * Tue Jul 26 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.0-1
 - Update to 8.13.0
 
