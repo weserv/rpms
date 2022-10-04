@@ -12,7 +12,7 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.55.0
+Version:        2.55.1
 Release:        1%{?dist}
 
 License:        LGPLv2+
@@ -134,6 +134,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Tue Oct  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.55.1-1
+- Update to 2.55.1
+
 * Thu Aug  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.55.0-1
 - Update to 2.55.0
 
