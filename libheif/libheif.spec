@@ -1,13 +1,11 @@
 Name:           libheif
-Version:        1.12.0
-Release:        2%{?dist}
+Version:        1.13.0
+Release:        1%{?dist}
 Summary:        HEIF file format decoder and encoder
 
 License:        LGPLv3+ and MIT
 URL:            https://github.com/strukturag/%{name}
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-# Patch from https://github.com/strukturag/libheif/commit/0f8496f22d284e1a69df12fe0b72f375aed31315.patch
-Patch0:         dav1d-1.0.0-compatibility.patch
+Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  gcc-c++
@@ -37,7 +35,6 @@ developing applications that use %{name}.
 
 %prep
 %autosetup -p1
-NOCONFIGURE=1 ./autogen.sh
 rm -rf third-party/
 
 
@@ -77,6 +74,9 @@ find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 
 
 %changelog
+* Tue Oct  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.13.0-1
+- Update to 1.13.0
+
 * Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.12.0-2
 - Rebuild for dav1d SONAME bump
 - Fix dav1d 1.0.0 compatibility using fix from
