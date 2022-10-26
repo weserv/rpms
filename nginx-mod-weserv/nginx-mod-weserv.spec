@@ -1,7 +1,7 @@
 %global nginx_modname weserv
 
-%global commit 6dcca50caea32dfbb71336980a7826b483b80229
-%global commitdate 20220726
+%global commit 0955dc1cec0b28e6c3d74c63f5c7da97507f0208
+%global commitdate 20221026
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -39,7 +39,7 @@ The %{name}-tools package provides command-line tools based on the
 API library of %{name}.
 
 %prep
-%autosetup -n images-%{commit} -p1
+%autosetup -p1 -n images-%{commit}
 
 %build
 %cmake -DINSTALL_NGX_MODULE=OFF \
@@ -82,6 +82,9 @@ popd
 
 
 %changelog
+* Wed Oct 26 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20221026git0955dc1
+- Update to weserv/images@0955dc1
+
 * Tue Jul 26 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20220726git6dcca50
 - Update to weserv/images@6dcca50
 
