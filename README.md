@@ -1,4 +1,4 @@
-# rpms.weserv.nl
+# weserv/rpms
 
 Spec files and patches used for building the nginx weserv module and dependencies in RHEL 8 (and its derivatives).
 
