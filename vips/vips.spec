@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.13
-%global vips_version %{vips_version_base}.2
+%global vips_version %{vips_version_base}.3
 %global vips_soname_major 42
 #global vips_prever rc2
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -49,6 +49,12 @@
 %bcond_without             heif
 
 %bcond_without             tests
+
+%if 0%{?fedora} >= 33 || 0%{?rhel} >= 9
+%bcond_without             jxl
+%else
+%bcond_with                jxl
+%endif
 
 Name:           vips
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
@@ -119,6 +125,9 @@ This package should be installed if you want to use a program compiled
 against VIPS.
 
 Additional image formats are supported in additional optional packages:
+%if %{with jxl}
+* %{name}-jxl
+%endif
 * %{name}-heif
 * %{name}-openslide
 * %{name}-poppler
@@ -156,6 +165,17 @@ Conflicts:     %{name} < %{version}-%{release}, %{name} > %{version}-%{release}
 %description doc
 The %{name}-doc package contains extensive documentation about VIPS in both
 HTML and PDF formats.
+%endif
+
+%if %{with jxl}
+%package jxl
+Summary:       JPEG-XL support for %{name}
+BuildRequires: pkgconfig(libjxl) >= 0.5
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+Supplements:   %{name}
+
+%description jxl
+The %{name}-jxl package contains the Jxl module for VIPS.
 %endif
 
 %if %{with heif}
@@ -253,6 +273,9 @@ exit 1
 export CFLAGS="%{optflags} -ftree-vectorize"
 export CXXFLAGS="%{optflags} -ftree-vectorize"
 %meson \
+%if %{without jxl}
+    -Djpeg-xl=disabled \
+%endif
 %if %{without heif}
     -Dheif=disabled \
 %endif
@@ -278,7 +301,6 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     -Dmagick-features=load \
     -Dcfitsio=disabled \
     -Dfftw=disabled \
-    -Djpeg-xl=disabled \
     -Dmatio=disabled \
     -Dnifti=disabled \
     -Dopenexr=disabled \
@@ -336,6 +358,11 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %files poppler
 %{_libdir}/vips-modules-%{vips_version_base}/vips-poppler.so
 
+%if %{with jxl}
+%files jxl
+%{_libdir}/vips-modules-%{vips_version_base}/vips-jxl.so
+%endif
+
 %if %{with heif}
 %files heif
 %{_libdir}/vips-modules-%{vips_version_base}/vips-heif.so
@@ -358,6 +385,10 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Sun Nov 20 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.3-1
+- Update to 8.13.3
+- Enable libjxl usage
+
 * Tue Oct  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.2-1
 - Update to 8.13.2
 
