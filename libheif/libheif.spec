@@ -1,5 +1,5 @@
 Name:           libheif
-Version:        1.13.0
+Version:        1.14.0
 Release:        1%{?dist}
 Summary:        HEIF file format decoder and encoder
 
@@ -7,9 +7,8 @@ License:        LGPLv3+ and MIT
 URL:            https://github.com/strukturag/%{name}
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  autoconf
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  libtool
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 BuildRequires:  pkgconfig(dav1d)
 BuildRequires:  pkgconfig(libde265)
@@ -39,15 +38,17 @@ rm -rf third-party/
 
 
 %build
-%configure --disable-static \
-           --disable-x265 \
-           --enable-rav1e
+%cmake -DENABLE_PLUGIN_LOADING=0 \
+       -DWITH_RAV1E_PLUGIN=0 \
+       -DWITH_X265=0 \
+       -DWITH_AOM=0 \
+       -DWITH_SvtEnc=0
 
-%make_build
+%cmake_build
 
 
 %install
-%make_install
+%cmake_install
 find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 
 
@@ -68,12 +69,16 @@ find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 %{_mandir}/man1/heif-*
 
 %files devel
-%{_includedir}/*
-%{_libdir}/pkgconfig/libheif.pc
+%{_includedir}/%{name}/
+%{_libdir}/cmake/%{name}/
+%{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/*.so
 
 
 %changelog
+* Sun Nov 20 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.14.0-1
+- Update to 1.14.0
+
 * Tue Oct  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.13.0-1
 - Update to 1.13.0
 
