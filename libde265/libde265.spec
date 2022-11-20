@@ -1,6 +1,6 @@
 Name:           libde265
-Version:        1.0.8
-Release:        2%{?dist}
+Version:        1.0.9
+Release:        1%{?dist}
 Summary:        Open H.265 video codec implementation
 
 License:        LGPLv3+
@@ -90,6 +90,9 @@ rm -f %{buildroot}%{_bindir}/yuv-distortion
 %{_bindir}/acceleration_speed
 
 %changelog
+* Sun Nov 20 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.9-1
+- Update to 1.0.9
+
 * Fri Jan  1 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.8-2
 - Import from rpmfusion
 - Drop libswscale, Qt5, sdl dependencies
