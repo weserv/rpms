@@ -7,10 +7,10 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.13
+%global vips_version_base 8.14
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc2
+%global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
@@ -57,7 +57,7 @@ Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
 URL:            https://github.com/libvips/libvips
-Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_tagver}.tar.gz
+Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -303,8 +303,8 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %endif
 
 %files -f vips%{vips_version_base}.lang
-%doc AUTHORS NEWS THANKS README.md ChangeLog
-%license COPYING
+%doc ChangeLog README.md
+%license LICENSE
 %{_libdir}/*.so.%{vips_soname_major}*
 %{_libdir}/girepository-1.0
 %dir %{_libdir}/vips-modules-%{vips_version_base}
@@ -326,7 +326,7 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 %files doc
 %{_datadir}/gtk-doc
 %{_docdir}/vips-doc/html
-%license COPYING
+%license LICENSE
 %endif
 
 
@@ -358,6 +358,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.0~rc1-1
+- Update to 8.14.0-rc1
+
 * Tue Jul 26 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.0-1
 - Update to 8.13.0
 
