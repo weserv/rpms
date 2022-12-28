@@ -1,4 +1,4 @@
-%global rav1e_version 0.5.0
+%global rav1e_version 0.6.2
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
@@ -14,12 +14,12 @@ URL:            https://github.com/xiph/rav1e
 Source0:        %{url}/archive/v%{rav1e_tarver}/%{name}-%{rav1e_tarver}.tar.gz
 
 # Use vendored crate dependencies so we can build offline.
-# Created using cargo-vendor
-Source1:        https://rpms.weserv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.xz
+# Created using "cargo vendor"
+Source1:        https://rpms.wsrv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.xz
 
 BuildRequires:  cargo-c
 BuildRequires:  nasm >= 2.14.0
-BuildRequires:  rust-toolset >= 1.52.1
+BuildRequires:  rust-toolset >= 1.62.1
 
 %description
 Fastest and safest AV1 encoder.
@@ -41,7 +41,7 @@ developing applications that use %{name}.
 %prep
 %autosetup -p1 -n %{name}-%{rav1e_tarver}
 
-# Source1 is vendored dependencies
+# Use the vendored dependencies in Source1
 %cargo_prep -V 1
 
 %build
@@ -64,8 +64,7 @@ developing applications that use %{name}.
     --pkgconfigdir=%{_libdir}/pkgconfig \
     --library-type=cdylib
 
-%post   -n librav1e0 -p /sbin/ldconfig
-%postun -n librav1e0 -p /sbin/ldconfig
+%ldconfig_scriptlets -n librav1e0
 
 %files
 %{_bindir}/rav1e
@@ -82,6 +81,10 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.2-1
+- Update to 0.6.2
+- Switch to %%ldconfig_scriptlets
+
 * Mon Nov  8 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.5.0-1
 - Update to 0.5.0
 
