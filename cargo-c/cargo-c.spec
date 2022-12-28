@@ -17,7 +17,7 @@
 %endif
 
 Name:           cargo-c
-Version:        0.9.9
+Version:        0.9.13
 Release:        1%{?dist}
 Summary:        Helper program to build and install c-like libraries
 
@@ -28,7 +28,7 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
-Source1:        https://rpms.weserv.nl/sources/%{name}-%{version}-vendor.tar.xz
+Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 BuildRequires:  rust-packaging
 # needed by curl-sys
@@ -37,13 +37,13 @@ BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(openssl) >= 1.0.1
 
 %if %{with bundled_libgit2}
-Provides:       bundled(libgit2) = 1.3.0
+Provides:       bundled(libgit2) = 1.4.2
 %else
-BuildRequires:  pkgconfig(libgit2) >= 1.1.0
+BuildRequires:  pkgconfig(libgit2) >= 1.4.0
 %endif
 
 %if %{with bundled_libssh2}
-Provides:       bundled(libssh2) = 1.10.0~dev
+Provides:       bundled(libssh2) = 1.10.0
 %else
 # needs libssh2_userauth_publickey_frommemory
 BuildRequires:  pkgconfig(libssh2) >= 1.6.0
@@ -106,6 +106,9 @@ rm -rf %{buildroot}/%{_builddir}/%{name}-%{version}/vendor/
 %{_bindir}/cargo-capi
 
 %changelog
+* Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.13-1
+- Update to 0.9.13
+
 * Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.9-1
 - Update to 0.9.9
 
