@@ -2,7 +2,7 @@
 # required rust libraries
 %global bundled_rust_deps 1
 
-%global rav1e_version 0.5.1
+%global rav1e_version 0.6.2
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
@@ -19,7 +19,7 @@ Source0:        %{url}/archive/v%{rav1e_tarver}/%{name}-%{rav1e_tarver}.tar.gz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
-Source1:        https://rpms.weserv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.xz
+Source1:        https://rpms.wsrv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.xz
 
 BuildRequires:  cargo-c
 BuildRequires:  nasm >= 2.14.0
@@ -99,6 +99,9 @@ rm -rf %{buildroot}/%{_builddir}/%{name}-%{version}/vendor/
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.2-1
+- Update to 0.6.2
+
 * Wed Jul 27 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.5.1-1
 - Update to 0.5.1
 - Switch to %%ldconfig_scriptlets
