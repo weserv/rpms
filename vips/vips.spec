@@ -52,14 +52,14 @@
 
 Name:           vips
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
 URL:            https://github.com/libvips/libvips
 Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_version}.tar.xz
 
-# https://github.com/kleisauke/libvips/commit/164e5010cd9e1ef4e376a6f86341e38602fae4a4
+# https://github.com/libvips/libvips/compare/master...kleisauke:stop-idle-threads
 Patch0:         stop-idle-threads.patch
 
 BuildRequires:  gcc
@@ -361,6 +361,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Fri Dec 30 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.0~rc1-3
+- Test build for kleisauke/libvips@02e93f8
+
 * Fri Dec 30 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.0~rc1-2
 - Test build for kleisauke/libvips@164e501
 

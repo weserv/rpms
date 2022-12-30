@@ -1,7 +1,7 @@
 From 164e5010cd9e1ef4e376a6f86341e38602fae4a4 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Fri, 30 Dec 2022 16:41:52 +0100
-Subject: [PATCH] Stop idle threads after 15 seconds
+Subject: [PATCH 1/5] Stop idle threads after 15 seconds
 
 In line with the previous behaviour of GLib's threadpool.
 ---
@@ -159,3 +159,219 @@ index 4e9cb10ce2..2a96f4513a 100644
  	VIPS_FREE( member );
  }
  
+
+From 4f778d115bd853c73a34162890021a21d96c5fce Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Fri, 30 Dec 2022 18:19:37 +0100
+Subject: [PATCH 2/5] Re-add `member->user_data`
+
+---
+ libvips/iofuncs/threadset.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libvips/iofuncs/threadset.c b/libvips/iofuncs/threadset.c
+index 2a96f4513a..a6e69d744e 100644
+--- a/libvips/iofuncs/threadset.c
++++ b/libvips/iofuncs/threadset.c
+@@ -62,6 +62,7 @@ typedef struct _VipsThreadsetMember {
+ 	const char *domain;
+ 	GFunc func; 
+ 	void *data;
++	void *user_data;
+ 
+ 	/* The thread waits on this when it's free.
+ 	 */
+@@ -118,7 +119,7 @@ vips_threadset_work( void *pointer )
+ 
+ 		/* Execute the task.
+ 		 */
+-		member->func( member->data, NULL );
++		member->func( member->data, member->user_data );
+ 
+ 		/* Free any thread-private resources -- they will not be
+ 		 * useful for the next task to use this thread.
+@@ -128,6 +129,7 @@ vips_threadset_work( void *pointer )
+ 		member->domain = NULL;
+ 		member->func = NULL;
+ 		member->data = NULL;
++		member->user_data = NULL;
+ 
+ 		/* We are free ... back on the free list!
+ 		 */
+@@ -269,6 +271,7 @@ vips_threadset_run( VipsThreadset *set,
+ 	member->domain = domain;
+ 	member->func = func;
+ 	member->data = data;
++	member->user_data = NULL;
+ 	vips_semaphore_up( &member->idle );
+ 
+ 	return( 0 );
+
+From 1e65421d206071cb405aabd8160e0fd7de95a6a7 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Fri, 30 Dec 2022 18:32:34 +0100
+Subject: [PATCH 3/5] Make the timeout a double
+
++ prefer microsecond precision.
+---
+ libvips/include/vips/internal.h | 2 +-
+ libvips/iofuncs/semaphore.c     | 7 ++++---
+ libvips/iofuncs/threadset.c     | 7 ++++++-
+ 3 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/libvips/include/vips/internal.h b/libvips/include/vips/internal.h
+index eb31a62e13..f28052d7f0 100644
+--- a/libvips/include/vips/internal.h
++++ b/libvips/include/vips/internal.h
+@@ -160,7 +160,7 @@ int vips__object_leak( void );
+ int vips__open_image_read( const char *filename );
+ int vips__open_image_write( const char *filename, gboolean temp );
+ 
+-int vips__semaphore_down_timed( VipsSemaphore *s, int timeout_s );
++int vips__semaphore_down_timed( VipsSemaphore *s, double timeout_ms );
+ 
+ /* im_image_open_input() needs to have this visible.
+  */
+diff --git a/libvips/iofuncs/semaphore.c b/libvips/iofuncs/semaphore.c
+index 62f83a8c88..cd070ee6a6 100644
+--- a/libvips/iofuncs/semaphore.c
++++ b/libvips/iofuncs/semaphore.c
+@@ -146,10 +146,11 @@ vips_semaphore_down( VipsSemaphore *s )
+ }
+ 
+ /* Waits until sem > 0, then decrement.
+- * Returns -1 when the relative time in @timeout_s (in seconds) was passed.
++ * Returns -1 when the relative time in @timeout_ms (in microseconds)
++ * was passed.
+  */
+ int
+-vips__semaphore_down_timed( VipsSemaphore *s, int timeout_s )
++vips__semaphore_down_timed( VipsSemaphore *s, double timeout_ms )
+ {
+ 	gint64 end_time;
+ 	int value_after_op;
+@@ -158,7 +159,7 @@ vips__semaphore_down_timed( VipsSemaphore *s, int timeout_s )
+ 
+ 	g_mutex_lock( s->mutex );
+ 
+-	end_time = g_get_monotonic_time() + timeout_s * G_TIME_SPAN_SECOND;
++	end_time = g_get_monotonic_time() + timeout_ms;
+ 	while( s->v < 1 )
+ 		if( !g_cond_wait_until( s->cond, s->mutex, end_time ) ) {
+ 			/* timeout has passed.
+diff --git a/libvips/iofuncs/threadset.c b/libvips/iofuncs/threadset.c
+index a6e69d744e..3267bffaef 100644
+--- a/libvips/iofuncs/threadset.c
++++ b/libvips/iofuncs/threadset.c
+@@ -92,6 +92,11 @@ struct _VipsThreadset {
+ 	int max_threads;
+ };
+ 
++/* The maximum relative time (in microseconds) that a thread waits
++ * for work before being stopped.
++ */
++static const double max_idle_time = 15 * G_TIME_SPAN_SECOND;
++
+ /* The thread work function.
+  */
+ static void *
+@@ -103,7 +108,7 @@ vips_threadset_work( void *pointer )
+ 	for(;;) {
+ 		/* Wait for at least 15 seconds to be given work.
+ 		 */
+-		if( vips__semaphore_down_timed( &member->idle, 15 ) == -1 )
++		if( vips__semaphore_down_timed( &member->idle, max_idle_time ) == -1 )
+ 			break;
+ 
+ 		/* Killed or no task available? Leave this thread.
+
+From c1df1d04957961304f5f634d61fee2f40be96f81 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Fri, 30 Dec 2022 18:52:53 +0100
+Subject: [PATCH 4/5] Plug a possible memory leak
+
+---
+ libvips/iofuncs/threadset.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/libvips/iofuncs/threadset.c b/libvips/iofuncs/threadset.c
+index 3267bffaef..441932401c 100644
+--- a/libvips/iofuncs/threadset.c
++++ b/libvips/iofuncs/threadset.c
+@@ -143,14 +143,19 @@ vips_threadset_work( void *pointer )
+ 		g_mutex_unlock( set->lock );
+ 	}
+ 
+-	/* Timed-out or kill has been requested ... remove from the free list.
+-	 * Leave this thread on the members list, so it can be found and joined.
++	/* Timed-out or kill has been requested ... remove from both free
++	 * and member list.
+ 	 */
+ 	g_mutex_lock( set->lock );
+ 	set->free = g_slist_remove( set->free, member );
++	set->members = g_slist_remove( set->members, member );
+ 	set->n_threads -= 1;
+ 	g_mutex_unlock( set->lock );
+ 
++	vips_semaphore_destroy( &member->idle );
++
++	VIPS_FREE( member );
++
+ 	return( NULL );
+ }
+ 
+@@ -291,9 +296,8 @@ vips_threadset_kill_member( VipsThreadsetMember *member )
+ 	vips_semaphore_up( &member->idle );
+ 	g_thread_join( member->thread );
+ 
+-	vips_semaphore_destroy( &member->idle );
+-
+-	VIPS_FREE( member );
++	/* member is freed on thread exit.
++	 */
+ }
+ 
+ /** 
+@@ -315,10 +319,8 @@ vips_threadset_free( VipsThreadset *set )
+ 
+ 		member = NULL;
+ 		g_mutex_lock( set->lock );
+-		if( set->members ) {
++		if( set->members )
+ 			member = (VipsThreadsetMember *) set->members->data;
+-			set->members = g_slist_remove( set->members, member );
+-		}
+ 		g_mutex_unlock( set->lock );
+ 
+ 		if( !member )
+
+From 02e93f8ae2b17c0c76ef6fa6869614e6966dd458 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Fri, 30 Dec 2022 19:19:48 +0100
+Subject: [PATCH 5/5] Fix a segfault
+
+`member` is freed during thread exit, so use a temporary variable here.
+---
+ libvips/iofuncs/threadset.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/libvips/iofuncs/threadset.c b/libvips/iofuncs/threadset.c
+index 441932401c..cbea6ba4c8 100644
+--- a/libvips/iofuncs/threadset.c
++++ b/libvips/iofuncs/threadset.c
+@@ -292,9 +292,14 @@ vips_threadset_run( VipsThreadset *set,
+ static void
+ vips_threadset_kill_member( VipsThreadsetMember *member )
+ {
++	GThread *thread;
++
++	thread = member->thread;
+ 	member->kill = TRUE;
++
+ 	vips_semaphore_up( &member->idle );
+-	g_thread_join( member->thread );
++
++	(void) g_thread_join( thread );
+ 
+ 	/* member is freed on thread exit.
+ 	 */
