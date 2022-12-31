@@ -52,7 +52,7 @@
 
 Name:           vips
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
@@ -361,6 +361,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Sat Dec 31 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.0~rc2-4
+- Test build for kleisauke/libvips@88a6f29
+
 * Fri Dec 30 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.0~rc1-3
 - Test build for kleisauke/libvips@02e93f8
 
