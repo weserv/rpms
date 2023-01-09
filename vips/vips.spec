@@ -8,9 +8,9 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.14
-%global vips_version %{vips_version_base}.0
+%global vips_version %{vips_version_base}.1
 %global vips_soname_major 42
-%global vips_prever rc1
+#global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
@@ -61,7 +61,7 @@ Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_version}.ta
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  meson
+BuildRequires:  meson >= 0.55
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(expat)
@@ -283,16 +283,13 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     -Dnifti=disabled \
     -Dopenexr=disabled \
     -Dpdfium=disabled \
+    -Dquantizr=disabled \
     %{nil}
 
 %meson_build
 
 %install
 %meson_install
-
-%if 0%{?fedora} >= 29 || 0%{?rhel} >= 8
-sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipsprofile
-%endif
 
 # locale stuff
 %find_lang vips%{vips_version_base}
@@ -358,6 +355,9 @@ sed -e 's:/usr/bin/python:%{_bindir}/python3:' -i %{buildroot}/%{_bindir}/vipspr
 
 
 %changelog
+* Mon Jan  9 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.1-1
+- Update to 8.14.1
+
 * Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.0~rc1-1
 - Update to 8.14.0-rc1
 
