@@ -1,5 +1,5 @@
 Name:           libde265
-Version:        1.0.9
+Version:        1.0.11
 Release:        1%{?dist}
 Summary:        Open H.265 video codec implementation
 
@@ -64,7 +64,6 @@ find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 # Don't package internal development tools.
 rm -f %{buildroot}%{_bindir}/bjoentegaard
 rm -f %{buildroot}%{_bindir}/block-rate-estim
-rm -f %{buildroot}%{_bindir}/enc265
 rm -f %{buildroot}%{_bindir}/gen-enc-table
 rm -f %{buildroot}%{_bindir}/hdrcopy
 rm -f %{buildroot}%{_bindir}/rd-curves
@@ -90,6 +89,9 @@ rm -f %{buildroot}%{_bindir}/yuv-distortion
 %{_bindir}/acceleration_speed
 
 %changelog
+* Thu Feb  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.11-1
+- Update to 1.0.11
+
 * Sun Nov 20 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.9-1
 - Update to 1.0.9
 
