@@ -2,7 +2,7 @@
 # required rust libraries
 %global bundled_rust_deps 1
 
-%global rav1e_version 0.6.2
+%global rav1e_version 0.6.3
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
@@ -99,6 +99,9 @@ rm -rf %{buildroot}/%{_builddir}/%{name}-%{version}/vendor/
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Sun Mar 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.3-1
+- Update to 0.6.3
+
 * Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.2-1
 - Update to 0.6.2
 
