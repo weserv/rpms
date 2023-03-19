@@ -1,5 +1,5 @@
 Name:           libheif
-Version:        1.14.2
+Version:        1.15.1
 Release:        1%{?dist}
 Summary:        HEIF file format decoder and encoder
 
@@ -49,8 +49,6 @@ rm -rf third-party/
 
 %install
 %cmake_install
-find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
-
 
 %ldconfig_scriptlets
 
@@ -64,7 +62,6 @@ find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 %{_bindir}/heif-thumbnailer
 %{_libdir}/*.so.1*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.*
-%{_datadir}/mime/packages/*.xml
 %{_datadir}/thumbnailers/
 %{_mandir}/man1/heif-*
 
@@ -76,6 +73,9 @@ find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
 
 
 %changelog
+* Sun Mar 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.15.1-1
+- Update to 1.15.1
+
 * Mon Jan  9 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.14.2-1
 - Update to 1.14.2
 
