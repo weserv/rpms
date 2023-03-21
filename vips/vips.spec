@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.14
-%global vips_version %{vips_version_base}.1
+%global vips_version %{vips_version_base}.2
 %global vips_soname_major 42
 #global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -355,6 +355,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Tue Mar 21 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-1
+- Update to 8.14.2
+
 * Mon Jan  9 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.1-1
 - Update to 8.14.1
 
