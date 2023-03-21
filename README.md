@@ -25,14 +25,14 @@ Build the `nginx-mod-weserv` RPM within a Docker container:
 
 * Build the source RPM.
     ```bash
-    docker run --cap-add=SYS_ADMIN -v $(pwd):/rpms -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
+    docker run --privileged -v $(pwd):/rpms -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
        mock --buildsrpm -r el8-wsrv-x86_64 --enable-network -D '_disable_source_fetch 0' --resultdir=/rpmbuild/SRPMS \
          --spec=/rpms/nginx-mod-weserv/nginx-mod-weserv.spec --sources=/rpms/nginx-mod-weserv
     ```
 
 * Build the RPM.
     ```bash
-    docker run --cap-add=SYS_ADMIN -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
+    docker run --privileged -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
       mock --rebuild -r el8-wsrv-x86_64 --resultdir=/rpmbuild/RPMS/"{{target_arch}}"/ \
-        /rpmbuild/SRPMS/nginx-mod-weserv-5.0.0-1.20220726git6dcca50.el8.wsrv.src.rpm
+        /rpmbuild/SRPMS/nginx-mod-weserv-5.0.0-1.20230321git7757b18.el8.wsrv.src.rpm
     ```
