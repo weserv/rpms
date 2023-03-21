@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.14
-%global vips_version %{vips_version_base}.1
+%global vips_version %{vips_version_base}.2
 %global vips_soname_major 42
 #global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -50,7 +50,7 @@
 
 %bcond_without             tests
 
-%if 0%{?fedora} >= 33 || 0%{?rhel} >= 9
+%if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
 %bcond_without             jxl
 %else
 %bcond_with                jxl
@@ -170,7 +170,7 @@ HTML and PDF formats.
 %if %{with jxl}
 %package jxl
 Summary:       JPEG-XL support for %{name}
-BuildRequires: pkgconfig(libjxl) >= 0.5
+BuildRequires: pkgconfig(libjxl) >= 0.6
 Requires:      %{name}%{?_isa} = %{version}-%{release}
 Supplements:   %{name}
 
@@ -382,6 +382,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Tue Mar 21 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-1
+- Update to 8.14.2
+
 * Mon Jan  9 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.1-1
 - Update to 8.14.1
 
