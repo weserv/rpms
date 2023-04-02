@@ -1,36 +1,50 @@
 Name:           libheif
-Version:        1.15.1
+Epoch:          1
+Version:        1.15.2
 Release:        1%{?dist}
-Summary:        HEIF file format decoder and encoder
+Summary:        HEIF and AVIF file format decoder and encoder
 
-License:        LGPLv3+ and MIT
+License:        LGPL-3.0-or-later and MIT
 URL:            https://github.com/strukturag/%{name}
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 BuildRequires:  pkgconfig(dav1d)
 BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
-BuildRequires:  pkgconfig(rav1e)
 BuildRequires:  pkgconfig(libpng)
-
-Requires:  shared-mime-info
+BuildRequires:  pkgconfig(rav1e)
 
 %description
-HEIF is a image format using HEVC image coding for the best compression ratios.
-libheif uses libde265 for the actual image decoding and x265 for encoding.
-Alternative codecs for, e.g., AVC and JPEG can be provided as plugins.
+libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format)
+file format decoder and encoder.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
+%package        tools
+Summary:        Tools for manipulating HEIF files
+License:        MIT
+Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:       shared-mime-info
+
+%description    tools
+This package provides tools for manipulating HEIF files.
+
+%package -n     heif-pixbuf-loader
+Summary:        HEIF image loader for GTK+ applications
+BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:       gdk-pixbuf2%{?_isa}
+
+%description -n heif-pixbuf-loader
+This package provides a plugin to load HEIF files in GTK+ applications.
 
 %prep
 %autosetup -p1
@@ -56,14 +70,7 @@ rm -rf third-party/
 %files
 %license COPYING
 %doc README.md
-%{_bindir}/heif-convert
-%{_bindir}/heif-enc
-%{_bindir}/heif-info
-%{_bindir}/heif-thumbnailer
 %{_libdir}/*.so.1*
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.*
-%{_datadir}/thumbnailers/
-%{_mandir}/man1/heif-*
 
 %files devel
 %{_includedir}/%{name}/
@@ -71,8 +78,21 @@ rm -rf third-party/
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/*.so
 
+%files tools
+%{_bindir}/heif-*
+%{_mandir}/man1/heif-*
+%{_datadir}/thumbnailers/heif.thumbnailer
+
+%files -n heif-pixbuf-loader
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
+
 
 %changelog
+* Sun Apr  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.15.2-1
+- Bump epoch
+- Update to 1.15.2
+- Split tools and gdk-pixbuf loader to subpackages
+
 * Sun Mar 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.15.1-1
 - Update to 1.15.1
 
