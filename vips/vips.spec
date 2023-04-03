@@ -53,12 +53,15 @@
 Name:           vips
 Epoch:          1
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C/C++ library for processing large images
 
 License:        LGPLv2+
 URL:            https://github.com/libvips/libvips
 Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_version}.tar.xz
+
+# https://github.com/libvips/libvips/commit/cbe65cc060d62887ae505087a9ff49c78650dd97
+Patch0:         cbe65cc060d62887ae505087a9ff49c78650dd97.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -246,7 +249,7 @@ exit 1
 %endif
 %endif
 
-%setup -q -n vips-%{vips_version}
+%autosetup -p1 -n vips-%{vips_version}
 
 %build
 # Upstream recommends enabling auto-vectorization of inner loops:
@@ -356,6 +359,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-2
+- Test build for libvips/libvips@cbe65cc
+
 * Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-1
 - Bump epoch
 
