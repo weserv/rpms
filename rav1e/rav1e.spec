@@ -1,4 +1,4 @@
-%global rav1e_version 0.6.3
+%global rav1e_version 0.6.4
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
@@ -81,6 +81,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.4-1
+- Update to 0.6.4
+
 * Sun Mar 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.3-1
 - Update to 0.6.3
 
