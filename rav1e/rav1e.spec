@@ -4,7 +4,7 @@
 
 Name:           rav1e
 Version:        %{rav1e_version}%{?rav1e_prever:~%{rav1e_prever}}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Fastest and safest AV1 encoder
 
 # Upstream license specification: BSD-2-Clause
@@ -24,15 +24,15 @@ BuildRequires:  rust-toolset >= 1.62.1
 %description
 Fastest and safest AV1 encoder.
 
-%package -n librav1e0
+%package libs
 Summary:        Library files for rav1e
 
-%description -n librav1e0
+%description libs
 Library files for rav1e, the fastest and safest AV1 encoder.
 
 %package devel
 Summary:        Development files for rav1e
-Requires:       librav1e0%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 The %{name}-devel package contains libraries and header files for
@@ -64,12 +64,12 @@ developing applications that use %{name}.
     --pkgconfigdir=%{_libdir}/pkgconfig \
     --library-type=cdylib
 
-%ldconfig_scriptlets -n librav1e0
+%ldconfig_scriptlets libs
 
 %files
 %{_bindir}/rav1e
 
-%files -n librav1e0
+%files libs
 %license LICENSE PATENTS
 %{_libdir}/librav1e.so.0*
 
@@ -81,6 +81,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.4-2
+- Rename librav1e0 subpackage to rav1e-libs
+
 * Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.4-1
 - Update to 0.6.4
 
