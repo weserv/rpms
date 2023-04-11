@@ -57,6 +57,7 @@
 %endif
 
 Name:           vips
+Epoch:          1
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
 Release:        1%{?dist}
 Summary:        C/C++ library for processing large images
@@ -139,7 +140,7 @@ Additional image formats are supported in additional optional packages:
 
 %package devel
 Summary:    Development files for %{name}
-Requires:   %{name}%{?_isa} = %{version}-%{release}
+Requires:   %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description devel
 The %{name}-devel package contains the header files and
@@ -149,7 +150,7 @@ contains a C++ API and development documentation.
 
 %package tools
 Summary:    Command-line tools for %{name}
-Requires:   %{name}%{?_isa} = %{version}-%{release}
+Requires:   %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description tools
 The %{name}-tools package contains command-line tools for working with VIPS.
@@ -160,7 +161,7 @@ The %{name}-tools package contains command-line tools for working with VIPS.
 Summary:       Documentation for %{name}
 BuildRequires: gtk-doc
 BuildRequires: doxygen
-Conflicts:     %{name} < %{version}-%{release}, %{name} > %{version}-%{release}
+Conflicts:     %{name} < %{epoch}:%{version}-%{release}, %{name} > %{epoch}:%{version}-%{release}
 
 %description doc
 The %{name}-doc package contains extensive documentation about VIPS in both
@@ -171,7 +172,7 @@ HTML and PDF formats.
 %package jxl
 Summary:       JPEG-XL support for %{name}
 BuildRequires: pkgconfig(libjxl) >= 0.6
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Supplements:   %{name}
 
 %description jxl
@@ -181,8 +182,8 @@ The %{name}-jxl package contains the Jxl module for VIPS.
 %if %{with heif}
 %package heif
 Summary:       Heif support for %{name}
-BuildRequires: pkgconfig(libheif) >= 1.3
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+BuildRequires: pkgconfig(libheif) >= 1.4.0
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description heif
 The %{name}-heif package contains the Heif module for VIPS.
@@ -191,7 +192,7 @@ The %{name}-heif package contains the Heif module for VIPS.
 %package openslide
 Summary:       OpenSlide support for %{name}
 BuildRequires: pkgconfig(openslide) >= 3.3.0
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description openslide
 The %{name}-openslide package contains the OpenSlide module for VIPS.
@@ -199,7 +200,7 @@ The %{name}-openslide package contains the OpenSlide module for VIPS.
 %package poppler
 Summary:       Poppler support for %{name}
 BuildRequires: pkgconfig(poppler-glib)
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description poppler
 The %{name}-poppler package contains the Poppler module for VIPS.
@@ -208,12 +209,12 @@ The %{name}-poppler package contains the Poppler module for VIPS.
 %package magick-im6
 Summary:       Magick support for %{name} using ImageMagick6
 BuildRequires: ImageMagick6-devel
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 %if 0%{?fedora} >= 34
-Obsoletes:     %{name}-magick         < %{version}-%{release}
+Obsoletes:     %{name}-magick         < %{epoch}:%{version}-%{release}
 %endif
-Provides:      %{name}-magick         = %{version}-%{release}
-Provides:      %{name}-magick%{?_isa} = %{version}-%{release}
+Provides:      %{name}-magick         = %{epoch}:%{version}-%{release}
+Provides:      %{name}-magick%{?_isa} = %{epoch}:%{version}-%{release}
 Conflicts:     %{name}-magick-im7
 Conflicts:     %{name}-magick-gm
 
@@ -226,9 +227,9 @@ using ImageMagick version 6.
 %package magick-im7
 Summary:       Magick support for %{name} using ImageMagick7
 BuildRequires: ImageMagick7-devel
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Provides:      %{name}-magick         = %{version}-%{release}
-Provides:      %{name}-magick%{?_isa} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Provides:      %{name}-magick         = %{epoch}:%{version}-%{release}
+Provides:      %{name}-magick%{?_isa} = %{epoch}:%{version}-%{release}
 Conflicts:     %{name}-magick-im6
 Conflicts:     %{name}-magick-gm
 
@@ -241,9 +242,9 @@ using ImageMagick version 7.
 %package magick-gm
 Summary:       Magick support for %{name} using GraphicsMagick
 BuildRequires: GraphicsMagick-devel
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Provides:      %{name}-magick         = %{version}-%{release}
-Provides:      %{name}-magick%{?_isa} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Provides:      %{name}-magick         = %{epoch}:%{version}-%{release}
+Provides:      %{name}-magick%{?_isa} = %{epoch}:%{version}-%{release}
 Conflicts:     %{name}-magick-im6
 Conflicts:     %{name}-magick-im7
 
@@ -382,6 +383,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-1
+- Bump epoch
+
 * Tue Mar 21 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-1
 - Update to 8.14.2
 
