@@ -1,6 +1,6 @@
 Name:           libheif
 Epoch:          1
-Version:        1.15.2
+Version:        1.16.1
 Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
@@ -10,6 +10,7 @@ Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
+#BuildRequires: pkgconfig(libsharpyuv) TODO requires libwebp >= 1.3.0
 BuildRequires:  pkgconfig(dav1d)
 BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
@@ -88,6 +89,9 @@ rm -rf third-party/
 
 
 %changelog
+* Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.16.1-1
+- Update to 1.16.1
+
 * Sun Apr  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.15.2-1
 - Bump epoch
 - Update to 1.15.2
