@@ -1,5 +1,5 @@
 Name:           libspng
-Version:        0.7.3
+Version:        0.7.4
 Release:        1%{?dist}
 Summary:        Simple, modern libpng alternative
 
@@ -53,6 +53,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/spng.pc
 
 %changelog
+* Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.7.4-1
+- Update to 0.7.4
+
 * Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.7.3-1
 - Update to 0.7.3
 
