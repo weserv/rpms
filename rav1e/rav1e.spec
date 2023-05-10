@@ -1,10 +1,10 @@
-%global rav1e_version 0.6.4
+%global rav1e_version 0.6.5
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
 Name:           rav1e
 Version:        %{rav1e_version}%{?rav1e_prever:~%{rav1e_prever}}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Fastest and safest AV1 encoder
 
 # Upstream license specification: BSD-2-Clause
@@ -81,6 +81,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.5-1
+- Update to 0.6.5
+
 * Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.4-2
 - Rename librav1e0 subpackage to rav1e-libs
 
