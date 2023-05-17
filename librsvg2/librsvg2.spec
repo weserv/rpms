@@ -12,20 +12,21 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.55.1
+Version:        2.56.0
 Release:        1%{?dist}
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.55/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.56/librsvg-%{version}.tar.xz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
-Source1:        https://rpms.weserv.nl/sources/%{name}-%{version}-vendor.tar.xz
+Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 BuildRequires:  rust-packaging
 BuildRequires:  chrpath
 BuildRequires:  gcc
+BuildRequires:  gi-docgen
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  make
 BuildRequires:  pkgconfig(cairo) >= %{cairo_version}
@@ -91,7 +92,7 @@ sed -i 's/--locked //g' Makefile.in
 
 # Replace bare `cargo` with the one used by %%cargo_* macros
 %configure --disable-static  \
-           --disable-gtk-doc \
+           --enable-gtk-doc \
            --docdir=%{_pkgdocdir} \
            --enable-introspection \
            --enable-vala \
@@ -110,7 +111,7 @@ chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader
 rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 
 %files
-%doc code-of-conduct.md CONTRIBUTING.md README.md
+%doc code-of-conduct.md NEWS README.md
 %license COPYING.LIB
 %{_libdir}/librsvg-2.so.*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
@@ -128,12 +129,17 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/librsvg-2.0.vapi
+%{_docdir}/Rsvg-2.0
 
 %files tools
 %{_bindir}/rsvg-convert
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Wed May 17 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.56.0-1
+- Update to 2.56.0
+- Enable gtk-doc support
+
 * Tue Oct  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.55.1-1
 - Update to 2.55.1
 
