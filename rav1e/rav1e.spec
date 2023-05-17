@@ -1,4 +1,4 @@
-%global rav1e_version 0.6.5
+%global rav1e_version 0.6.6
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
@@ -19,7 +19,7 @@ Source1:        https://rpms.wsrv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.
 
 BuildRequires:  cargo-c
 BuildRequires:  nasm >= 2.14.0
-BuildRequires:  rust-toolset >= 1.62.1
+BuildRequires:  rust-toolset >= 1.60.0
 
 %description
 Fastest and safest AV1 encoder.
@@ -81,6 +81,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Wed May 17 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.6-1
+- Update to 0.6.6
+
 * Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.5-1
 - Update to 0.6.5
 
