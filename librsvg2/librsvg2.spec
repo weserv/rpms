@@ -12,7 +12,7 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.56.1
+Version:        2.56.3
 Release:        1%{?dist}
 
 License:        LGPLv2+
@@ -46,8 +46,7 @@ BuildRequires:  /usr/bin/rst2man
 
 Requires:       cairo%{?_isa} >= %{cairo_version}
 Requires:       cairo-gobject%{?_isa} >= %{cairo_version}
-# We install a gdk-pixbuf svg loader
-Requires:       gdk-pixbuf2%{?_isa}
+Recommends:     rsvg-pixbuf-loader
 
 %description
 An SVG library based on cairo.
@@ -59,6 +58,14 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description devel
 This package provides the necessary development libraries and include
 files to allow you to develop with librsvg.
+
+%package -n rsvg-pixbuf-loader
+Summary:        SVG image loader for gdk-pixbuf
+Requires:       gdk-pixbuf2%{?_isa}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description -n rsvg-pixbuf-loader
+This package provides a gdk-pixbuf plugin for loading SVG images in GTK apps.
 
 %package tools
 Summary:        Extra tools for librsvg
@@ -114,11 +121,13 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %doc code-of-conduct.md NEWS README.md
 %license COPYING.LIB
 %{_libdir}/librsvg-2.so.*
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Rsvg-2.0.typelib
 %dir %{_datadir}/thumbnailers
 %{_datadir}/thumbnailers/librsvg.thumbnailer
+
+%files -n rsvg-pixbuf-loader
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
 
 %files devel
 %{_libdir}/librsvg-2.so
@@ -136,6 +145,10 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Mon Jul 24 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.56.3-1
+- Update to 2.56.3
+- Split gdk-pixbuf loader into a subpackage
+
 * Mon Jun 26 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.56.1-1
 - Update to 2.56.1
 
