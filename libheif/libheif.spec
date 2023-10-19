@@ -1,6 +1,6 @@
 Name:           libheif
 Epoch:          1
-Version:        1.16.2
+Version:        1.17.1
 Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
@@ -54,10 +54,13 @@ rm -rf third-party/
 
 %build
 %cmake -DENABLE_PLUGIN_LOADING=0 \
+       -DWITH_DAV1D=1 \
+       -DWITH_DAV1D_PLUGIN=0 \
+       -DWITH_RAV1E=1 \
        -DWITH_RAV1E_PLUGIN=0 \
        -DWITH_X265=0 \
-       -DWITH_AOM=0 \
-       -DWITH_SvtEnc=0
+       -DWITH_AOM_DECODER=0 \
+       -DWITH_AOM_ENCODER=0
 
 %cmake_build
 
@@ -89,6 +92,9 @@ rm -rf third-party/
 
 
 %changelog
+* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.1-1
+- Update to 1.17.1
+
 * Mon Jun 26 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.16.2-1
 - Update to 1.16.2
 
