@@ -7,10 +7,10 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.14
-%global vips_version %{vips_version_base}.4
+%global vips_version_base 8.15
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
+%global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
@@ -23,10 +23,12 @@
 %bcond_without             libimagequant
 %bcond_without             libcgif
 %bcond_without             libspng
+%bcond_without             highway
 %else
 %bcond_with                libimagequant
 %bcond_with                libcgif
 %bcond_with                libspng
+%bcond_with                highway
 %endif
 
 %if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
@@ -67,7 +69,11 @@ BuildRequires:  gettext
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
-BuildRequires:  pkgconfig(orc-0.4)
+%if %{with highway}
+BuildRequires:  pkgconfig(libhwy) >= 1.0.5
+%else
+BuildRequires:  pkgconfig(orc-0.4) >= 0.4.11
+%endif
 BuildRequires:  pkgconfig(lcms2)
 BuildRequires:  pkgconfig(pangoft2)
 BuildRequires:  pkgconfig(zlib)
@@ -76,7 +82,7 @@ BuildRequires:  pkgconfig(libtiff-4)
 # upstream requires 0.6
 BuildRequires:  pkgconfig(libwebp) > 1
 BuildRequires:  pkgconfig(libexif)
-BuildRequires:  pkgconfig(libgsf-1)
+BuildRequires:  pkgconfig(libarchive) >= 3
 BuildRequires:  pkgconfig(librsvg-2.0) >= 2.50.0
 BuildRequires:  pkgconfig(libjpeg) > 1.5.3
 %if %{with libspng}
@@ -276,6 +282,11 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %if %{with gm}
     -Dmagick-package=GraphicsMagick \
 %endif
+%if %{with highway}
+    -Dhighway=enabled \
+%else
+    -Dhighway=disabled \
+%endif
     -Dmagick-features=load \
     -Dcfitsio=disabled \
     -Dfftw=disabled \
@@ -356,6 +367,11 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.0~rc1-1
+- Update to 8.15.0-rc1
+- Remove liborc in favor of libhwy on Fedora and EL-8
+- Remove libgsf in favor of libarchive
+
 * Tue Aug 15 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.4-1
 - Update to 8.14.4
 
