@@ -10,7 +10,7 @@
 %global vips_version_base 8.15
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc1
+%global vips_prever rc2
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
@@ -367,6 +367,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Fri Nov  3 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.0~rc2-1
+- Update to 8.15.0-rc2
+
 * Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.0~rc1-1
 - Update to 8.15.0-rc1
 - Remove liborc in favor of libhwy on Fedora and EL-8
