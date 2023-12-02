@@ -13,7 +13,7 @@
 %endif
 
 Name:           cargo-c
-Version:        0.9.15
+Version:        0.9.27
 Release:        1%{?dist}
 Summary:        Helper program to build and install c-like libraries
 
@@ -26,27 +26,27 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 # Created using "cargo vendor"
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
-BuildRequires:  rust-toolset >= 1.66.0
+BuildRequires:  rust-toolset >= 1.70.0
 # needed by curl-sys
 BuildRequires:  pkgconfig(libcurl)
 # needed by openssl-sys
 BuildRequires:  pkgconfig(openssl) >= 1.0.1
 
 %if %{with bundled_libgit2}
-Provides:       bundled(libgit2) = 1.5.0
+Provides:       bundled(libgit2) = 1.6.4
 %else
-BuildRequires:  pkgconfig(libgit2) >= 1.4.4
+BuildRequires:  pkgconfig(libgit2) >= 1.6.4
 %endif
 
 %if %{with bundled_libssh2}
-Provides:       bundled(libssh2) = 1.10.0
+Provides:       bundled(libssh2) = 1.11.0
 %else
 # needs libssh2_userauth_publickey_frommemory
 BuildRequires:  pkgconfig(libssh2) >= 1.6.0
 %endif
 
 # It only supports being called as a subcommand, e.g. "cargo cbuild"
-Requires:       cargo >= 1.66.0
+Requires:       cargo >= 1.70.0
 
 %description
 Helper program to build and install c-like libraries.
@@ -88,6 +88,9 @@ export LIBSSH2_SYS_USE_PKG_CONFIG=1
 %{_bindir}/cargo-capi
 
 %changelog
+* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.27-1
+- Update to 0.9.27
+
 * Wed May 17 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.9.15-1
 - Update to 0.9.15
 
