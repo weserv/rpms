@@ -8,16 +8,16 @@
 # required rust libraries
 %global bundled_rust_deps 1
 
-%global cairo_version 1.16.0
+%global cairo_version 1.17.0
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.56.3
+Version:        2.57.0
 Release:        1%{?dist}
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.56/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.57/librsvg-%{version}.tar.xz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
@@ -145,6 +145,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.57.0-1
+- Update to 2.57.0
+
 * Mon Jul 24 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.56.3-1
 - Update to 2.56.3
 - Split gdk-pixbuf loader into a subpackage
