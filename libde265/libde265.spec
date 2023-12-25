@@ -1,5 +1,5 @@
 Name:           libde265
-Version:        1.0.14
+Version:        1.0.15
 Release:        1%{?dist}
 Summary:        Open H.265 video codec implementation
 
@@ -89,6 +89,9 @@ rm -f %{buildroot}%{_bindir}/yuv-distortion
 %{_bindir}/acceleration_speed
 
 %changelog
+* Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.15-1
+- Update to 1.0.15
+
 * Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.14-1
 - Update to 1.0.14
 
