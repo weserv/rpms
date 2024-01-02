@@ -1,4 +1,4 @@
-%global rav1e_version 0.6.6
+%global rav1e_version 0.7.0
 #global rav1e_prever alpha
 %global rav1e_tarver %{rav1e_version}%{?rav1e_prever:-%{rav1e_prever}}
 
@@ -7,9 +7,9 @@ Version:        %{rav1e_version}%{?rav1e_prever:~%{rav1e_prever}}
 Release:        1%{?dist}
 Summary:        Fastest and safest AV1 encoder
 
-# Upstream license specification: BSD-2-Clause
-# src/ext/x86/x86inc.asm is under ISC, https://github.com/xiph/rav1e/issues/2181
-License:        BSD and ISC
+# rav1e is published under the terms of the BSD-2-Clause license,
+# with the exception of one file: "src/ext/x86/x86inc.asm" (ISC license)
+License:        BSD-2-Clause AND ISC
 URL:            https://github.com/xiph/rav1e
 Source0:        %{url}/archive/v%{rav1e_tarver}/%{name}-%{rav1e_tarver}.tar.gz
 
@@ -19,10 +19,10 @@ Source1:        https://rpms.wsrv.nl/sources/%{name}-%{rav1e_tarver}-vendor.tar.
 
 BuildRequires:  cargo-c
 BuildRequires:  nasm >= 2.14.0
-BuildRequires:  rust-toolset >= 1.60.0
+BuildRequires:  rust-toolset >= 1.70.0
 
 %description
-Fastest and safest AV1 encoder.
+The fastest and safest AV1 encoder.
 
 %package libs
 Summary:        Library files for rav1e
@@ -81,6 +81,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/rav1e.pc
 
 %changelog
+* Tue Jan  2 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.7.0-1
+- Update to 0.7.0
+
 * Wed May 17 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.6.6-1
 - Update to 0.6.6
 
