@@ -1,0 +1,89 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Tue, 2 Jan 2024 10:00:00 +0100
+Subject: [PATCH 1/1] Revert "(#1019): Fix small-caps and bump the version of Pango
+ required to 1.50.0"
+
+This reverts commit 73c1ee7519555aa90c1c45828ffaa2f573812864.
+
+RHEL 9 doesn't provide Pango 1.50.0.
+
+diff --git a/configure b/configure
+index 1111111..2222222 100755
+--- a/configure
++++ b/configure
+@@ -3580,7 +3580,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.50.0
++PANGO_REQUIRED=1.46.0
+ 
+ 
+ 
+diff --git a/configure.ac b/configure.ac
+index 1111111..2222222 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -66,7 +66,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.50.0
++PANGO_REQUIRED=1.46.0
+ 
+ dnl ===========================================================================
+ 
+diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
+index 1111111..2222222 100644
+--- a/rsvg/Cargo.toml
++++ b/rsvg/Cargo.toml
+@@ -28,15 +28,15 @@ gio = { name = "gio-2.0", version = "2.24" }
+ glib = { name = "glib-2.0", version = "2.50" }
+ harfbuzz = "2.0"
+ libxml2 = { name = "libxml-2.0", fallback-names = ["libxml2"], version = "2.9" }
+-pangocairo = "1.50"
++pangocairo = "1.46"
+ 
+ [package.metadata.system-deps.'cfg(windows)']
+ fontconfig = { version = "1.7", optional = true }
+-pangoft2 = { version = "1.50", optional = true }
++pangoft2 = { version = "1.46", optional = true }
+ 
+ [package.metadata.system-deps.'cfg(not(windows))']
+ fontconfig = { version = "1.7" }
+-pangoft2 = { version = "1.50" }
++pangoft2 = { version = "1.46" }
+ 
+ [features]
+ c-api = []
+diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
+index 1111111..2222222 100644
+--- a/rsvg/src/text.rs
++++ b/rsvg/src/text.rs
+@@ -1283,7 +1283,9 @@ fn add_pango_attributes(
+     font_desc.set_family(props.font_family.as_str());
+     font_desc.set_style(pango::Style::from(props.font_style));
+ 
+-    font_desc.set_variant(pango::Variant::from(props.font_variant));
++    // PANGO_VARIANT_SMALL_CAPS does nothing: https://gitlab.gnome.org/GNOME/pango/-/issues/566
++    // see below for using the "smcp" OpenType feature for fonts that support it.
++    // font_desc.set_variant(pango::Variant::from(props.font_variant));
+ 
+     font_desc.set_weight(pango::Weight::from(props.font_weight));
+     font_desc.set_stretch(pango::Stretch::from(props.font_stretch));
+@@ -1306,6 +1308,13 @@ fn add_pango_attributes(
+         attributes.push(pango::AttrInt::new_strikethrough(true).upcast());
+     }
+ 
++    // FIXME: Using the "smcp" OpenType feature only works for fonts that support it.  We
++    // should query if the font supports small caps, and synthesize them if it doesn't.
++    if props.font_variant == FontVariant::SmallCaps {
++        // smcp - small capitals - https://docs.microsoft.com/en-ca/typography/opentype/spec/features_pt#smcp
++        attributes.push(pango::AttrFontFeatures::new("'smcp' 1").upcast());
++    }
++
+     // Set the range in each attribute
+ 
+     for attr in &mut attributes {
+

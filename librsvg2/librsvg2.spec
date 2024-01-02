@@ -12,16 +12,18 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.57.0
+Version:        2.57.1
 Release:        1%{?dist}
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
 Source0:        https://download.gnome.org/sources/librsvg/2.57/librsvg-%{version}.tar.xz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
+# Revert 73c1ee7 for compat with RHEL 9
+Patch0:         revert-73c1ee7.patch
 
 BuildRequires:  rust-packaging
 BuildRequires:  chrpath
@@ -88,7 +90,7 @@ This package provides extra utilities based on the librsvg library.
 # Ensure we build without --locked, as %%cargo_prep removes
 # the lock file (Cargo.lock), allowing more wiggle room when
 # providing Rust dependencies.
-sed -i 's/--locked //g' Makefile.in
+sed -i 's/--locked //g' Makefile.am
 
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
@@ -96,14 +98,14 @@ sed -i 's/--locked //g' Makefile.in
 %endif
 
 %build
-
 # Replace bare `cargo` with the one used by %%cargo_* macros
+export CARGO="%__cargo"
+
 %configure --disable-static  \
            --enable-gtk-doc \
            --docdir=%{_pkgdocdir} \
            --enable-introspection \
-           --enable-vala \
-           CARGO="%{__cargo}"
+           --enable-vala
 %make_build
 
 %install
@@ -145,6 +147,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Tue Jan  2 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.57.1-1
+- Update to 2.57.1
+
 * Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.57.0-1
 - Update to 2.57.0
 
