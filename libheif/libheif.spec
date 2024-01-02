@@ -1,7 +1,7 @@
 Name:           libheif
 Epoch:          1
 Version:        1.17.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
 License:        LGPL-3.0-or-later and MIT
@@ -92,6 +92,9 @@ rm -rf third-party/
 
 
 %changelog
+* Tue Jan  2 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.6-2
+- Rebuild for rav1e SONAME bump
+
 * Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.6-1
 - Update to 1.17.6
 
