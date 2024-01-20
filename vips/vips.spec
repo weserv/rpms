@@ -58,7 +58,7 @@ Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
 Release:        1%{?dist}
 Summary:        C/C++ library for processing large images
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://github.com/libvips/libvips
 Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_version}.tar.xz
 
