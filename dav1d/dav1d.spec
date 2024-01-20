@@ -3,7 +3,9 @@ Version:        1.3.0
 Release:        1%{?dist}
 Summary:        AV1 cross-platform Decoder
 
-License:        BSD
+# src/ext/x86/x86inc.asm is ISC
+# tools/compat/getopt.c is ISC
+License:        BSD-2-Clause AND ISC
 URL:            https://code.videolan.org/videolan/dav1d
 Source0:        https://download.videolan.org/pub/videolan/dav1d/%{version}/dav1d-%{version}.tar.xz
 
