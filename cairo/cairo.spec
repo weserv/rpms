@@ -14,7 +14,7 @@ Version:	1.17.4
 Release:	2%{?dist}
 Summary:	A 2D graphics library
 
-License:	LGPLv2 or MPLv1.1
+License:	LGPL-2.1-only OR MPL-1.1
 URL:		http://cairographics.org
 Source0:	http://cairographics.org/snapshots/%{name}-%{version}.tar.xz
 
