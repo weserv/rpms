@@ -9,7 +9,7 @@ Version:        5.0.0
 Release:        1.%{commitdate}git%{shortcommit}%{?dist}
 Summary:        Nginx weserv module
 
-License:        BSD
+License:        BSD-3-Clause
 URL:            https://github.com/weserv/images
 Source0:        %{url}/archive/%{commit}/images-%{shortcommit}.tar.gz
 
