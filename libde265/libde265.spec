@@ -3,7 +3,7 @@ Version:        1.0.15
 Release:        1%{?dist}
 Summary:        Open H.265 video codec implementation
 
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 URL:            https://www.libde265.org/
 Source0:        https://github.com/strukturag/libde265/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
