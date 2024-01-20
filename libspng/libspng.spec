@@ -3,7 +3,7 @@ Version:        0.7.4
 Release:        1%{?dist}
 Summary:        Simple, modern libpng alternative
 
-License:        BSD
+License:        BSD-2-Clause
 URL:            https://libspng.org/
 Source0:        https://github.com/randy408/libspng/archive/v%{version}/%{name}-%{version}.tar.gz
 
