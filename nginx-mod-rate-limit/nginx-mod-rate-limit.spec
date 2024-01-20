@@ -6,7 +6,7 @@ Version:        1.0.0
 Release:        1%{?dist}
 Summary:        A Redis backed rate limit module for Nginx web servers
 
-License:        BSD
+License:        BSD-3-Clause
 URL:            https://github.com/weserv/rate-limit-nginx-module
 Source0:        %{url}/archive/v%{version}/%{origname}-%{version}.tar.gz
 
