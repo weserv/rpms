@@ -4,7 +4,7 @@ Summary: A portable x86 assembler which uses Intel-like syntax
 Name: nasm
 Version: 2.15.05
 Release: 1%{?dist}
-License: BSD
+License: BSD-2-Clause
 URL: http://www.nasm.us
 Source0: https://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.xz
 Source1: https://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}-xdoc.tar.xz
