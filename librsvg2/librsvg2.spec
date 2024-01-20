@@ -15,7 +15,7 @@ Summary:        An SVG library based on cairo
 Version:        2.50.5
 Release:        3%{?dist}
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
 Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
 
