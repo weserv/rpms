@@ -11,7 +11,7 @@ applying the same operation to 'lanes'.}
 %endif
 
 Name:           highway
-Version:        1.0.7
+Version:        1.1.0
 Release:        1%{?dist}
 Summary:        Efficient and performance-portable SIMD
 
@@ -95,6 +95,9 @@ Documentation for Highway.
 %doc g3doc hwy/examples
 
 %changelog
+* Fri Mar 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.1.0-1
+- Update to 1.1.0
+
 * Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.7-1
 - Import from Fedora
 - Update to 1.0.7
