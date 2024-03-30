@@ -1,5 +1,5 @@
 Name:           dav1d
-Version:        1.4.0
+Version:        1.4.1
 Release:        1%{?dist}
 Summary:        AV1 cross-platform Decoder
 
@@ -64,6 +64,9 @@ Development files for dav1d, the AV1 cross-platform Decoder.
 %{_libdir}/pkgconfig/dav1d.pc
 
 %changelog
+* Sat Mar 30 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.4.1-1
+- Update to 1.4.1
+
 * Fri Mar 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.4.0-1
 - Update to 1.4.0
 
