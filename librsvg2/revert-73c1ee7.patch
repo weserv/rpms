@@ -61,7 +61,7 @@ diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/text.rs
 +++ b/rsvg/src/text.rs
-@@ -1283,7 +1283,9 @@ fn add_pango_attributes(
+@@ -1282,7 +1282,9 @@ fn add_pango_attributes(
      font_desc.set_family(props.font_family.as_str());
      font_desc.set_style(pango::Style::from(props.font_style));
  
@@ -72,7 +72,7 @@ index 1111111..2222222 100644
  
      font_desc.set_weight(pango::Weight::from(props.font_weight));
      font_desc.set_stretch(pango::Stretch::from(props.font_stretch));
-@@ -1306,6 +1308,13 @@ fn add_pango_attributes(
+@@ -1305,6 +1307,13 @@ fn add_pango_attributes(
          attributes.push(pango::AttrInt::new_strikethrough(true).upcast());
      }
  
