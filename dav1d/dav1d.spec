@@ -1,5 +1,5 @@
 Name:           dav1d
-Version:        1.4.1
+Version:        1.4.3
 Release:        1%{?dist}
 Summary:        AV1 cross-platform Decoder
 
@@ -22,13 +22,13 @@ Requires:       libdav1d%{?_isa} = %{version}-%{release}
 dav1d is a new AV1 cross-platform Decoder, open-source, and focused on speed
 and correctness.
 
-%package -n libdav1d
+%package     -n libdav1d
 Summary:        Library files for dav1d
 
 %description -n libdav1d
 Library files for dav1d, the AV1 cross-platform Decoder.
 
-%package -n libdav1d-devel
+%package     -n libdav1d-devel
 Summary:        Development files for dav1d
 Requires:       libdav1d%{?_isa} = %{version}-%{release}
 
@@ -64,6 +64,9 @@ Development files for dav1d, the AV1 cross-platform Decoder.
 %{_libdir}/pkgconfig/dav1d.pc
 
 %changelog
+* Fri Jul 12 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.4.3-1
+- Update to 1.4.3
+
 * Sat Mar 30 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.4.1-1
 - Update to 1.4.1
 
