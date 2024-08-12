@@ -8,28 +8,28 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.15
-%global vips_version %{vips_version_base}.2
+%global vips_version %{vips_version_base}.3
 %global vips_soname_major 42
 #global vips_prever rc2
-%global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}a
+%global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
-%else
-%bcond_with                doc
-%endif
+%bcond_without             tests
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
-%bcond_without             libimagequant
-%bcond_without             libcgif
-%bcond_without             libspng
+%bcond_without             heif
 %bcond_without             highway
-%else
-%bcond_with                libimagequant
-%bcond_with                libcgif
-%bcond_with                libspng
-%bcond_with                highway
-%endif
+%bcond_without             jxl
+%bcond_without             libcgif
+%bcond_without             libimagequant
+%bcond_without             libspng
+
+# 2 builds needed to get the full stack
+# --without im6 --with im7
+# --without im6 --with gm
+
+%bcond_without             im6
+%bcond_with                im7
+%bcond_with                gm
 
 %if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
 %bcond_without             openjpeg2
@@ -39,23 +39,6 @@
 # so vips segfaults in various place
 # also see https://github.com/libvips/libvips/pull/2305
 %bcond_with                openjpeg2
-%endif
-
-# 2 builds needed to get the full stack
-# --without im6 --with im7
-# --without im6 --with gm
-
-%bcond_without             im6
-%bcond_with                im7
-%bcond_with                gm
-%bcond_without             heif
-
-%bcond_without             tests
-
-%if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
-%bcond_without             jxl
-%else
-%bcond_with                jxl
 %endif
 
 Name:           vips
@@ -84,9 +67,7 @@ BuildRequires:  pkgconfig(lcms2)
 BuildRequires:  pkgconfig(pangoft2)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(libtiff-4)
-# Ensure we use libwebp7 on EL-7
-# upstream requires 0.6
-BuildRequires:  pkgconfig(libwebp) > 1
+BuildRequires:  pkgconfig(libwebp) >= 0.6
 BuildRequires:  pkgconfig(libexif)
 BuildRequires:  pkgconfig(libarchive) >= 3
 BuildRequires:  pkgconfig(librsvg-2.0) >= 2.50.0
@@ -113,15 +94,10 @@ BuildRequires:  bc
 # Not available as system library
 Provides:       bundled(libnsgif)
 
-%if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
 Suggests:   %{name}-openslide
 Suggests:   %{name}-magick-im6
 Recommends: %{name}-heif
 Recommends: %{name}-poppler
-%else
-Requires:   %{name}-poppler
-%endif
-
 
 %description
 VIPS is an image processing library. It is good for very large images
@@ -394,6 +370,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Mon Aug 12 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.3-1
+- Update to 8.15.3
+
 * Fri Mar 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.2-1
 - Update to 8.15.2
 
