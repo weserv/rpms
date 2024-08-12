@@ -8,28 +8,28 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.15
-%global vips_version %{vips_version_base}.2
+%global vips_version %{vips_version_base}.3
 %global vips_soname_major 42
 #global vips_prever rc2
-%global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}a
+%global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
 %bcond_without             doc
-%else
-%bcond_with                doc
-%endif
+%bcond_without             tests
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
-%bcond_without             libimagequant
-%bcond_without             libcgif
-%bcond_without             libspng
+%bcond_without             heif
 %bcond_without             highway
-%else
-%bcond_with                libimagequant
-%bcond_with                libcgif
-%bcond_with                libspng
-%bcond_with                highway
-%endif
+%bcond_without             jxl
+%bcond_without             libcgif
+%bcond_without             libimagequant
+%bcond_without             libspng
+
+# 2 builds needed to get the full stack
+# --without im6 --with im7
+# --without im6 --with gm
+
+%bcond_without             im6
+%bcond_with                im7
+%bcond_with                gm
 
 %if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
 %bcond_without             openjpeg2
@@ -40,17 +40,6 @@
 # also see https://github.com/libvips/libvips/pull/2305
 %bcond_with                openjpeg2
 %endif
-
-# 2 builds needed to get the full stack
-# --without im6 --with im7
-# --without im6 --with gm
-
-%bcond_without             im6
-%bcond_with                im7
-%bcond_with                gm
-%bcond_without             heif
-
-%bcond_without             tests
 
 Name:           vips
 Epoch:          1
@@ -78,9 +67,7 @@ BuildRequires:  pkgconfig(lcms2)
 BuildRequires:  pkgconfig(pangoft2)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(libtiff-4)
-# Ensure we use libwebp7 on EL-7
-# upstream requires 0.6
-BuildRequires:  pkgconfig(libwebp) > 1
+BuildRequires:  pkgconfig(libwebp) >= 0.6
 BuildRequires:  pkgconfig(libexif)
 BuildRequires:  pkgconfig(libarchive) >= 3
 BuildRequires:  pkgconfig(librsvg-2.0) >= 2.50.0
@@ -107,15 +94,10 @@ BuildRequires:  bc
 # Not available as system library
 Provides:       bundled(libnsgif)
 
-%if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
 Suggests:   %{name}-openslide
 Suggests:   %{name}-magick-im6
 Recommends: %{name}-heif
 Recommends: %{name}-poppler
-%else
-Requires:   %{name}-poppler
-%endif
-
 
 %description
 VIPS is an image processing library. It is good for very large images
@@ -126,6 +108,9 @@ This package should be installed if you want to use a program compiled
 against VIPS.
 
 Additional image formats are supported in additional optional packages:
+%if %{with jxl}
+* %{name}-jxl
+%endif
 * %{name}-heif
 * %{name}-openslide
 * %{name}-poppler
@@ -163,6 +148,17 @@ Conflicts:     %{name} < %{epoch}:%{version}-%{release}, %{name} > %{epoch}:%{ve
 %description doc
 The %{name}-doc package contains extensive documentation about VIPS in both
 HTML and PDF formats.
+%endif
+
+%if %{with jxl}
+%package jxl
+Summary:       JPEG-XL support for %{name}
+BuildRequires: pkgconfig(libjxl) >= 0.6
+Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Supplements:   %{name}
+
+%description jxl
+The %{name}-jxl package contains the Jxl module for VIPS.
 %endif
 
 %if %{with heif}
@@ -260,6 +256,9 @@ exit 1
 export CFLAGS="%{optflags} -ftree-vectorize"
 export CXXFLAGS="%{optflags} -ftree-vectorize"
 %meson \
+%if %{without jxl}
+    -Djpeg-xl=disabled \
+%endif
 %if %{without heif}
     -Dheif=disabled \
 %endif
@@ -290,7 +289,6 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     -Dmagick-features=load \
     -Dcfitsio=disabled \
     -Dfftw=disabled \
-    -Djpeg-xl=disabled \
     -Dmatio=disabled \
     -Dnifti=disabled \
     -Dopenexr=disabled \
@@ -345,6 +343,11 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %files poppler
 %{_libdir}/vips-modules-%{vips_version_base}/vips-poppler.so
 
+%if %{with jxl}
+%files jxl
+%{_libdir}/vips-modules-%{vips_version_base}/vips-jxl.so
+%endif
+
 %if %{with heif}
 %files heif
 %{_libdir}/vips-modules-%{vips_version_base}/vips-heif.so
@@ -367,6 +370,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Mon Aug 12 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.3-1
+- Update to 8.15.3
+
 * Fri Mar 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.2-1
 - Update to 8.15.2
 
@@ -401,6 +407,13 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 * Wed Dec 28 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.0~rc1-1
 - Update to 8.14.0-rc1
+
+* Sun Nov 20 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.3-1
+- Update to 8.13.3
+- Enable libjxl usage
+
+* Tue Oct  4 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.2-1
+- Update to 8.13.2
 
 * Tue Jul 26 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.13.0-1
 - Update to 8.13.0
