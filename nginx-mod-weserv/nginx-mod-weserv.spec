@@ -1,7 +1,7 @@
 %global nginx_modname weserv
 
-%global commit 269e35ee0a1080010051876850fc311be8961801
-%global commitdate 20240725
+%global commit 947dbc4ef817509620f678d9186cb6c097957687
+%global commitdate 20240812
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -13,12 +13,9 @@ License:        BSD-3-Clause
 URL:            https://github.com/weserv/images
 Source0:        %{url}/archive/%{commit}/images-%{shortcommit}.tar.gz
 
-# Fix an assertion failure in the test suite
-Patch0:         fix-assertion-failure.patch
-
-%if 0%{?fedora} >= 38 || 0%{?rhel} >= 9
-# Migrate to Catch2 v3 for compat with F38 and EL9
-Patch1:         migrate-to-catch2-v3.patch
+%if 0%{?rhel} < 9
+# Revert 94279b7 for compat with EL8
+Patch0:         revert-94279b7.patch
 %endif
 
 BuildRequires:  gcc-c++
@@ -90,6 +87,9 @@ popd
 
 
 %changelog
+* Mon Aug 12 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20240812git947dbc4
+- Update to weserv/images@947dbc4
+
 * Thu Jul 25 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20240725git269e35e
 - Update to weserv/images@269e35e
 - Migrate to Catch2 v3 on F38 and EL9
