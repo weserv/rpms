@@ -10,36 +10,49 @@
 
 %global cairo_version 1.17.0
 
+# Disable AVIF support by default to reduce the attack surface
+%bcond_with     avif
+
+# Tests require Rust 1.77 or newer, EL9 ships with version 1.75
+%bcond_with     tests
+
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.57.3
+Version:        2.58.93
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.57/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.58/librsvg-%{version}.tar.xz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
-# Revert 73c1ee7 for compat with RHEL 9
-Patch0:         revert-73c1ee7.patch
 
-BuildRequires:  rust-packaging
-BuildRequires:  chrpath
+# Patch to ensure compat with EL9:
+# - Revert commit 73c1ee7, ec5d747, c88987b and 166f74f;
+# - Downgrade the minimum supported Rust version (MSRV) to 1.75.0;
+# - Downgrade the minimum required Meson version to 0.63.3;
+# - Ensure compat with Binutils < 2.39.
+Patch0:         el-9-compat.patch
+
 BuildRequires:  gcc
+BuildRequires:  meson >= 0.63.3
+BuildRequires:  cargo-c >= 0.9.19
+BuildRequires:  cargo-rpm-macros >= 24
 BuildRequires:  gi-docgen
-BuildRequires:  gobject-introspection-devel
-BuildRequires:  make
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(cairo) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-gobject) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-png) >= %{cairo_version}
 BuildRequires:  pkgconfig(fontconfig)
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+%if %{with avif}
+BuildRequires:  pkgconfig(dav1d)
+%endif
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(gthread-2.0)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pangoft2)
@@ -61,7 +74,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package provides the necessary development libraries and include
 files to allow you to develop with librsvg.
 
-%package -n rsvg-pixbuf-loader
+%package     -n rsvg-pixbuf-loader
 Summary:        SVG image loader for gdk-pixbuf
 Requires:       gdk-pixbuf2%{?_isa}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -77,20 +90,22 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package provides extra utilities based on the librsvg library.
 
 %prep
-%autosetup -p1 -n librsvg-%{version}
+%autosetup -p1 -n librsvg-%{version} %{?bundled_rust_deps:-a1}
 
-%if 0%{?bundled_rust_deps}
-# Use the vendored dependencies in Source1
-%{__tar} -xoaf %{SOURCE1}
-%define cargo_registry $(pwd)/vendor
-%endif
-
-%cargo_prep
+%cargo_prep %{?bundled_rust_deps:-v vendor}
 
 # Ensure we build without --locked, as %%cargo_prep removes
 # the lock file (Cargo.lock), allowing more wiggle room when
 # providing Rust dependencies.
-sed -i 's/--locked //g' Makefile.am
+sed -i 's/, "--locked"//g' meson/cargo_wrapper.py
+
+# --buildtype=plain implies non-release mode
+sed -i "s/not get_option('debug')/get_option('optimization') in ['2', '3', 's']/" meson.build
+
+%if 0%{?rhel} <= 9
+# https://bugzilla.redhat.com/show_bug.cgi?id=2109099
+sed -i "s/'gdk-pixbuf-query-loaders')/& + '-%{__isa_bits}'/" gdk-pixbuf-loader/meson.build
+%endif
 
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
@@ -98,30 +113,38 @@ sed -i 's/--locked //g' Makefile.am
 %endif
 
 %build
-# Replace bare `cargo` with the one used by %%cargo_* macros
-export CARGO="%__cargo"
+%meson \
+%if %{without avif}
+    -Davif=disabled \
+%endif
+    %{nil}
 
-%configure --disable-static  \
-           --enable-gtk-doc \
-           --docdir=%{_pkgdocdir} \
-           --enable-introspection \
-           --enable-vala
-%make_build
+%meson_build
+
+%cargo_license_summary
+%{cargo_license} > LICENSE.dependencies
+%if 0%{?bundled_rust_deps}
+%cargo_vendor_manifest
+%endif
 
 %install
-%make_install
-find %{buildroot} -type f -name '*.la' -print -delete
-
-# Remove lib64 rpaths
-chrpath --delete %{buildroot}%{_bindir}/rsvg-convert
-chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
+%meson_install
 
 # Not useful in this package.
 rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 
+%if %{with tests}
+%check
+%meson_test
+%endif
+
 %files
 %doc code-of-conduct.md NEWS README.md
 %license COPYING.LIB
+%license LICENSE.dependencies
+%if 0%{?bundled_rust_deps}
+%license cargo-vendor.txt
+%endif
 %{_libdir}/librsvg-2.so.*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Rsvg-2.0.typelib
@@ -129,7 +152,7 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_datadir}/thumbnailers/librsvg.thumbnailer
 
 %files -n rsvg-pixbuf-loader
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader_svg.so
 
 %files devel
 %{_libdir}/librsvg-2.so
@@ -140,6 +163,7 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/librsvg-2.0.vapi
+%{_datadir}/vala/vapi/librsvg-2.0.deps
 %{_docdir}/Rsvg-2.0
 
 %files tools
@@ -147,6 +171,10 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Thu Aug 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.58.93-1
+- Update to 2.58.93
+- Disable AVIF support by default
+
 * Sat Mar 30 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.57.3-1
 - Update to 2.57.3
 
