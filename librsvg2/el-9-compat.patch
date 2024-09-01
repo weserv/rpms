@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Tue, 2 Jan 2024 10:00:00 +0100
-Subject: [PATCH 1/7] Revert "(#1019): Fix small-caps and bump the version of Pango
+Subject: [PATCH 1/6] Revert "(#1019): Fix small-caps and bump the version of Pango
  required to 1.50.0"
 
 This reverts commit 73c1ee7519555aa90c1c45828ffaa2f573812864.
@@ -12,7 +12,7 @@ diff --git a/meson.build b/meson.build
 index 1111111..2222222 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -56,7 +56,7 @@ gio_required           = '>= 2.24.0'
+@@ -58,7 +58,7 @@ gio_required           = '>= 2.24.0'
  glib_required          = '>= 2.50.0'
  harfbuzz_required      = '>= 2.0.0'
  libxml_required        = '>= 2.9.0'
@@ -43,7 +43,7 @@ index 1111111..2222222 100644
 +pangoft2 = { version = "1.46" }
  
  [features]
- avif = ["image/avif"]
+ avif = ["image/avif-native"]
 diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/text.rs
@@ -77,7 +77,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 14:50:22 +0200
-Subject: [PATCH 2/7] Revert "Bump Cairo requirement to 1.18.0 so we can update
+Subject: [PATCH 2/6] Revert "Bump Cairo requirement to 1.18.0 so we can update
  gtk-rs"
 
 This reverts commit ec5d747479f4098669bb93901f3008d412e3f62f.
@@ -101,7 +101,7 @@ diff --git a/meson.build b/meson.build
 index 1111111..2222222 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -48,7 +48,7 @@ py = import('python')
+@@ -50,7 +50,7 @@ py = import('python')
  python = py.find_installation()
  
  # Required versions for dependencies - Please update devel_environment.rst with version numbers if these change
@@ -154,7 +154,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 17:17:11 +0200
-Subject: [PATCH 3/7] Revert "add pdf1.7 as additional format"
+Subject: [PATCH 3/6] Revert "add pdf1.7 as additional format"
 
 This reverts commit c88987b77e8cdde51bfd4defbbce47c3b41221eb.
 
@@ -230,7 +230,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 17:18:10 +0200
-Subject: [PATCH 4/7] Revert "add PDF version 1.6"
+Subject: [PATCH 4/6] Revert "add PDF version 1.6"
 
 This reverts commit 166f74f593201fea7e95a8cd961cab88cf644bf7.
 
@@ -324,7 +324,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 15:00:00 +0200
-Subject: [PATCH 5/7] Downgrade MSRV to 1.75.0
+Subject: [PATCH 5/6] Downgrade MSRV to 1.75.0
 
 To ensure compat with RHEL 9.
 
@@ -336,7 +336,7 @@ index 1111111..2222222 100644
  categories = ["graphics", "multimedia::images", "rendering::data-formats"]
  keywords = ["svg", "cairo"]
  edition = "2021"
--rust-version = "1.78.0"
+-rust-version = "1.77.2"
 +rust-version = "1.75.0"
  
  [profile.overflow]
@@ -349,7 +349,7 @@ index 1111111..2222222 100644
  **Compilers and build tools:**
  
  * a C compiler
--* `rust <https://www.rust-lang.org/>`_ 1.78.0 or later
+-* `rust <https://www.rust-lang.org/>`_ 1.77.2 or later
 +* `rust <https://www.rust-lang.org/>`_ 1.75.0 or later
  * `cargo <https://www.rust-lang.org/>`_
  * ``cargo-cbuild`` from `cargo-c <https://github.com/lu-zero/cargo-c>`_
@@ -362,7 +362,7 @@ index 1111111..2222222 100644
  #   - the "rust-version" value in Cargo.toml
  #   - the "_manual_setup" section of devel-docs/devel_environment.rst
  #   - the "RUST_MINIMUM" variable in ci/container_builds.yml
--msrv = '1.78.0'
+-msrv = '1.77.2'
 +msrv = '1.75.0'
  cargo = find_program('cargo', version:'>= @0@'.format(msrv))
  cargo_wrapper = find_program('meson/cargo_wrapper.py', native: true)
@@ -371,7 +371,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 15:34:44 +0200
-Subject: [PATCH 6/7] Downgrade minimum required Meson version to 0.63.3
+Subject: [PATCH 6/6] Downgrade minimum required Meson version to 0.63.3
 
 To ensure compat with RHEL 9.
 
@@ -382,42 +382,18 @@ index 1111111..2222222 100644
 @@ -1,7 +1,7 @@
  project('librsvg',
          'c',
-         version: '2.58.93', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+         version: '2.58.94', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
 -        meson_version: '>= 1.2.0',
 +        meson_version: '>= 0.63.3',
          default_options: [
            'pkgconfig.relocatable=true',
          ]
-
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Kleis Auke Wolthuizen <github@kleisauke.nl>
-Date: Thu, 15 Aug 2024 16:59:09 +0200
-Subject: [PATCH 7/7] Ensure compat with Binutils < 2.39
-
-See:
-https://sourceware.org/git/?p=binutils-gdb.git;h=aa02037b08312eece5c06e1e98b2ce8b30993c5c
-
-diff --git a/meson/makedef.py b/meson/makedef.py
-index 1111111..2222222 100755
---- a/meson/makedef.py
-+++ b/meson/makedef.py
-@@ -131,8 +131,9 @@ if __name__ == '__main__':
-         )
-         if s.returncode != 0:
-             # If it fails, retry without skipping LLVM bitcode (macOS flag)
-+            # -U was an alias for --unicode= instead of --defined-only before Binutils 2.39
-             s = subprocess.run(
--                [args.nm, '-U', '-g', '-j', libname_path_posix],
-+                [args.nm, '--defined-only', '-g', '-j', libname_path_posix],
-                 stdout=subprocess.PIPE,
-                 stderr=subprocess.STDOUT,
-                 universal_newlines=True,
-@@ -141,7 +142,7 @@ if __name__ == '__main__':
-         if s.returncode != 0:
-             # -j was added only in Binutils 2.37
-             s = subprocess.run(
--                [args.nm, '-U', '-g', libname_path_posix],
-+                [args.nm, '--defined-only', '-g', libname_path_posix],
-                 stdout=subprocess.PIPE,
-                 stderr=subprocess.DEVNULL,
-                 universal_newlines=True,
+@@ -434,7 +434,7 @@ else
+ endif
+ 
+ cargo_dylib_prefix = lib_prefix
+-if cc.has_define('__MINGW32__')
++if cc.get_define('__MINGW32__') != ''
+   cargo_dylib_prefix = ''
+ endif
+ 

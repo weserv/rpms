@@ -18,7 +18,7 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.58.93
+Version:        2.58.94
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
@@ -32,8 +32,7 @@ Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 # Patch to ensure compat with EL9:
 # - Revert commit 73c1ee7, ec5d747, c88987b and 166f74f;
 # - Downgrade the minimum supported Rust version (MSRV) to 1.75.0;
-# - Downgrade the minimum required Meson version to 0.63.3;
-# - Ensure compat with Binutils < 2.39.
+# - Downgrade the minimum required Meson version to 0.63.3.
 Patch0:         el-9-compat.patch
 
 BuildRequires:  gcc
@@ -171,6 +170,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Sun Sep  1 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.58.94-1
+- Update to 2.58.94
+
 * Thu Aug 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.58.93-1
 - Update to 2.58.93
 - Disable AVIF support by default
