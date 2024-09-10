@@ -10,8 +10,8 @@
 %global vips_version_base 8.15
 %global vips_version %{vips_version_base}.4
 %global vips_soname_major 42
-%global vips_prever b7198e2
-%global vips_tagver b7198e256f8369234598e2d7d3e5b35698cebfc5
+%global vips_prever cbfa4ac
+%global vips_tagver cbfa4aca479f8ed15e3f1de294eb9042c4cd3ae4
 
 %bcond_without             doc
 %bcond_without             tests
@@ -44,7 +44,7 @@
 Name:           vips
 Epoch:          1
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        C/C++ library for processing large images
 
 License:        LGPL-2.1-or-later
@@ -370,6 +370,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Tue Sep 10 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.4~cbfa4ac-5
+- Test build for kleisauke/libvips@cbfa4ac
+
 * Mon Sep  9 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.4~b7198e2-4
 - Test build for kleisauke/libvips@b7198e2
 
