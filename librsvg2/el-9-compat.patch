@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Tue, 2 Jan 2024 10:00:00 +0100
-Subject: [PATCH 1/6] Revert "(#1019): Fix small-caps and bump the version of Pango
+Subject: [PATCH 1/7] Revert "(#1019): Fix small-caps and bump the version of Pango
  required to 1.50.0"
 
 This reverts commit 73c1ee7519555aa90c1c45828ffaa2f573812864.
@@ -77,7 +77,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 14:50:22 +0200
-Subject: [PATCH 2/6] Revert "Bump Cairo requirement to 1.18.0 so we can update
+Subject: [PATCH 2/7] Revert "Bump Cairo requirement to 1.18.0 so we can update
  gtk-rs"
 
 This reverts commit ec5d747479f4098669bb93901f3008d412e3f62f.
@@ -154,7 +154,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 17:17:11 +0200
-Subject: [PATCH 3/6] Revert "add pdf1.7 as additional format"
+Subject: [PATCH 3/7] Revert "add pdf1.7 as additional format"
 
 This reverts commit c88987b77e8cdde51bfd4defbbce47c3b41221eb.
 
@@ -230,7 +230,7 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 17:18:10 +0200
-Subject: [PATCH 4/6] Revert "add PDF version 1.6"
+Subject: [PATCH 4/7] Revert "add PDF version 1.6"
 
 This reverts commit 166f74f593201fea7e95a8cd961cab88cf644bf7.
 
@@ -323,8 +323,152 @@ index 1111111..2222222 100644
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Fri, 13 Sep 2024 11:11:40 +0200
+Subject: [PATCH 5/7] Revert "rsvg-c: Use C-string literals when possible"
+
+This reverts commit 0e68f6fe870b9d383805f9bd79eaed766803f0ef.
+
+RHEL 9 doesn't provide Rust 1.77.0.
+
+diff --git a/librsvg-c/src/handle.rs b/librsvg-c/src/handle.rs
+index 1111111..2222222 100644
+--- a/librsvg-c/src/handle.rs
++++ b/librsvg-c/src/handle.rs
+@@ -2089,12 +2089,12 @@ mod tests {
+     #[test]
+     fn path_or_url_unix() {
+         unsafe {
+-            match PathOrUrl::new(c"/foo/bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("/foo/bar")).unwrap() {
+                 PathOrUrl::Path(_) => (),
+                 _ => panic!("unix filename should be a PathOrUrl::Path"),
+             }
+ 
+-            match PathOrUrl::new(c"foo/bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("foo/bar")).unwrap() {
+                 PathOrUrl::Path(_) => (),
+                 _ => panic!("unix filename should be a PathOrUrl::Path"),
+             }
+@@ -2104,22 +2104,22 @@ mod tests {
+     #[test]
+     fn path_or_url_windows() {
+         unsafe {
+-            match PathOrUrl::new(c"c:/foo/bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("c:/foo/bar")).unwrap() {
+                 PathOrUrl::Path(_) => (),
+                 _ => panic!("windows filename should be a PathOrUrl::Path"),
+             }
+ 
+-            match PathOrUrl::new(c"C:/foo/bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("C:/foo/bar")).unwrap() {
+                 PathOrUrl::Path(_) => (),
+                 _ => panic!("windows filename should be a PathOrUrl::Path"),
+             }
+ 
+-            match PathOrUrl::new(c"c:\\foo\\bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("c:\\foo\\bar")).unwrap() {
+                 PathOrUrl::Path(_) => (),
+                 _ => panic!("windows filename should be a PathOrUrl::Path"),
+             }
+ 
+-            match PathOrUrl::new(c"C:\\foo\\bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("C:\\foo\\bar")).unwrap() {
+                 PathOrUrl::Path(_) => (),
+                 _ => panic!("windows filename should be a PathOrUrl::Path"),
+             }
+@@ -2129,7 +2129,7 @@ mod tests {
+     #[test]
+     fn path_or_url_unix_url() {
+         unsafe {
+-            match PathOrUrl::new(c"file:///foo/bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("file:///foo/bar")).unwrap() {
+                 PathOrUrl::Url(_) => (),
+                 _ => panic!("file:// unix filename should be a PathOrUrl::Url"),
+             }
+@@ -2139,12 +2139,12 @@ mod tests {
+     #[test]
+     fn path_or_url_windows_url() {
+         unsafe {
+-            match PathOrUrl::new(c"file://c:/foo/bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("file://c:/foo/bar")).unwrap() {
+                 PathOrUrl::Url(_) => (),
+                 _ => panic!("file:// windows filename should be a PathOrUrl::Url"),
+             }
+ 
+-            match PathOrUrl::new(c"file://C:/foo/bar".as_ptr()).unwrap() {
++            match PathOrUrl::new(rsvg_c_str!("file://C:/foo/bar")).unwrap() {
+                 PathOrUrl::Url(_) => (),
+                 _ => panic!("file:// windows filename should be a PathOrUrl::Url"),
+             }
+@@ -2154,7 +2154,7 @@ mod tests {
+     #[test]
+     fn path_or_url_empty_str() {
+         unsafe {
+-            assert!(PathOrUrl::new(c"".as_ptr()).is_err());
++            assert!(PathOrUrl::new(rsvg_c_str!("")).is_err());
+         }
+ 
+         assert!(PathOrUrl::from_os_str(OsStr::new("")).is_err());
+diff --git a/librsvg-c/src/messages.rs b/librsvg-c/src/messages.rs
+index 1111111..2222222 100644
+--- a/librsvg-c/src/messages.rs
++++ b/librsvg-c/src/messages.rs
+@@ -56,7 +56,7 @@ macro_rules! rsvg_c_str {
+ fn rsvg_g_log(level: glib::ffi::GLogLevelFlags, msg: &str) {
+     // stolen from gmessages.c:log_level_to_priority()
+     let priority = match level {
+-        G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL => c"4".as_ptr(),
++        G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL => rsvg_c_str!("4"),
+         _ => unreachable!("please add another log level priority to rsvg_g_log()"),
+     };
+ 
+@@ -68,19 +68,19 @@ fn rsvg_g_log(level: glib::ffi::GLogLevelFlags, msg: &str) {
+     // trace.  So, we'll omit them.
+     let fields = [
+         GLogField {
+-            key: c"PRIORITY".as_ptr(),
++            key: rsvg_c_str!("PRIORITY"),
+             value: priority.cast(),
+             length: -1,
+         },
+         GLogField {
+-            key: c"MESSAGE".as_ptr(),
++            key: rsvg_c_str!("MESSAGE"),
+             value: c_char_msg.cast(),
+             length: msg.len() as _,
+         },
+         // This is the G_LOG_DOMAIN set from the Makefile
+         GLogField {
+-            key: c"GLIB_DOMAIN".as_ptr(),
+-            value: c"librsvg".as_ptr().cast(),
++            key: rsvg_c_str!("GLIB_DOMAIN"),
++            value: rsvg_c_str!("librsvg").cast(),
+             length: -1,
+         },
+     ];
+@@ -127,7 +127,7 @@ macro_rules! rsvg_return_if_fail {
+         $(
+             if !$condition {
+                 glib::ffi::g_return_if_fail_warning(
+-                    c"librsvg".as_ptr(),
++                    rsvg_c_str!("librsvg"),
+                     rsvg_c_str!(stringify!($func_name)),
+                     rsvg_c_str!(stringify!($condition)),
+                 );
+@@ -147,7 +147,7 @@ macro_rules! rsvg_return_val_if_fail {
+         $(
+             if !$condition {
+                 glib::ffi::g_return_if_fail_warning(
+-                    c"librsvg".as_ptr(),
++                    rsvg_c_str!("librsvg"),
+                     rsvg_c_str!(stringify!($func_name)),
+                     rsvg_c_str!(stringify!($condition)),
+                 );
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 15:00:00 +0200
-Subject: [PATCH 5/6] Downgrade MSRV to 1.75.0
+Subject: [PATCH 6/7] Downgrade MSRV to 1.75.0
 
 To ensure compat with RHEL 9.
 
@@ -366,12 +510,12 @@ index 1111111..2222222 100644
 +msrv = '1.75.0'
  cargo = find_program('cargo', version:'>= @0@'.format(msrv))
  cargo_wrapper = find_program('meson/cargo_wrapper.py', native: true)
- cargo_c = find_program('cargo-cbuild', version:'>= 0.9.19')
+ cargo_c = find_program('cargo-cbuild', version:'>= 0.9.19') # https://github.com/lu-zero/cargo-c
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Thu, 15 Aug 2024 15:34:44 +0200
-Subject: [PATCH 6/6] Downgrade minimum required Meson version to 0.63.3
+Subject: [PATCH 7/7] Downgrade minimum required Meson version to 0.63.3
 
 To ensure compat with RHEL 9.
 
@@ -382,7 +526,7 @@ index 1111111..2222222 100644
 @@ -1,7 +1,7 @@
  project('librsvg',
          'c',
-         version: '2.58.94', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+         version: '2.59.0', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
 -        meson_version: '>= 1.2.0',
 +        meson_version: '>= 0.63.3',
          default_options: [
