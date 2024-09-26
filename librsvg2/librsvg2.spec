@@ -1,9 +1,3 @@
-# https://github.com/rust-lang/rust/issues/47714
-%undefine _strict_symbol_defs_build
-
-# We want verbose builds
-%global _configure_disable_silent_rules 1
-
 # Use bundled deps as we don't ship the exact right versions for all the
 # required rust libraries
 %global bundled_rust_deps 1
@@ -19,7 +13,7 @@
 Name:           librsvg2
 Summary:        An SVG library based on cairo
 Version:        2.59.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 
 License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
@@ -98,9 +92,6 @@ This package provides extra utilities based on the librsvg library.
 # providing Rust dependencies.
 sed -i 's/, "--locked"//g' meson/cargo_wrapper.py
 
-# --buildtype=plain implies non-release mode
-sed -i "s/not get_option('debug')/get_option('optimization') in ['2', '3', 's']/" meson.build
-
 %if 0%{?rhel} <= 9
 # https://bugzilla.redhat.com/show_bug.cgi?id=2109099
 sed -i "s/'gdk-pixbuf-query-loaders')/& + '-%{__isa_bits}'/" gdk-pixbuf-loader/meson.build
@@ -112,6 +103,11 @@ sed -i "s/'gdk-pixbuf-query-loaders')/& + '-%{__isa_bits}'/" gdk-pixbuf-loader/m
 %endif
 
 %build
+%if 0%{?rhel} <= 9
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/#_compiler_flags
+export RUSTFLAGS="%build_rustflags"
+%endif
+
 %meson \
 %if %{without avif}
     -Davif=disabled \
@@ -170,6 +166,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Thu Sep 26 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.0-2
+- Ensure compiler flags are passed to rustc
+
 * Fri Sep 13 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.0-1
 - Update to 2.59.0
 
