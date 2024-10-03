@@ -12,8 +12,8 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.59.0
-Release:        2%{?dist}
+Version:        2.59.1
+Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
@@ -143,11 +143,6 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_libdir}/librsvg-2.so.*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Rsvg-2.0.typelib
-%dir %{_datadir}/thumbnailers
-%{_datadir}/thumbnailers/librsvg.thumbnailer
-
-%files -n rsvg-pixbuf-loader
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader_svg.so
 
 %files devel
 %{_libdir}/librsvg-2.so
@@ -161,11 +156,19 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_datadir}/vala/vapi/librsvg-2.0.deps
 %{_docdir}/Rsvg-2.0
 
+%files -n rsvg-pixbuf-loader
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader_svg.so
+%dir %{_datadir}/thumbnailers
+%{_datadir}/thumbnailers/librsvg.thumbnailer
+
 %files tools
 %{_bindir}/rsvg-convert
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Thu Oct  3 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.1-1
+- Update to 2.59.1
+
 * Thu Sep 26 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.0-2
 - Ensure compiler flags are passed to rustc
 
