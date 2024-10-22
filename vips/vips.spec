@@ -10,7 +10,7 @@
 %global vips_version_base 8.16
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc1
+%global vips_prever rc2
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %bcond_without             doc
@@ -370,6 +370,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Tue Oct 22 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.0~rc2-1
+- Update to 8.16.0-rc2
+
 * Wed Oct 16 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.0~rc1-1
 - Update to 8.16.0-rc1
 
