@@ -12,7 +12,7 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.59.1
+Version:        2.59.2
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
@@ -99,7 +99,8 @@ sed -i "s/'gdk-pixbuf-query-loaders')/& + '-%{__isa_bits}'/" gdk-pixbuf-loader/m
 
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
-%cargo_generate_buildrequires
+# cargo-c requires all optional dependencies to be available
+%cargo_generate_buildrequires -a
 %endif
 
 %build
@@ -166,6 +167,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Wed Oct 30 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.2-1
+- Update to 2.59.2
+
 * Thu Oct  3 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.1-1
 - Update to 2.59.1
 

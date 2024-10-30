@@ -48,7 +48,7 @@ diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/text.rs
 +++ b/rsvg/src/text.rs
-@@ -1298,7 +1298,9 @@ fn add_pango_attributes(
+@@ -1303,7 +1303,9 @@ fn add_pango_attributes(
      font_desc.set_family(props.font_family.as_str());
      font_desc.set_style(pango::Style::from(props.font_style));
  
@@ -59,7 +59,7 @@ index 1111111..2222222 100644
  
      font_desc.set_weight(pango::Weight::from(props.font_weight));
      font_desc.set_stretch(pango::Stretch::from(props.font_stretch));
-@@ -1321,6 +1323,13 @@ fn add_pango_attributes(
+@@ -1326,6 +1328,13 @@ fn add_pango_attributes(
          attributes.push(pango::AttrInt::new_strikethrough(true).upcast());
      }
  
@@ -84,11 +84,11 @@ This reverts commit ec5d747479f4098669bb93901f3008d412e3f62f.
 
 RHEL 9 doesn't provide Cairo 1.18.0.
 
-diff --git a/devel-docs/devel_environment.rst b/devel-docs/devel_environment.rst
+diff --git a/devel-docs/_build_dependencies.rst b/devel-docs/_build_dependencies.rst
 index 1111111..2222222 100644
---- a/devel-docs/devel_environment.rst
-+++ b/devel-docs/devel_environment.rst
-@@ -118,7 +118,7 @@ minimum version is listed here; you may use a newer version instead.
+--- a/devel-docs/_build_dependencies.rst
++++ b/devel-docs/_build_dependencies.rst
+@@ -15,7 +15,7 @@ minimum version is listed here; you may use a newer version instead.
  
  **Mandatory dependencies:**
  
@@ -485,11 +485,11 @@ index 1111111..2222222 100644
  
  [profile.overflow]
  inherits = "release"
-diff --git a/devel-docs/devel_environment.rst b/devel-docs/devel_environment.rst
+diff --git a/devel-docs/_build_dependencies.rst b/devel-docs/_build_dependencies.rst
 index 1111111..2222222 100644
---- a/devel-docs/devel_environment.rst
-+++ b/devel-docs/devel_environment.rst
-@@ -110,7 +110,7 @@ minimum version is listed here; you may use a newer version instead.
+--- a/devel-docs/_build_dependencies.rst
++++ b/devel-docs/_build_dependencies.rst
+@@ -7,7 +7,7 @@ minimum version is listed here; you may use a newer version instead.
  **Compilers and build tools:**
  
  * a C compiler
@@ -526,13 +526,13 @@ index 1111111..2222222 100644
 @@ -1,7 +1,7 @@
  project('librsvg',
          'c',
-         version: '2.59.1', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+         version: '2.59.2', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
 -        meson_version: '>= 1.2.0',
 +        meson_version: '>= 0.63.3',
          default_options: [
            'pkgconfig.relocatable=true',
          ]
-@@ -434,7 +434,7 @@ else
+@@ -432,7 +432,7 @@ else
  endif
  
  cargo_dylib_prefix = lib_prefix
