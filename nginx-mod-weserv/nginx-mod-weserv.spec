@@ -1,7 +1,7 @@
 %global nginx_modname weserv
 
-%global commit 947dbc4ef817509620f678d9186cb6c097957687
-%global commitdate 20240812
+%global commit 4133e2ff4745a2a70ca12e3113a5306e9e941efd
+%global commitdate 20241101
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -22,7 +22,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  cmake
 BuildRequires:  nginx-mod-devel
 BuildRequires:  cmake(Catch2) >= 2.7.1
-BuildRequires:  pkgconfig(vips-cpp) >= 8.9.0
+BuildRequires:  pkgconfig(vips-cpp) >= 8.12.0
 
 %description
 %{summary}.
@@ -87,6 +87,9 @@ popd
 
 
 %changelog
+* Fri Nov  1 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20241101git4133e2f
+- Update to weserv/images@4133e2f
+
 * Mon Aug 12 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20240812git947dbc4
 - Update to weserv/images@947dbc4
 

@@ -32,7 +32,7 @@ index 1111111..2222222 100644
  
  #include "test_environment.h"
  
-@@ -133,7 +135,7 @@ int main(const int argc, const char *argv[]) {
+@@ -129,7 +131,7 @@ int main(const int argc, const char *argv[]) {
  
      auto cli =
          session.cli() |
@@ -427,7 +427,7 @@ index 1111111..2222222 100644
  using Catch::Matchers::Equals;
  using Catch::Matchers::StartsWith;
  using vips::VImage;
-@@ -123,9 +122,9 @@ TEST_CASE("output", "[stream]") {
+@@ -116,9 +115,9 @@ TEST_CASE("output", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -440,7 +440,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("origin") {
-@@ -324,10 +323,10 @@ TEST_CASE("gif options", "[stream]") {
+@@ -317,10 +316,10 @@ TEST_CASE("gif options", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -455,7 +455,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("frame delay") {
-@@ -341,10 +340,10 @@ TEST_CASE("gif options", "[stream]") {
+@@ -334,10 +333,10 @@ TEST_CASE("gif options", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -470,7 +470,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("page height") {
-@@ -358,10 +357,10 @@ TEST_CASE("gif options", "[stream]") {
+@@ -351,10 +350,10 @@ TEST_CASE("gif options", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -485,7 +485,7 @@ index 1111111..2222222 100644
      }
  }
  
-@@ -372,11 +371,10 @@ TEST_CASE("metadata", "[stream]") {
+@@ -365,11 +364,10 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -501,7 +501,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("png 8 bit paletted") {
-@@ -385,8 +383,8 @@ TEST_CASE("metadata", "[stream]") {
+@@ -378,8 +376,8 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -512,7 +512,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("webp") {
-@@ -400,7 +398,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -393,7 +391,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -521,7 +521,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("avif") {
-@@ -414,7 +412,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -407,7 +405,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -530,7 +530,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("tiff") {
-@@ -428,7 +426,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -421,7 +419,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -539,7 +539,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("svg") {
-@@ -442,7 +440,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -435,7 +433,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -548,7 +548,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("pdf") {
-@@ -456,7 +454,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -449,7 +447,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -557,7 +557,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("heic") {
-@@ -470,8 +468,8 @@ TEST_CASE("metadata", "[stream]") {
+@@ -463,8 +461,8 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -568,7 +568,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("magick") {
-@@ -485,6 +483,6 @@ TEST_CASE("metadata", "[stream]") {
+@@ -478,6 +476,6 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -778,7 +778,7 @@ index 1111111..2222222 100644
 @@ -1,6 +1,6 @@
  FetchContent_Declare(catch2
          GIT_REPOSITORY https://github.com/catchorg/Catch2.git
--        GIT_TAG v3.6.0
+-        GIT_TAG v3.7.1
 +        GIT_TAG v2.13.10
          )
  
