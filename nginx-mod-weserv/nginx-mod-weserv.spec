@@ -1,7 +1,5 @@
-%global nginx_modname weserv
-
-%global commit 4133e2ff4745a2a70ca12e3113a5306e9e941efd
-%global commitdate 20241101
+%global commit f2e6e51bdbe2d3594390c2f8b0e9c01433d85b40
+%global commitdate 20241224
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -64,15 +62,16 @@ API library of %{name}.
 pushd %{_vpath_builddir}
 install -dm 0755 %{buildroot}%{nginx_moddir}
 install -pm 0755 ngx_weserv_module.so %{buildroot}%{nginx_moddir}
+popd
+
 install -dm 0755 %{buildroot}%{nginx_modconfdir}
 echo 'load_module "%{nginx_moddir}/ngx_weserv_module.so";' \
     > %{buildroot}%{nginx_modconfdir}/mod-weserv.conf
-popd
 
 
 %files
 %license LICENSE
-%doc README.md
+%doc CHANGELOG.md README.md
 %{_libdir}/libweserv.so.5*
 %{nginx_moddir}/ngx_weserv_module.so
 %{nginx_modconfdir}/mod-weserv.conf
@@ -87,6 +86,9 @@ popd
 
 
 %changelog
+* Tue Dec 24 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20241224gitf2e6e51
+- Update to weserv/images@f2e6e51
+
 * Fri Nov  1 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20241101git4133e2f
 - Update to weserv/images@4133e2f
 

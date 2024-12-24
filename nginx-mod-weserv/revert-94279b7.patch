@@ -32,7 +32,7 @@ index 1111111..2222222 100644
  
  #include "test_environment.h"
  
-@@ -129,7 +131,7 @@ int main(const int argc, const char *argv[]) {
+@@ -128,7 +130,7 @@ int main(const int argc, const char *argv[]) {
  
      auto cli =
          session.cli() |
@@ -75,7 +75,7 @@ index 1111111..2222222 100644
      }
      SECTION("source") {
          class InvalidSource : public SourceInterface {
-@@ -56,7 +55,7 @@ TEST_CASE("invalid image", "[invalid]") {
+@@ -55,7 +54,7 @@ TEST_CASE("invalid image", "[invalid]") {
          CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
          CHECK(status.error_cause() == Status::ErrorCause::Application);
          CHECK_THAT(status.message(),
@@ -83,8 +83,8 @@ index 1111111..2222222 100644
 +                   Contains("Invalid or unsupported image format"));
      }
      SECTION("empty source") {
-         if (vips_version(0) < 8 ||
-@@ -82,6 +81,6 @@ TEST_CASE("invalid image", "[invalid]") {
+         class UnreadableSource : public SourceInterface {
+@@ -76,6 +73,6 @@ TEST_CASE("invalid image", "[invalid]") {
          CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
          CHECK(status.error_cause() == Status::ErrorCause::Application);
          CHECK_THAT(status.message(),
