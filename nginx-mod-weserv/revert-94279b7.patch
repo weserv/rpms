@@ -652,7 +652,7 @@ index 1111111..2222222 100644
  using weserv::api::utils::Status;
  
  TEST_CASE("status", "[status]") {
-@@ -59,84 +58,80 @@ TEST_CASE("status", "[status]") {
+@@ -59,84 +58,81 @@ TEST_CASE("status", "[status]") {
      SECTION("to JSON includes details") {
          auto json = Status::OK.to_json();
  
@@ -687,35 +687,37 @@ index 1111111..2222222 100644
 -        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
 -        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
 -        CHECK_THAT(json, ContainsSubstring(
--                             R"("message":"The requested URL timed out.")"));
+-                             R"("message":"The requested URL timed out")"));
 +        CHECK_THAT(json, Contains(R"("status":"error")"));
 +        CHECK_THAT(json, Contains(R"("code":404)"));
 +        CHECK_THAT(json,
-+                   Contains(R"("message":"The requested URL timed out.")"));
++                   Contains(R"("message":"The requested URL timed out")"));
  
          // https://github.com/weserv/images/issues/264
          json = Status(500, "", Status::ErrorCause::Upstream).to_json();
  
 -        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
 -        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-         CHECK_THAT(json,
+-        CHECK_THAT(json,
 -                   ContainsSubstring(
 -                       R"("message":"The requested URL returned error: 500")"));
-+                   Contains(R"("message":"The requested URL returned error: 500")"));
++        CHECK_THAT(json, Contains(R"("status":"error")"));
++        CHECK_THAT(json, Contains(R"("code":404)"));
++        CHECK_THAT(
++            json,
++            Contains(R"("message":"The requested URL returned error: 500")"));
  
          json = Status(502, "", Status::ErrorCause::Upstream).to_json();
  
 -        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
 -        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
--        CHECK_THAT(json, ContainsSubstring(
--                             "The hostname of the origin is unresolvable (DNS) "
--                             "or blocked by policy."));
+-        CHECK_THAT(json,
+-                   ContainsSubstring(
+-                       "The hostname of the origin is unresolvable (DNS)"));
 +        CHECK_THAT(json, Contains(R"("status":"error")"));
 +        CHECK_THAT(json, Contains(R"("code":404)"));
-+        CHECK_THAT(json, Contains("The hostname of the origin is unresolvable "
-+                                  "(DNS) or blocked by policy."));
++        CHECK_THAT(
++            json, Contains("The hostname of the origin is unresolvable (DNS)"));
  
          json = Status(310, "Will not follow a redirection to itself",
                        Status::ErrorCause::Upstream)
