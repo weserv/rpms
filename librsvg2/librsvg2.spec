@@ -7,12 +7,13 @@
 # Disable AVIF support by default to reduce the attack surface
 %bcond_with     avif
 
-# Tests require Rust 1.77 or newer, EL9 ships with version 1.75
+# Skip tests, including the reftests related to text rendering,
+# as exact visual matches cannot be guaranteed.
 %bcond_with     tests
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.59.2
+Version:        2.59.90
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
@@ -24,8 +25,7 @@ Source0:        https://download.gnome.org/sources/librsvg/2.59/librsvg-%{versio
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 # Patch to ensure compat with EL9:
-# - Revert commit 73c1ee7, ec5d747, c88987b, 166f74f and 0e68f6f;
-# - Downgrade the minimum supported Rust version (MSRV) to 1.75.0;
+# - Revert commit 73c1ee7, ec5d747, c88987b and 166f74f;
 # - Downgrade the minimum required Meson version to 0.63.3.
 Patch0:         el-9-compat.patch
 
@@ -167,6 +167,10 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Tue Feb 11 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.90-1
+- Update to 2.59.90
+- Update EL9 compat patch for RHEL 9.5 which provides Rust 1.79
+
 * Wed Oct 30 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.2-1
 - Update to 2.59.2
 
