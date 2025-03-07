@@ -1,6 +1,6 @@
 Name:           libheif
 Epoch:          1
-Version:        1.17.6
+Version:        1.19.7
 Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
@@ -38,7 +38,7 @@ Requires:       shared-mime-info
 %description    tools
 This package provides tools for manipulating HEIF files.
 
-%package -n     heif-pixbuf-loader
+%package     -n heif-pixbuf-loader
 Summary:        HEIF image loader for GTK+ applications
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
@@ -92,6 +92,9 @@ rm -rf third-party/
 
 
 %changelog
+* Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-1
+- Update to 1.19.7
+
 * Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.6-1
 - Update to 1.17.6
 
