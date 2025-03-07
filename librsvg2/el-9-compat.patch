@@ -25,7 +25,7 @@ diff --git a/meson.build b/meson.build
 index 1111111..2222222 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -56,7 +56,7 @@ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
+@@ -55,7 +55,7 @@ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
  glib_required          = '>= 2.50.0'
  harfbuzz_required      = '>= 2.0.0'
  libxml_required        = '>= 2.9.0'
@@ -114,7 +114,7 @@ diff --git a/meson.build b/meson.build
 index 1111111..2222222 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -49,7 +49,7 @@ py = import('python')
+@@ -48,7 +48,7 @@ py = import('python')
  python = py.find_installation()
  
  # Required versions for dependencies - Please update _build_dependencies.rst with version numbers if these change
@@ -348,13 +348,13 @@ index 1111111..2222222 100644
 @@ -1,7 +1,7 @@
  project('librsvg',
          'c',
-         version: '2.59.90', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+         version: '2.59.91', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
 -        meson_version: '>= 1.3.0',
 +        meson_version: '>= 0.63.3',
          default_options: [
          ]
  )
-@@ -347,7 +347,7 @@ if host_system in ['windows', 'linux']
+@@ -358,7 +358,7 @@ if host_system in ['windows', 'linux']
    endif
  
    foreach i: native_libs.stdout().split()
@@ -363,7 +363,7 @@ index 1111111..2222222 100644
        if i.endswith('.lib') # pre Rust 1.83
          default_overrides = [
            'b_vscrt=md@0@'.format(i.substring(0, -4).split('msvcrt')[1])
-@@ -447,7 +447,7 @@ else
+@@ -460,7 +460,7 @@ else
  endif
  
  cargo_dylib_prefix = lib_prefix

@@ -13,7 +13,7 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.59.90
+Version:        2.59.91
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
@@ -167,6 +167,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.91-1
+- Update to 2.59.91
+
 * Tue Feb 11 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.59.90-1
 - Update to 2.59.90
 - Update EL9 compat patch for RHEL 9.5 which provides Rust 1.79
