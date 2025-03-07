@@ -1,7 +1,7 @@
 Name:           libheif
 Epoch:          1
-Version:        1.17.6
-Release:        2%{?dist}
+Version:        1.19.7
+Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
 License:        LGPL-3.0-or-later and MIT
@@ -38,7 +38,7 @@ Requires:       shared-mime-info
 %description    tools
 This package provides tools for manipulating HEIF files.
 
-%package -n     heif-pixbuf-loader
+%package     -n heif-pixbuf-loader
 Summary:        HEIF image loader for GTK+ applications
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
@@ -51,6 +51,11 @@ This package provides a plugin to load HEIF files in GTK+ applications.
 %autosetup -p1
 rm -rf third-party/
 
+%if 0%{?rhel} < 9
+# heif-enc requires std::filesystem, so link against -lstdc++fs on
+# RHEL 8 and older.
+sed -i "/^target_link_libraries(heif-enc/s/)/ stdc++fs)/" examples/CMakeLists.txt
+%endif
 
 %build
 %cmake -DENABLE_PLUGIN_LOADING=0 \
@@ -92,6 +97,9 @@ rm -rf third-party/
 
 
 %changelog
+* Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-1
+- Update to 1.19.7
+
 * Tue Jan  2 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.6-2
 - Rebuild for rav1e SONAME bump
 
