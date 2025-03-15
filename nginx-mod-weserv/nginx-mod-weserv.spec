@@ -1,5 +1,5 @@
-%global commit 1a0ce6358c36d9506a35760257f3a7b511f09d06
-%global commitdate 20250209
+%global commit dc6cc0965fd2012490359256c768b4e0d3e21de5
+%global commitdate 20250315
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -86,6 +86,9 @@ echo 'load_module "%{nginx_moddir}/ngx_weserv_module.so";' \
 
 
 %changelog
+* Sat Mar 15 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20250315gitdc6cc09
+- Update to weserv/images@dc6cc09
+
 * Sun Feb  9 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20250209git1a0ce63
 - Update to weserv/images@1a0ce63
 
