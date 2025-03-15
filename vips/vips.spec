@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.16
-%global vips_version %{vips_version_base}.0
+%global vips_version %{vips_version_base}.1
 %global vips_soname_major 42
 #global vips_prever rc2
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -126,8 +126,7 @@ Requires:   %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description devel
 The %{name}-devel package contains the header files and
-libraries necessary for developing programs using VIPS. It also
-contains a C++ API and development documentation.
+libraries necessary for developing programs using VIPS.
 
 
 %package tools
@@ -146,29 +145,31 @@ BuildRequires: doxygen
 Conflicts:     %{name} < %{epoch}:%{version}-%{release}, %{name} > %{epoch}:%{version}-%{release}
 
 %description doc
-The %{name}-doc package contains extensive documentation about VIPS in both
-HTML and PDF formats.
+The %{name}-doc package contains extensive HTML documentation about VIPS and
+its C++ API.
 %endif
 
 %if %{with jxl}
 %package jxl
-Summary:       JPEG-XL support for %{name}
+Summary:       JPEG XL support for %{name}
 BuildRequires: pkgconfig(libjxl) >= 0.6
 Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Supplements:   %{name}
 
 %description jxl
-The %{name}-jxl package contains the Jxl module for VIPS.
+The %{name}-jxl package contains the jxl module for VIPS, providing JPEG XL
+support.
 %endif
 
 %if %{with heif}
 %package heif
-Summary:       Heif support for %{name}
+Summary:       HEIF support for %{name}
 BuildRequires: pkgconfig(libheif) >= 1.4.0
 Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description heif
-The %{name}-heif package contains the Heif module for VIPS.
+The %{name}-heif package contains the heif module for VIPS, providing AVIF
+support.
 %endif
 
 %package openslide
@@ -231,7 +232,7 @@ Conflicts:     %{name}-magick-im6
 Conflicts:     %{name}-magick-im7
 
 %description magick-gm
-The %{name}-magick-gm contains the Magick module for VIPS
+The %{name}-magick-gm package contains the Magick module for VIPS
 using GraphicsMagick.
 %endif
 
@@ -248,7 +249,7 @@ exit 1
 %endif
 %endif
 
-%setup -q -n vips-%{vips_version}
+%autosetup -p1 -n vips-%{vips_version}
 
 %build
 # Upstream recommends enabling auto-vectorization of inner loops:
@@ -370,6 +371,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Sat Mar 15 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.1-1
+- Update to 8.16.1
+
 * Mon Oct 28 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.0-1
 - Update to 8.16.0
 
