@@ -1,7 +1,7 @@
 Name:           libheif
 Epoch:          1
 Version:        1.19.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
 License:        LGPL-3.0-or-later and MIT
@@ -58,7 +58,8 @@ sed -i "/^target_link_libraries(heif-enc/s/)/ stdc++fs)/" examples/CMakeLists.tx
 %endif
 
 %build
-%cmake -DENABLE_PLUGIN_LOADING=0 \
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DENABLE_PLUGIN_LOADING=0 \
        -DWITH_DAV1D=1 \
        -DWITH_DAV1D_PLUGIN=0 \
        -DWITH_RAV1E=1 \
@@ -97,6 +98,10 @@ sed -i "/^target_link_libraries(heif-enc/s/)/ stdc++fs)/" examples/CMakeLists.tx
 
 
 %changelog
+* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-2
+- Ensure assertions are disabled as discussed in
+  https://github.com/strukturag/libheif/pull/1492
+
 * Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-1
 - Update to 1.19.7
 
