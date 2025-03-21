@@ -44,12 +44,18 @@
 Name:           vips
 Epoch:          1
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C/C++ library for processing large images
 
 License:        LGPL-2.1-or-later
 URL:            https://github.com/libvips/libvips
 Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_tagver}.tar.xz
+
+# https://github.com/libvips/libvips/pull/4424
+Patch0:         pr-4424.patch
+
+# https://github.com/libvips/libvips/pull/4428
+Patch1:         pr-4428.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -371,6 +377,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.1-2
+- Backport security fixes
+
 * Sat Mar 15 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.1-1
 - Update to 8.16.1
 
