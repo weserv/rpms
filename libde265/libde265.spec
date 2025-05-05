@@ -1,5 +1,5 @@
 Name:           libde265
-Version:        1.0.15
+Version:        1.0.16
 Release:        1%{?dist}
 Summary:        Open H.265 video codec implementation
 
@@ -29,19 +29,6 @@ API makes it easy to integrate it into other software.
 
 The development headers for compiling programs that use libde265
 are provided by this package.
-
-%package examples
-# The entire examples source code is GPLv3+ except extra/getopt* which is BSD.
-License:    GPLv3+ and BSD
-Summary:    Open H.265 video codec implementation - examples
-Requires:   %{name}%{?_isa} = %{version}-%{release}
-
-%description examples
-libde265 is an open source implementation of the H.265 video codec.
-It is written from scratch for simplicity and efficiency. Its simple
-API makes it easy to integrate it into other software.
-
-Sample applications using libde265 are provided by this package.
 
 %prep
 %autosetup -p1
@@ -73,22 +60,21 @@ rm -f %{buildroot}%{_bindir}/yuv-distortion
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS
+%doc AUTHORS README.md
 %license COPYING
 %{_libdir}/*.so.*
 
 %files devel
-%doc README.md
 %{_includedir}/libde265/
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
 
-%files examples
-%doc README.md
-%{_bindir}/acceleration_speed
-
 %changelog
+* Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.16-1
+- Update to 1.0.16
+- Remove examples subpackage
+
 * Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.15-1
 - Update to 1.0.15
 
