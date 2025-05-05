@@ -1,7 +1,7 @@
 Name:           libheif
 Epoch:          1
-Version:        1.19.7
-Release:        2%{?dist}
+Version:        1.19.8
+Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
 License:        LGPL-3.0-or-later and MIT
@@ -93,6 +93,9 @@ rm -rf third-party/
 
 
 %changelog
+* Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.8-1
+- Update to 1.19.8
+
 * Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-2
 - Ensure assertions are disabled as discussed in
   https://github.com/strukturag/libheif/pull/1492
