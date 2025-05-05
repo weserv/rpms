@@ -1,7 +1,7 @@
 Name:           libheif
 Epoch:          1
-Version:        1.19.7
-Release:        2%{?dist}
+Version:        1.19.8
+Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
 License:        LGPL-3.0-or-later and MIT
@@ -52,9 +52,9 @@ This package provides a plugin to load HEIF files in GTK+ applications.
 rm -rf third-party/
 
 %if 0%{?rhel} < 9
-# heif-enc requires std::filesystem, so link against -lstdc++fs on
+# heif-{dec,enc,info} requires std::filesystem, so link against -lstdc++fs on
 # RHEL 8 and older.
-sed -i "/^target_link_libraries(heif-enc/s/)/ stdc++fs)/" examples/CMakeLists.txt
+sed -i "/^target_link_libraries(heif-\(dec\|enc\|info\)/s/)/ stdc++fs)/" examples/CMakeLists.txt
 %endif
 
 %build
@@ -98,6 +98,9 @@ sed -i "/^target_link_libraries(heif-enc/s/)/ stdc++fs)/" examples/CMakeLists.tx
 
 
 %changelog
+* Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.8-1
+- Update to 1.19.8
+
 * Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-2
 - Ensure assertions are disabled as discussed in
   https://github.com/strukturag/libheif/pull/1492
