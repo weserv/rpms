@@ -7,13 +7,18 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.16
-%global vips_version %{vips_version_base}.1
+%global vips_version_base 8.17
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc2
+%global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
+%if 0%{?rhel} >= 9
 %bcond_without             doc
+%else
+# gi-docgen is not available on EPEL 8
+%bcond_with                doc
+%endif
 %bcond_without             tests
 
 %bcond_without             heif
@@ -44,18 +49,12 @@
 Name:           vips
 Epoch:          1
 Version:        %{vips_version}%{?vips_prever:~%{vips_prever}}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        C/C++ library for processing large images
 
 License:        LGPL-2.1-or-later
 URL:            https://github.com/libvips/libvips
 Source0:        %{url}/releases/download/v%{vips_tagver}/vips-%{vips_tagver}.tar.xz
-
-# https://github.com/libvips/libvips/pull/4424
-Patch0:         pr-4424.patch
-
-# https://github.com/libvips/libvips/pull/4428
-Patch1:         pr-4428.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -102,6 +101,7 @@ Provides:       bundled(libnsgif)
 
 Suggests:   %{name}-openslide
 Suggests:   %{name}-magick-im6
+Recommends: %{name}-jxl
 Recommends: %{name}-heif
 Recommends: %{name}-poppler
 
@@ -146,7 +146,8 @@ The %{name}-tools package contains command-line tools for working with VIPS.
 %if %{with doc}
 %package doc
 Summary:       Documentation for %{name}
-BuildRequires: gtk-doc
+BuildArch:     noarch
+BuildRequires: gi-docgen
 BuildRequires: doxygen
 Conflicts:     %{name} < %{epoch}:%{version}-%{release}, %{name} > %{epoch}:%{version}-%{release}
 
@@ -158,9 +159,8 @@ its C++ API.
 %if %{with jxl}
 %package jxl
 Summary:       JPEG XL support for %{name}
-BuildRequires: pkgconfig(libjxl) >= 0.6
+BuildRequires: pkgconfig(libjxl) >= 0.7
 Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
-Supplements:   %{name}
 
 %description jxl
 The %{name}-jxl package contains the jxl module for VIPS, providing JPEG XL
@@ -170,7 +170,7 @@ support.
 %if %{with heif}
 %package heif
 Summary:       HEIF support for %{name}
-BuildRequires: pkgconfig(libheif) >= 1.4.0
+BuildRequires: pkgconfig(libheif) >= 1.7.0
 Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description heif
@@ -180,7 +180,7 @@ support.
 
 %package openslide
 Summary:       OpenSlide support for %{name}
-BuildRequires: pkgconfig(openslide) >= 3.3.0
+BuildRequires: pkgconfig(openslide) >= 3.4.0
 Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description openslide
@@ -282,8 +282,8 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     -Dspng=disabled \
 %endif
 %if %{with doc}
-    -Ddoxygen=true \
-    -Dgtk_doc=true \
+    -Dcpp-docs=true \
+    -Ddocs=true \
 %endif
 %if %{with gm}
     -Dmagick-package=GraphicsMagick \
@@ -338,8 +338,8 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 %if %{with doc}
 %files doc
-%{_datadir}/gtk-doc
-%{_docdir}/vips-doc/html
+%{_docdir}/vips
+%{_docdir}/vips-cpp/html
 %license LICENSE
 %endif
 
@@ -377,48 +377,54 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
-* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.1-2
+* Thu Jun  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.17.0~rc1-1
+- Update to 8.17.0-rc1
+- Drop patches merged upstream
+- Recommends vips-jxl instead of supplements
+- Build vips-doc package as noarch
+
+* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.16.1-2
 - Backport security fixes
 
-* Sat Mar 15 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.1-1
+* Sat Mar 15 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.16.1-1
 - Update to 8.16.1
 
-* Mon Oct 28 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.0-1
+* Mon Oct 28 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.16.0-1
 - Update to 8.16.0
 
-* Tue Oct 22 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.0~rc2-1
+* Tue Oct 22 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.16.0~rc2-1
 - Update to 8.16.0-rc2
 
-* Wed Oct 16 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.16.0~rc1-1
+* Wed Oct 16 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.16.0~rc1-1
 - Update to 8.16.0-rc1
 
-* Mon Aug 12 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.3-1
+* Mon Aug 12 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.15.3-1
 - Update to 8.15.3
 
-* Fri Mar 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.2-1
+* Fri Mar 15 2024 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.15.2-1
 - Update to 8.15.2
 
-* Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.1-1
+* Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.15.1-1
 - Update to 8.15.1
 
-* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.0-1
+* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.15.0-1
 - Update to 8.15.0
 
-* Fri Nov  3 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.0~rc2-1
+* Fri Nov  3 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.15.0~rc2-1
 - Update to 8.15.0-rc2
 
-* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.15.0~rc1-1
+* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.15.0~rc1-1
 - Update to 8.15.0-rc1
 - Remove liborc in favor of libhwy on Fedora and EL-8
 - Remove libgsf in favor of libarchive
 
-* Tue Aug 15 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.4-1
+* Tue Aug 15 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.14.4-1
 - Update to 8.14.4
 
-* Mon Jul 24 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.3-1
+* Mon Jul 24 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.14.3-1
 - Update to 8.14.3
 
-* Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-1
+* Tue Apr 11 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.14.2-1
 - Bump epoch
 
 * Tue Mar 21 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 8.14.2-1
