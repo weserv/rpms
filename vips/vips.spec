@@ -10,7 +10,7 @@
 %global vips_version_base 8.17
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc1
+#global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?rhel} >= 9
@@ -377,6 +377,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Thu Jun  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.17.0-1
+- Update to 8.17.0
+
 * Thu Jun  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.17.0~rc1-1
 - Update to 8.17.0-rc1
 - Drop patches merged upstream
