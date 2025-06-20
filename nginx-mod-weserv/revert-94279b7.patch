@@ -64,18 +64,9 @@ index 1111111..2222222 100644
 -                   ContainsSubstring("Invalid or unsupported image format"));
 +                   Contains("Invalid or unsupported image format"));
      }
-     SECTION("file") {
-         auto test_file = fixtures->dir + "/doesnotexist.jpg";
-@@ -24,7 +23,7 @@ TEST_CASE("invalid image", "[invalid]") {
-         CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
-         CHECK_THAT(status.message(),
--                   ContainsSubstring("Invalid or unsupported image format"));
-+                   Contains("Invalid or unsupported image format"));
-     }
      SECTION("source") {
          class InvalidSource : public SourceInterface {
-@@ -55,7 +54,7 @@ TEST_CASE("invalid image", "[invalid]") {
+@@ -45,7 +44,7 @@ TEST_CASE("invalid image", "[invalid]") {
          CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
          CHECK(status.error_cause() == Status::ErrorCause::Application);
          CHECK_THAT(status.message(),
@@ -84,7 +75,7 @@ index 1111111..2222222 100644
      }
      SECTION("empty source") {
          class UnreadableSource : public SourceInterface {
-@@ -76,6 +73,6 @@ TEST_CASE("invalid image", "[invalid]") {
+@@ -64,6 +63,6 @@ TEST_CASE("invalid image", "[invalid]") {
          CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
          CHECK(status.error_cause() == Status::ErrorCause::Application);
          CHECK_THAT(status.message(),
@@ -137,6 +128,41 @@ index 1111111..2222222 100644
 +            status.message(),
 +            Contains("Input image exceeds the maximum number of pages."));
          CHECK(out_buf.empty());
+     }
+ }
+diff --git a/test/api/exceptions/unit-other.cpp b/test/api/exceptions/unit-other.cpp
+index 1111111..2222222 100644
+--- a/test/api/exceptions/unit-other.cpp
++++ b/test/api/exceptions/unit-other.cpp
+@@ -1,9 +1,8 @@
+-#include <catch2/catch_test_macros.hpp>
+-#include <catch2/matchers/catch_matchers_string.hpp>
++#include <catch2/catch.hpp>
+ 
+ #include "../base.h"
+ 
+-using Catch::Matchers::ContainsSubstring;
++using Catch::Matchers::Contains;
+ 
+ TEST_CASE("libvips error", "[other]") {
+     SECTION("input file") {
+@@ -14,8 +13,7 @@ TEST_CASE("libvips error", "[other]") {
+         CHECK(!status.ok());
+         CHECK(status.code() == static_cast<int>(Status::Code::LibvipsError));
+         CHECK(status.error_cause() == Status::ErrorCause::Application);
+-        CHECK_THAT(status.message(),
+-                   ContainsSubstring("No such file or directory"));
++        CHECK_THAT(status.message(), Contains("No such file or directory"));
+     }
+     SECTION("output file") {
+         auto test_image = fixtures->input_jpg;
+@@ -24,7 +22,6 @@ TEST_CASE("libvips error", "[other]") {
+         CHECK(!status.ok());
+         CHECK(status.code() == static_cast<int>(Status::Code::LibvipsError));
+         CHECK(status.error_cause() == Status::ErrorCause::Application);
+-        CHECK_THAT(status.message(),
+-                   ContainsSubstring("No such file or directory"));
++        CHECK_THAT(status.message(), Contains("No such file or directory"));
      }
  }
 diff --git a/test/api/exceptions/unit-timeout.cpp b/test/api/exceptions/unit-timeout.cpp
@@ -411,15 +437,13 @@ diff --git a/test/api/processors/unit-stream.cpp b/test/api/processors/unit-stre
 index 1111111..2222222 100644
 --- a/test/api/processors/unit-stream.cpp
 +++ b/test/api/processors/unit-stream.cpp
-@@ -1,5 +1,4 @@
+@@ -1,11 +1,10 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
  
  #include "../base.h"
  
-@@ -7,7 +6,7 @@
- #include <fstream>
  #include <vips/vips8>
  
 -using Catch::Matchers::ContainsSubstring;
@@ -427,7 +451,7 @@ index 1111111..2222222 100644
  using Catch::Matchers::Equals;
  using Catch::Matchers::StartsWith;
  using vips::VImage;
-@@ -116,9 +115,9 @@ TEST_CASE("output", "[stream]") {
+@@ -114,9 +113,9 @@ TEST_CASE("output", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -440,7 +464,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("origin") {
-@@ -317,10 +316,10 @@ TEST_CASE("gif options", "[stream]") {
+@@ -311,10 +310,10 @@ TEST_CASE("gif options", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -455,7 +479,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("frame delay") {
-@@ -334,10 +333,10 @@ TEST_CASE("gif options", "[stream]") {
+@@ -328,10 +327,10 @@ TEST_CASE("gif options", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -470,7 +494,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("page height") {
-@@ -351,10 +350,10 @@ TEST_CASE("gif options", "[stream]") {
+@@ -345,10 +344,10 @@ TEST_CASE("gif options", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -485,7 +509,7 @@ index 1111111..2222222 100644
      }
  }
  
-@@ -365,11 +364,10 @@ TEST_CASE("metadata", "[stream]") {
+@@ -359,11 +358,10 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -501,7 +525,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("png 8 bit paletted") {
-@@ -378,8 +376,8 @@ TEST_CASE("metadata", "[stream]") {
+@@ -372,8 +370,8 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -512,7 +536,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("webp") {
-@@ -393,7 +391,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -387,7 +385,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -521,7 +545,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("avif") {
-@@ -407,7 +405,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -401,7 +399,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -530,7 +554,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("tiff") {
-@@ -421,7 +419,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -415,7 +413,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -539,7 +563,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("svg") {
-@@ -435,7 +433,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -429,7 +427,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -548,7 +572,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("pdf") {
-@@ -449,7 +447,7 @@ TEST_CASE("metadata", "[stream]") {
+@@ -443,7 +441,7 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -557,7 +581,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("heic") {
-@@ -463,8 +461,8 @@ TEST_CASE("metadata", "[stream]") {
+@@ -457,8 +455,8 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -568,7 +592,7 @@ index 1111111..2222222 100644
      }
  
      SECTION("magick") {
-@@ -478,6 +476,6 @@ TEST_CASE("metadata", "[stream]") {
+@@ -472,6 +470,6 @@ TEST_CASE("metadata", "[stream]") {
  
          std::string buffer = process_file<std::string>(test_image, params);
  
@@ -780,7 +804,7 @@ index 1111111..2222222 100644
 @@ -1,6 +1,6 @@
  FetchContent_Declare(catch2
          GIT_REPOSITORY https://github.com/catchorg/Catch2.git
--        GIT_TAG v3.8.0
+-        GIT_TAG v3.8.1
 +        GIT_TAG v2.13.10
          )
  
