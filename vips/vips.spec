@@ -13,12 +13,7 @@
 #global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
-%if 0%{?rhel} >= 9
 %bcond_without             doc
-%else
-# gi-docgen is not available on EPEL 8
-%bcond_with                doc
-%endif
 %bcond_without             tests
 
 %bcond_without             heif
@@ -27,24 +22,15 @@
 %bcond_without             libcgif
 %bcond_without             libimagequant
 %bcond_without             libspng
-
-# 2 builds needed to get the full stack
-# --without im6 --with im7
-# --without im6 --with gm
-
-%bcond_without             im6
-%bcond_with                im7
-%bcond_with                gm
-
-%if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
 %bcond_without             openjpeg2
-%else
-# disabled by default
-# as vips pulls poppler (libopenjpeg) and IM (libopenjp2)
-# so vips segfaults in various place
-# also see https://github.com/libvips/libvips/pull/2305
-%bcond_with                openjpeg2
-%endif
+
+# 1-2 builds needed to get the full stack (im6 only for EL8, EL9)
+# --without im7 --with im6
+# --without im7 --with gm
+
+%bcond_without             im7
+%bcond_with                im6
+%bcond_with                gm
 
 Name:           vips
 Epoch:          1
@@ -100,7 +86,7 @@ BuildRequires:  bc
 Provides:       bundled(libnsgif)
 
 Suggests:   %{name}-openslide
-Suggests:   %{name}-magick-im6
+Suggests:   %{name}-magick-im7
 Recommends: %{name}-jxl
 Recommends: %{name}-heif
 Recommends: %{name}-poppler
@@ -339,7 +325,7 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %if %{with doc}
 %files doc
 %{_docdir}/vips
-%{_docdir}/vips-cpp/html
+%{_docdir}/vips-cpp
 %license LICENSE
 %endif
 
