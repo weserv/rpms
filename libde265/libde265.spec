@@ -57,8 +57,6 @@ rm -f %{buildroot}%{_bindir}/rd-curves
 rm -f %{buildroot}%{_bindir}/tests
 rm -f %{buildroot}%{_bindir}/yuv-distortion
 
-%ldconfig_scriptlets
-
 %files
 %doc AUTHORS README.md
 %license COPYING
