@@ -11,15 +11,10 @@ License:        BSD-3-Clause
 URL:            https://github.com/weserv/images
 Source0:        %{url}/archive/%{commit}/images-%{shortcommit}.tar.gz
 
-%if 0%{?rhel} < 9
-# Revert 94279b7 for compat with EL8
-Patch0:         revert-94279b7.patch
-%endif
-
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
 BuildRequires:  nginx-mod-devel
-BuildRequires:  cmake(Catch2) >= 2.7.1
+BuildRequires:  cmake(Catch2) >= 3.0.1
 BuildRequires:  pkgconfig(vips-cpp) >= 8.12.0
 
 %description
