@@ -7,7 +7,7 @@
 Name:           redis-rate-limiter
 Version:        0.0.1
 Release:        1.%{commitdate}git%{shortcommit}%{?dist}
-Summary:        Implementation of the GCR Algorithm in C as a Redis Module
+Summary:        C implementation of the GCR Algorithm for key-value stores
 
 License:        MIT
 URL:            https://github.com/onsigntv/redis-rate-limiter
@@ -15,34 +15,34 @@ Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 
 BuildRequires:  make
 BuildRequires:  gcc
-BuildRequires:  redis-devel
-BuildRequires:  redis >= 4
+BuildRequires:  valkey-devel
+BuildRequires:  valkey >= 7
 
-Requires:       redis >= 4
-Requires:       redis(modules_abi)%{?_isa} = %{redis_modules_abi}
+Requires:       valkey >= 7
+Requires:       valkey(modules_abi)%{?_isa} = %{valkey_modules_abi}
 
 %description
-A Redis module that provides rate limiting in Redis as a single command.
-Implements the fairly sophisticated generic cell rate algorithm which
-provides a rolling time window and doesn't depend on a background drip
-process.
+A C module that provides rate limiting as a single command for RESP-based
+key-value stores, such as Redis, Valkey, and KeyDB. Implements the fairly
+sophisticated generic cell rate algorithm which provides a rolling time
+window and doesn't depend on a background drip process.
 
 %prep
-%autosetup -n %{name}-%{commit} -p1
+%autosetup -p1 -n %{name}-%{commit}
 
 %build
 %set_build_flags
 %make_build LD="gcc" USE_MONOTONIC_CLOCK=1
 
 %install
-mkdir -p %{buildroot}%{redis_modules_dir}
-install -pDm755 %{module}.so %{buildroot}%{redis_modules_dir}/%{module}.so
+mkdir -p %{buildroot}%{valkey_modules_dir}
+install -pDm755 %{module}.so %{buildroot}%{valkey_modules_dir}/%{module}.so
 
 
 %files
 %license LICENSE
 %doc README.md
-%{redis_modules_dir}/%{module}.so
+%{valkey_modules_dir}/%{module}.so
 
 
 %changelog
