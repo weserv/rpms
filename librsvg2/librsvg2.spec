@@ -2,7 +2,7 @@
 # required rust libraries
 %global bundled_rust_deps 1
 
-%global cairo_version 1.17.0
+%global cairo_version 1.18.0
 
 # Disable AVIF support by default to reduce the attack surface
 %bcond_with     avif
@@ -24,13 +24,8 @@ Source0:        https://download.gnome.org/sources/librsvg/2.60/librsvg-%{versio
 # Created using "cargo vendor"
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
-# Patch to ensure compat with EL9:
-# - Revert commit 73c1ee7, ec5d747, c88987b and 166f74f;
-# - Downgrade the minimum required Meson version to 0.63.3.
-Patch0:         el-9-compat.patch
-
 BuildRequires:  gcc
-BuildRequires:  meson >= 0.63.3
+BuildRequires:  meson >= 1.3.0
 BuildRequires:  cargo-c >= 0.9.19
 BuildRequires:  cargo-rpm-macros >= 24
 BuildRequires:  gi-docgen
@@ -39,7 +34,6 @@ BuildRequires:  pkgconfig(cairo) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-gobject) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-png) >= %{cairo_version}
 BuildRequires:  pkgconfig(fontconfig)
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 %if %{with avif}
 BuildRequires:  pkgconfig(dav1d)
 %endif
@@ -69,6 +63,7 @@ files to allow you to develop with librsvg.
 
 %package     -n rsvg-pixbuf-loader
 Summary:        SVG image loader for gdk-pixbuf
+BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 Requires:       gdk-pixbuf2%{?_isa}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
@@ -92,11 +87,6 @@ This package provides extra utilities based on the librsvg library.
 # providing Rust dependencies.
 sed -i 's/, "--locked"//g' meson/cargo_wrapper.py
 
-%if 0%{?rhel} <= 9
-# https://bugzilla.redhat.com/show_bug.cgi?id=2109099
-sed -i "s/'gdk-pixbuf-query-loaders')/& + '-%{__isa_bits}'/" gdk-pixbuf-loader/meson.build
-%endif
-
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
 # cargo-c requires all optional dependencies to be available
@@ -104,11 +94,6 @@ sed -i "s/'gdk-pixbuf-query-loaders')/& + '-%{__isa_bits}'/" gdk-pixbuf-loader/m
 %endif
 
 %build
-%if 0%{?rhel} <= 9
-# https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/#_compiler_flags
-export RUSTFLAGS="%build_rustflags"
-%endif
-
 %meson \
 %if %{without avif}
     -Davif=disabled \
