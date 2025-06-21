@@ -1,6 +1,6 @@
 # weserv/rpms
 
-Spec files and patches used for building the nginx weserv module and dependencies in RHEL 9 (and its derivatives).
+Spec files and patches used for building the nginx weserv module and dependencies in RHEL 10 (and its derivatives).
 
 ## Build instructions
 
@@ -26,13 +26,13 @@ Build the `nginx-mod-weserv` RPM within a Docker container:
 * Build the source RPM.
     ```bash
     docker run --privileged -v $(pwd):/rpms -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
-       mock --buildsrpm -r el9-wsrv-x86_64 --enable-network -D '_disable_source_fetch 0' --resultdir=/rpmbuild/SRPMS \
+       mock --buildsrpm -r el10-wsrv-x86_64 --enable-network -D '_disable_source_fetch 0' --resultdir=/rpmbuild/SRPMS \
          --spec=/rpms/nginx-mod-weserv/nginx-mod-weserv.spec --sources=/rpms/nginx-mod-weserv
     ```
 
 * Build the RPM.
     ```bash
     docker run --privileged -v $HOME/rpmbuild:/rpmbuild weserv/rpms \
-      mock --rebuild -r el9-wsrv-x86_64 --resultdir=/rpmbuild/RPMS/"{{target_arch}}"/ \
-        /rpmbuild/SRPMS/nginx-mod-weserv-5.0.0-1.20250620gitdd2e828.el9.wsrv.src.rpm
+      mock --rebuild -r el10-wsrv-x86_64 --resultdir=/rpmbuild/RPMS/"{{target_arch}}"/ \
+        /rpmbuild/SRPMS/nginx-mod-weserv-5.0.0-1.20250620gitdd2e828.el10.wsrv.src.rpm
     ```
