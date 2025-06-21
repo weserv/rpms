@@ -4,7 +4,7 @@
 Name:           nginx-mod-rate-limit
 Version:        1.0.0
 Release:        1%{?dist}
-Summary:        A Redis backed rate limit module for Nginx web servers
+Summary:        A rate limit module for Nginx web servers
 
 License:        BSD-3-Clause
 URL:            https://github.com/weserv/rate-limit-nginx-module
@@ -19,7 +19,7 @@ Requires:       redis-rate-limiter
 %{summary}.
 
 %prep
-%autosetup -n %{origname}-%{version} -p1
+%autosetup -p1 -n %{origname}-%{version}
 
 %build
 %nginx_modconfigure
@@ -29,10 +29,11 @@ Requires:       redis-rate-limiter
 pushd %{_vpath_builddir}
 install -dm 0755 %{buildroot}%{nginx_moddir}
 install -pm 0755 ngx_http_rate_limit_module.so %{buildroot}%{nginx_moddir}
+popd
+
 install -dm 0755 %{buildroot}%{nginx_modconfdir}
 echo 'load_module "%{nginx_moddir}/ngx_http_rate_limit_module.so";' \
     > %{buildroot}%{nginx_modconfdir}/mod-rate-limit.conf
-popd
 
 
 %files
