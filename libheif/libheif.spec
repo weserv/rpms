@@ -10,7 +10,7 @@ Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
-#BuildRequires: pkgconfig(libsharpyuv) TODO requires libwebp >= 1.3.0
+BuildRequires:  pkgconfig(libsharpyuv)
 BuildRequires:  pkgconfig(dav1d)
 BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
@@ -41,8 +41,8 @@ This package provides tools for manipulating HEIF files.
 %package     -n heif-pixbuf-loader
 Summary:        HEIF image loader for GTK+ applications
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
-Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Requires:       gdk-pixbuf2%{?_isa}
+Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description -n heif-pixbuf-loader
 This package provides a plugin to load HEIF files in GTK+ applications.
@@ -69,8 +69,6 @@ rm -rf third-party/
 %install
 %cmake_install
 
-%ldconfig_scriptlets
-
 
 %files
 %license COPYING
@@ -93,35 +91,35 @@ rm -rf third-party/
 
 
 %changelog
-* Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.8-1
+* Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.19.8-1
 - Update to 1.19.8
 
-* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-2
+* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.19.7-2
 - Ensure assertions are disabled as discussed in
   https://github.com/strukturag/libheif/pull/1492
 
-* Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-1
+* Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.19.7-1
 - Update to 1.19.7
 
-* Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.6-1
+* Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.6-1
 - Update to 1.17.6
 
-* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.5-1
+* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.5-1
 - Update to 1.17.5
 
-* Fri Nov  3 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.3-1
+* Fri Nov  3 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.3-1
 - Update to 1.17.3
 
-* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.1-1
+* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.1-1
 - Update to 1.17.1
 
-* Mon Jun 26 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.16.2-1
+* Mon Jun 26 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.16.2-1
 - Update to 1.16.2
 
-* Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.16.1-1
+* Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.16.1-1
 - Update to 1.16.1
 
-* Sun Apr  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.15.2-1
+* Sun Apr  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.15.2-1
 - Bump epoch
 - Update to 1.15.2
 - Split tools and gdk-pixbuf loader to subpackages
