@@ -8,7 +8,7 @@
 # Please preserve changelog entries
 #
 %global vips_version_base 8.17
-%global vips_version %{vips_version_base}.0
+%global vips_version %{vips_version_base}.1
 %global vips_soname_major 42
 #global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
@@ -27,6 +27,7 @@
 %bcond_without             libcgif
 %bcond_without             libimagequant
 %bcond_without             libspng
+%bcond_without             openjpeg2
 
 # 2 builds needed to get the full stack
 # --without im6 --with im7
@@ -35,16 +36,6 @@
 %bcond_without             im6
 %bcond_with                im7
 %bcond_with                gm
-
-%if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
-%bcond_without             openjpeg2
-%else
-# disabled by default
-# as vips pulls poppler (libopenjpeg) and IM (libopenjp2)
-# so vips segfaults in various place
-# also see https://github.com/libvips/libvips/pull/2305
-%bcond_with                openjpeg2
-%endif
 
 Name:           vips
 Epoch:          1
@@ -339,7 +330,7 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %if %{with doc}
 %files doc
 %{_docdir}/vips
-%{_docdir}/vips-cpp/html
+%{_docdir}/vips-cpp
 %license LICENSE
 %endif
 
@@ -377,6 +368,10 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Wed Jul  9 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.17.1-1
+- Update to 8.17.1
+- EL-8: enable openjpeg2
+
 * Thu Jun  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.17.0-1
 - Update to 8.17.0
 
