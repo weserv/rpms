@@ -45,7 +45,7 @@ diff --git a/test/api/exceptions/unit-invalid.cpp b/test/api/exceptions/unit-inv
 index 1111111..2222222 100644
 --- a/test/api/exceptions/unit-invalid.cpp
 +++ b/test/api/exceptions/unit-invalid.cpp
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,10 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -53,41 +53,17 @@ index 1111111..2222222 100644
  #include "../base.h"
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
  
  TEST_CASE("invalid image", "[invalid]") {
      SECTION("buffer") {
-@@ -14,7 +13,7 @@ TEST_CASE("invalid image", "[invalid]") {
-         CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
-         CHECK_THAT(status.message(),
--                   ContainsSubstring("Invalid or unsupported image format"));
-+                   Contains("Invalid or unsupported image format"));
-     }
-     SECTION("source") {
-         class InvalidSource : public SourceInterface {
-@@ -45,7 +44,7 @@ TEST_CASE("invalid image", "[invalid]") {
-         CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
-         CHECK_THAT(status.message(),
--                   ContainsSubstring("Invalid or unsupported image format"));
-+                   Contains("Invalid or unsupported image format"));
-     }
-     SECTION("empty source") {
-         class UnreadableSource : public SourceInterface {
-@@ -64,6 +63,6 @@ TEST_CASE("invalid image", "[invalid]") {
-         CHECK(status.code() == static_cast<int>(Status::Code::InvalidImage));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
-         CHECK_THAT(status.message(),
--                   ContainsSubstring("Invalid or unsupported image format"));
-+                   Contains("Invalid or unsupported image format"));
-     }
- }
 diff --git a/test/api/exceptions/unit-large.cpp b/test/api/exceptions/unit-large.cpp
 index 1111111..2222222 100644
 --- a/test/api/exceptions/unit-large.cpp
 +++ b/test/api/exceptions/unit-large.cpp
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,10 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -95,46 +71,17 @@ index 1111111..2222222 100644
  #include "../base.h"
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
  
  TEST_CASE("too large image", "[large]") {
      SECTION("input") {
-@@ -19,7 +18,7 @@ TEST_CASE("too large image", "[large]") {
-         CHECK(status.code() == static_cast<int>(Status::Code::ImageTooLarge));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
-         CHECK_THAT(status.message(),
--                   ContainsSubstring("Input image exceeds pixel limit."));
-+                   Contains("Input image exceeds pixel limit."));
-     }
- 
-     SECTION("output") {
-@@ -33,7 +32,7 @@ TEST_CASE("too large image", "[large]") {
-         CHECK(status.code() == static_cast<int>(Status::Code::ImageTooLarge));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
-         CHECK_THAT(status.message(),
--                   ContainsSubstring("Output image exceeds pixel limit."));
-+                   Contains("Output image exceeds pixel limit."));
-         CHECK(out_buf.empty());
-     }
- }
-@@ -54,9 +53,9 @@ TEST_CASE("too many pages", "[large]") {
-         CHECK(!status.ok());
-         CHECK(status.code() == static_cast<int>(Status::Code::ImageTooLarge));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
--        CHECK_THAT(status.message(),
--                   ContainsSubstring(
--                       "Input image exceeds the maximum number of pages."));
-+        CHECK_THAT(
-+            status.message(),
-+            Contains("Input image exceeds the maximum number of pages."));
-         CHECK(out_buf.empty());
-     }
- }
 diff --git a/test/api/exceptions/unit-other.cpp b/test/api/exceptions/unit-other.cpp
 index 1111111..2222222 100644
 --- a/test/api/exceptions/unit-other.cpp
 +++ b/test/api/exceptions/unit-other.cpp
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,10 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -142,34 +89,17 @@ index 1111111..2222222 100644
  #include "../base.h"
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
  
  TEST_CASE("libvips error", "[other]") {
      SECTION("input file") {
-@@ -14,8 +13,7 @@ TEST_CASE("libvips error", "[other]") {
-         CHECK(!status.ok());
-         CHECK(status.code() == static_cast<int>(Status::Code::LibvipsError));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
--        CHECK_THAT(status.message(),
--                   ContainsSubstring("No such file or directory"));
-+        CHECK_THAT(status.message(), Contains("No such file or directory"));
-     }
-     SECTION("output file") {
-         auto test_image = fixtures->input_jpg;
-@@ -24,7 +22,6 @@ TEST_CASE("libvips error", "[other]") {
-         CHECK(!status.ok());
-         CHECK(status.code() == static_cast<int>(Status::Code::LibvipsError));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
--        CHECK_THAT(status.message(),
--                   ContainsSubstring("No such file or directory"));
-+        CHECK_THAT(status.message(), Contains("No such file or directory"));
-     }
- }
 diff --git a/test/api/exceptions/unit-timeout.cpp b/test/api/exceptions/unit-timeout.cpp
 index 1111111..2222222 100644
 --- a/test/api/exceptions/unit-timeout.cpp
 +++ b/test/api/exceptions/unit-timeout.cpp
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,10 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -177,25 +107,17 @@ index 1111111..2222222 100644
  #include "../base.h"
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
  
  TEST_CASE("process timeout", "[timeout]") {
      SECTION("image") {
-@@ -19,8 +18,7 @@ TEST_CASE("process timeout", "[timeout]") {
-         CHECK(status.code() == static_cast<int>(Status::Code::LibvipsError));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
-         CHECK_THAT(status.message(),
--                   ContainsSubstring(
--                       "Maximum image processing time of 1 second exceeded"));
-+                   Contains("Maximum image processing time of 1 second exceeded"));
-         CHECK(out_buf.empty());
-     }
- }
 diff --git a/test/api/exceptions/unit-unreadable.cpp b/test/api/exceptions/unit-unreadable.cpp
 index 1111111..2222222 100644
 --- a/test/api/exceptions/unit-unreadable.cpp
 +++ b/test/api/exceptions/unit-unreadable.cpp
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,10 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -203,23 +125,17 @@ index 1111111..2222222 100644
  #include "../base.h"
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
  
  TEST_CASE("unreadable image", "[unreadable]") {
      SECTION("buffer") {
-@@ -19,6 +18,6 @@ TEST_CASE("unreadable image", "[unreadable]") {
-         CHECK(status.code() ==
-               static_cast<int>(Status::Code::ImageNotReadable));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
--        CHECK_THAT(status.message(), ContainsSubstring("Image not readable"));
-+        CHECK_THAT(status.message(), Contains("Image not readable"));
-     }
- }
 diff --git a/test/api/exceptions/unit-unsupported.cpp b/test/api/exceptions/unit-unsupported.cpp
 index 1111111..2222222 100644
 --- a/test/api/exceptions/unit-unsupported.cpp
 +++ b/test/api/exceptions/unit-unsupported.cpp
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,10 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -227,20 +143,12 @@ index 1111111..2222222 100644
  #include "../base.h"
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
  
  TEST_CASE("unsupported saver", "[unsupported]") {
      SECTION("json") {
-@@ -19,8 +18,7 @@ TEST_CASE("unsupported saver", "[unsupported]") {
-         CHECK(status.code() ==
-               static_cast<int>(Status::Code::UnsupportedSaver));
-         CHECK(status.error_cause() == Status::ErrorCause::Application);
--        CHECK_THAT(status.message(),
--                   ContainsSubstring("Saving to json is disabled."));
-+        CHECK_THAT(status.message(), Contains("Saving to json is disabled."));
-         CHECK(out_buf.empty());
- 
-         status = process_file(test_image, &out_buf, "", config);
 diff --git a/test/api/max_color_distance.h b/test/api/max_color_distance.h
 index 1111111..2222222 100644
 --- a/test/api/max_color_distance.h
@@ -437,7 +345,7 @@ diff --git a/test/api/processors/unit-stream.cpp b/test/api/processors/unit-stre
 index 1111111..2222222 100644
 --- a/test/api/processors/unit-stream.cpp
 +++ b/test/api/processors/unit-stream.cpp
-@@ -1,11 +1,10 @@
+@@ -1,15 +1,17 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -447,178 +355,27 @@ index 1111111..2222222 100644
  #include <vips/vips8>
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
  using Catch::Matchers::Equals;
  using Catch::Matchers::StartsWith;
  using vips::VImage;
-@@ -114,9 +113,9 @@ TEST_CASE("output", "[stream]") {
  
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"jpeg")"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("width":300)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("height":300)"));
-+        CHECK_THAT(buffer, Contains(R"("format":"jpeg")"));
-+        CHECK_THAT(buffer, Contains(R"("width":300)"));
-+        CHECK_THAT(buffer, Contains(R"("height":300)"));
-     }
- 
-     SECTION("origin") {
-@@ -311,10 +310,10 @@ TEST_CASE("gif options", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"gif")"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("pages":8)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("pageHeight":1050)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("loop":1)"));
-+        CHECK_THAT(buffer, Contains(R"("format":"gif")"));
-+        CHECK_THAT(buffer, Contains(R"("pages":8)"));
-+        CHECK_THAT(buffer, Contains(R"("pageHeight":1050)"));
-+        CHECK_THAT(buffer, Contains(R"("loop":1)"));
-     }
- 
-     SECTION("frame delay") {
-@@ -328,10 +327,10 @@ TEST_CASE("gif options", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"gif")"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("pages":8)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("pageHeight":1050)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("delay":[200)"));
-+        CHECK_THAT(buffer, Contains(R"("format":"gif")"));
-+        CHECK_THAT(buffer, Contains(R"("pages":8)"));
-+        CHECK_THAT(buffer, Contains(R"("pageHeight":1050)"));
-+        CHECK_THAT(buffer, Contains(R"("delay":[200)"));
-     }
- 
-     SECTION("page height") {
-@@ -345,10 +344,10 @@ TEST_CASE("gif options", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"gif")"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("pages":8)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("height":7640)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("pageHeight":955)"));
-+        CHECK_THAT(buffer, Contains(R"("format":"gif")"));
-+        CHECK_THAT(buffer, Contains(R"("pages":8)"));
-+        CHECK_THAT(buffer, Contains(R"("height":7640)"));
-+        CHECK_THAT(buffer, Contains(R"("pageHeight":955)"));
-     }
- }
- 
-@@ -359,11 +358,10 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"jpeg")"));
--        CHECK_THAT(buffer,
--                   ContainsSubstring(R"("chromaSubsampling":"4:4:4:4")"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("isProgressive":false)"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("density":180)"));
-+        CHECK_THAT(buffer, Contains(R"("format":"jpeg")"));
-+        CHECK_THAT(buffer, Contains(R"("chromaSubsampling":"4:4:4:4")"));
-+        CHECK_THAT(buffer, Contains(R"("isProgressive":false)"));
-+        CHECK_THAT(buffer, Contains(R"("density":180)"));
-     }
- 
-     SECTION("png 8 bit paletted") {
-@@ -372,8 +370,8 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"png")"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("paletteBitDepth":8)"));
-+        CHECK_THAT(buffer, Contains(R"("format":"png")"));
-+        CHECK_THAT(buffer, Contains(R"("paletteBitDepth":8)"));
-     }
- 
-     SECTION("webp") {
-@@ -387,7 +385,7 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"webp")"));
-+        CHECK_THAT(buffer, Contains(R"("format":"webp")"));
-     }
- 
-     SECTION("avif") {
-@@ -401,7 +399,7 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"heif")"));
-+        CHECK_THAT(buffer, Contains(R"("format":"heif")"));
-     }
- 
-     SECTION("tiff") {
-@@ -415,7 +413,7 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"tiff")"));
-+        CHECK_THAT(buffer, Contains(R"("format":"tiff")"));
-     }
- 
-     SECTION("svg") {
-@@ -429,7 +427,7 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"svg")"));
-+        CHECK_THAT(buffer, Contains(R"("format":"svg")"));
-     }
- 
-     SECTION("pdf") {
-@@ -443,7 +441,7 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"pdf")"));
-+        CHECK_THAT(buffer, Contains(R"("format":"pdf")"));
-     }
- 
-     SECTION("heic") {
-@@ -457,8 +455,8 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"heif")"));
--        CHECK_THAT(buffer, ContainsSubstring(R"("pagePrimary":0)"));
-+        CHECK_THAT(buffer, Contains(R"("format":"heif")"));
-+        CHECK_THAT(buffer, Contains(R"("pagePrimary":0)"));
-     }
- 
-     SECTION("magick") {
-@@ -472,6 +470,6 @@ TEST_CASE("metadata", "[stream]") {
- 
-         std::string buffer = process_file<std::string>(test_image, params);
- 
--        CHECK_THAT(buffer, ContainsSubstring(R"("format":"magick")"));
-+        CHECK_THAT(buffer, Contains(R"("format":"magick")"));
-     }
- }
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
++
+ TEST_CASE("output", "[stream]") {
+     SECTION("jpeg") {
+         auto test_image = fixtures->input_jpg;
 diff --git a/test/api/processors/unit-thumbnail.cpp b/test/api/processors/unit-thumbnail.cpp
 index 1111111..2222222 100644
 --- a/test/api/processors/unit-thumbnail.cpp
 +++ b/test/api/processors/unit-thumbnail.cpp
-@@ -1,12 +1,11 @@
+@@ -1,4 +1,4 @@
 -#include <catch2/catch_test_macros.hpp>
--#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
  
  #include "../base.h"
  #include "../similar_image.h"
- 
- #include <vips/vips8>
- 
--using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
- using vips::VImage;
- 
- TEST_CASE("inside", "[thumbnail]") {
 diff --git a/test/api/processors/unit-tint.cpp b/test/api/processors/unit-tint.cpp
 index 1111111..2222222 100644
 --- a/test/api/processors/unit-tint.cpp
@@ -664,7 +421,7 @@ diff --git a/test/api/utils/unit-status.cpp b/test/api/utils/unit-status.cpp
 index 1111111..2222222 100644
 --- a/test/api/utils/unit-status.cpp
 +++ b/test/api/utils/unit-status.cpp
-@@ -1,9 +1,8 @@
+@@ -1,11 +1,13 @@
 -#include <catch2/catch_test_macros.hpp>
 -#include <catch2/matchers/catch_matchers_string.hpp>
 +#include <catch2/catch.hpp>
@@ -672,131 +429,15 @@ index 1111111..2222222 100644
  #include <weserv/utils/status.h>
  
 -using Catch::Matchers::ContainsSubstring;
-+using Catch::Matchers::Contains;
  using weserv::api::utils::Status;
  
++constexpr auto ContainsSubstring = [](const std::string &str) {
++    return Catch::Matchers::Contains(str);
++};
++
  TEST_CASE("status", "[status]") {
-@@ -59,84 +58,81 @@ TEST_CASE("status", "[status]") {
-     SECTION("to JSON includes details") {
-         auto json = Status::OK.to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"success")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":200)"));
--        CHECK_THAT(json, ContainsSubstring(R"("message":"OK")"));
-+        CHECK_THAT(json, Contains(R"("status":"success")"));
-+        CHECK_THAT(json, Contains(R"("code":200)"));
-+        CHECK_THAT(json, Contains(R"("message":"OK")"));
- 
-         json = Status(500, "").to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":500)"));
--        CHECK_THAT(json, ContainsSubstring(R"("message":"Something's wrong!)"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":500)"));
-+        CHECK_THAT(json, Contains(R"("message":"Something's wrong!)"));
- 
-         json = Status(/*NGX_BUSY*/ -3, "Too many requests").to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json,
--                   ContainsSubstring(R"("message":"NGINX returned error: -3)"));
--        CHECK_THAT(json, ContainsSubstring("(message: Too many requests)"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("message":"NGINX returned error: -3)"));
-+        CHECK_THAT(json, Contains("(message: Too many requests)"));
- 
-         json = Status(408, "", Status::ErrorCause::Upstream).to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
--        CHECK_THAT(json, ContainsSubstring(
--                             R"("message":"The requested URL timed out")"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-+        CHECK_THAT(json,
-+                   Contains(R"("message":"The requested URL timed out")"));
- 
-         // https://github.com/weserv/images/issues/264
-         json = Status(500, "", Status::ErrorCause::Upstream).to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
--        CHECK_THAT(json,
--                   ContainsSubstring(
--                       R"("message":"The requested URL returned error: 500")"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-+        CHECK_THAT(
-+            json,
-+            Contains(R"("message":"The requested URL returned error: 500")"));
- 
-         json = Status(502, "", Status::ErrorCause::Upstream).to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
--        CHECK_THAT(json,
--                   ContainsSubstring(
--                       "The hostname of the origin is unresolvable (DNS)"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-+        CHECK_THAT(
-+            json, Contains("The hostname of the origin is unresolvable (DNS)"));
- 
-         json = Status(310, "Will not follow a redirection to itself",
-                       Status::ErrorCause::Upstream)
-                    .to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-         CHECK_THAT(
-             json,
--            ContainsSubstring(
--                R"("message":"Will not follow a redirection to itself")"));
-+            Contains(R"("message":"Will not follow a redirection to itself")"));
- 
-         json = Status(404, "", Status::ErrorCause::Upstream).to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
--        CHECK_THAT(json,
--                   ContainsSubstring(
--                       R"("message":"The requested URL returned error: 404")"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-+        CHECK_THAT(
-+            json,
-+            Contains(R"("message":"The requested URL returned error: 404")"));
- 
-         json = Status(Status::Code::ImageNotReadable,
-                       "Image not readable. Is it a valid image?",
-                       Status::ErrorCause::Application)
-                    .to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-         CHECK_THAT(
-             json,
--            ContainsSubstring(
-+            Contains(
-                 R"("message":"Image not readable. Is it a valid image?")"));
- 
-         json = Status(Status::Code::ImageNotReadable, "",
-                       Status::ErrorCause::Application)
-                    .to_json();
- 
--        CHECK_THAT(json, ContainsSubstring(R"("status":"error")"));
--        CHECK_THAT(json, ContainsSubstring(R"("code":404)"));
--        CHECK_THAT(json, ContainsSubstring(R"("message":"Error code: 3")"));
-+        CHECK_THAT(json, Contains(R"("status":"error")"));
-+        CHECK_THAT(json, Contains(R"("code":404)"));
-+        CHECK_THAT(json, Contains(R"("message":"Error code: 3")"));
-     }
- }
+     SECTION("ok returns true when appropriate") {
+         CHECK(Status::OK.ok());
 diff --git a/third_party/catch2/CMakeLists.txt b/third_party/catch2/CMakeLists.txt
 index 1111111..2222222 100644
 --- a/third_party/catch2/CMakeLists.txt
