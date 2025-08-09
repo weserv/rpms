@@ -1,6 +1,6 @@
 Name:           libheif
 Epoch:          1
-Version:        1.19.8
+Version:        1.20.2
 Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
@@ -54,14 +54,15 @@ rm -rf third-party/
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-       -DENABLE_PLUGIN_LOADING=0 \
-       -DWITH_DAV1D=1 \
-       -DWITH_DAV1D_PLUGIN=0 \
-       -DWITH_RAV1E=1 \
-       -DWITH_RAV1E_PLUGIN=0 \
-       -DWITH_X265=0 \
-       -DWITH_AOM_DECODER=0 \
-       -DWITH_AOM_ENCODER=0
+       -DBUILD_TESTING=OFF \
+       -DENABLE_PLUGIN_LOADING=OFF \
+       -DWITH_DAV1D=ON \
+       -DWITH_DAV1D_PLUGIN=OFF \
+       -DWITH_RAV1E=ON \
+       -DWITH_RAV1E_PLUGIN=OFF \
+       -DWITH_X265=OFF \
+       -DWITH_AOM_DECODER=OFF \
+       -DWITH_AOM_ENCODER=OFF
 
 %cmake_build
 
@@ -93,35 +94,38 @@ rm -rf third-party/
 
 
 %changelog
-* Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.8-1
+* Sat Aug  9 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.20.2-1
+- Update to 1.20.2
+
+* Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.19.8-1
 - Update to 1.19.8
 
-* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-2
+* Fri Mar 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.19.7-2
 - Ensure assertions are disabled as discussed in
   https://github.com/strukturag/libheif/pull/1492
 
-* Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.19.7-1
+* Fri Mar  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.19.7-1
 - Update to 1.19.7
 
-* Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.6-1
+* Mon Dec 25 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.6-1
 - Update to 1.17.6
 
-* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.5-1
+* Sat Dec  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.5-1
 - Update to 1.17.5
 
-* Fri Nov  3 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.3-1
+* Fri Nov  3 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.3-1
 - Update to 1.17.3
 
-* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.17.1-1
+* Thu Oct 19 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.17.1-1
 - Update to 1.17.1
 
-* Mon Jun 26 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.16.2-1
+* Mon Jun 26 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.16.2-1
 - Update to 1.16.2
 
-* Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.16.1-1
+* Wed May 10 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.16.1-1
 - Update to 1.16.1
 
-* Sun Apr  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.15.2-1
+* Sun Apr  2 2023 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.15.2-1
 - Bump epoch
 - Update to 1.15.2
 - Split tools and gdk-pixbuf loader to subpackages
