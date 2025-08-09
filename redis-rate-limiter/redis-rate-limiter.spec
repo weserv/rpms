@@ -6,7 +6,7 @@
 
 Name:           redis-rate-limiter
 Version:        0.0.1
-Release:        1.%{commitdate}git%{shortcommit}%{?dist}
+Release:        2.%{commitdate}git%{shortcommit}%{?dist}
 Summary:        C implementation of the GCR Algorithm for key-value stores
 
 License:        MIT
@@ -15,10 +15,9 @@ Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 
 BuildRequires:  make
 BuildRequires:  gcc
-BuildRequires:  valkey-devel
-BuildRequires:  valkey >= 7
+BuildRequires:  valkey-devel >= 8.1
 
-Requires:       valkey >= 7
+Requires:       valkey >= 8.1
 Requires:       valkey(modules_abi)%{?_isa} = %{valkey_modules_abi}
 
 %description
@@ -30,22 +29,31 @@ window and doesn't depend on a background drip process.
 %prep
 %autosetup -p1 -n %{name}-%{commit}
 
+: Configuration file
+cat << EOF | tee %{module}.conf
+# %{name}
+loadmodule %{valkey_modules_dir}/%{module}.so
+EOF
+
 %build
 %set_build_flags
 %make_build LD="gcc" USE_MONOTONIC_CLOCK=1
 
 %install
-mkdir -p %{buildroot}%{valkey_modules_dir}
-install -pDm755 %{module}.so %{buildroot}%{valkey_modules_dir}/%{module}.so
-
+install -Dpm755 %{module}.so   %{buildroot}%{valkey_modules_dir}/%{module}.so
+install -Dpm640 %{module}.conf %{buildroot}%{valkey_modules_cfg}/%{module}.conf
 
 %files
 %license LICENSE
 %doc README.md
+%attr(0640, valkey, root) %config(noreplace) %{valkey_modules_cfg}/%{module}.conf
 %{valkey_modules_dir}/%{module}.so
 
 
 %changelog
+* Sat Aug  9 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1-2.20220715gitde3bced
+- Ensure installed module is loaded by default
+
 * Sat Jul 16 2022 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1-1.20220715gitde3bced
 - Update to onsigntv/redis-rate-limiter@de3bced
 - Drop patch merged upstream
