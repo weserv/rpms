@@ -1,6 +1,6 @@
 Name:           libheif
 Epoch:          1
-Version:        1.19.8
+Version:        1.20.2
 Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
@@ -15,7 +15,7 @@ BuildRequires:  pkgconfig(dav1d)
 BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
-BuildRequires:  pkgconfig(rav1e)
+BuildRequires:  pkgconfig(SvtAv1Enc)
 
 %description
 libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format)
@@ -54,14 +54,15 @@ rm -rf third-party/
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-       -DENABLE_PLUGIN_LOADING=0 \
-       -DWITH_DAV1D=1 \
-       -DWITH_DAV1D_PLUGIN=0 \
-       -DWITH_RAV1E=1 \
-       -DWITH_RAV1E_PLUGIN=0 \
-       -DWITH_X265=0 \
-       -DWITH_AOM_DECODER=0 \
-       -DWITH_AOM_ENCODER=0
+       -DBUILD_TESTING=OFF \
+       -DENABLE_PLUGIN_LOADING=OFF \
+       -DWITH_DAV1D=ON \
+       -DWITH_DAV1D_PLUGIN=OFF \
+       -DWITH_SvtEnc=ON \
+       -DWITH_SvtEnc_PLUGIN=OFF \
+       -DWITH_X265=OFF \
+       -DWITH_AOM_DECODER=OFF \
+       -DWITH_AOM_ENCODER=OFF
 
 %cmake_build
 
@@ -91,6 +92,10 @@ rm -rf third-party/
 
 
 %changelog
+* Sat Aug  9 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.20.2-1
+- Update to 1.20.2
+- Remove rav1e in favor of SVT-AV1
+
 * Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.19.8-1
 - Update to 1.19.8
 
