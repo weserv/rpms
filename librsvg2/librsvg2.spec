@@ -12,12 +12,16 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.50.5
-Release:        3%{?dist}
+Version:        2.50.9
+Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
 Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
+
+# Patch to ensure compat with EL8:
+# - Revert commit afba7f2 and 13c4857.
+Patch0:         el-8-compat.patch
 
 BuildRequires:  chrpath
 BuildRequires:  gcc
@@ -67,7 +71,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package provides extra utilities based on the librsvg library.
 
 %prep
-%autosetup -n librsvg-%{version} -p1 -Sgit
+%autosetup -p1 -n librsvg-%{version}
 %if 0%{?bundled_rust_deps}
 # Use the bundled deps
 %else
@@ -134,6 +138,9 @@ rm -vrf %{buildroot}%{_datadir}/doc
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Sun Nov  2 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.9-1
+- Update to 2.50.9
+
 * Thu Aug 12 2021 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.5-3
 - Rebuild with Rust 1.52.1
 

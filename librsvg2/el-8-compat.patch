@@ -1,0 +1,124 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Sun, 2 Nov 2025 14:11:07 +0100
+Subject: [PATCH 1/2] Revert "(#730): Incorrect text spacing when the transform
+ is not 1:1"
+
+This reverts commit afba7f2fcae0505113450198f74c8bf95c3cc13c.
+
+RHEL 8 doesn't provide Pango 1.44.0.
+
+diff --git a/rsvg_internals/src/drawing_ctx.rs b/rsvg_internals/src/drawing_ctx.rs
+index 1111111..2222222 100644
+--- a/rsvg_internals/src/drawing_ctx.rs
++++ b/rsvg_internals/src/drawing_ctx.rs
+@@ -1,11 +1,8 @@
+ //! The main context structure which drives the drawing process.
+ 
+ use float_cmp::approx_eq;
+-use glib::translate::*;
+-use glib_sys::gboolean;
+ use once_cell::sync::Lazy;
+ use pango::FontMapExt;
+-use pango_sys::PangoContext;
+ use regex::{Captures, Regex};
+ use std::borrow::Cow;
+ use std::cell::RefCell;
+@@ -2060,31 +2057,8 @@ impl From<TextRendering> for cairo::Antialias {
+ impl From<&DrawingCtx> for pango::Context {
+     fn from(draw_ctx: &DrawingCtx) -> pango::Context {
+         let cr = draw_ctx.cr.clone();
+-
+-        let mut options = cairo::FontOptions::new();
+-        if draw_ctx.testing {
+-            options.set_antialias(cairo::Antialias::Gray);
+-        }
+-
+-        options.set_hint_style(cairo::HintStyle::None);
+-        options.set_hint_metrics(cairo::HintMetrics::Off);
+-
+-        cr.set_font_options(&options);
+-
+         let font_map = pangocairo::FontMap::get_default().unwrap();
+         let context = font_map.create_context().unwrap();
+-
+-        unsafe {
+-            extern "C" {
+-                fn pango_context_set_round_glyph_positions(
+-                    context: *mut PangoContext,
+-                    round_positions: gboolean,
+-                );
+-            }
+-
+-            pango_context_set_round_glyph_positions(context.to_glib_none().0, false.to_glib());
+-        }
+-
+         pangocairo::functions::update_context(&cr, &context);
+ 
+         // Pango says this about pango_cairo_context_set_resolution():
+@@ -2105,6 +2079,16 @@ impl From<&DrawingCtx> for pango::Context {
+         // code.
+         pangocairo::functions::context_set_resolution(&context, 72.0);
+ 
++        if draw_ctx.testing {
++            let mut options = cairo::FontOptions::new();
++
++            options.set_antialias(cairo::Antialias::Gray);
++            options.set_hint_style(cairo::HintStyle::Full);
++            options.set_hint_metrics(cairo::HintMetrics::On);
++
++            pangocairo::functions::context_set_font_options(&context, Some(&options));
++        }
++
+         context
+     }
+ }
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Sun, 2 Nov 2025 14:13:38 +0100
+Subject: [PATCH 2/2] Revert "Bump pango requirement to 1.44"
+
+This reverts commit 13c48575999aba33aa2e8a2c4cfbc1b701a9970a.
+
+RHEL 8 doesn't provide Pango 1.44.0.
+
+diff --git a/COMPILING.md b/COMPILING.md
+index 1111111..2222222 100644
+--- a/COMPILING.md
++++ b/COMPILING.md
+@@ -44,7 +44,7 @@ minimum version is listed here; you may use a newer version instead.
+ * GObject-Introspection 0.10.8
+ * Gtk-doc 1.13
+ * Libxml2 2.9.0
+-* Pango 1.44.0
++* Pango 1.38.0
+ 
+ The following sections describe how to install these dependencies on
+ several systems.
+diff --git a/configure b/configure
+index 1111111..2222222 100644
+--- a/configure
++++ b/configure
+@@ -7960,7 +7960,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.44.0
++PANGO_REQUIRED=1.38.0
+ 
+ 
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether ln -s works" >&5
+diff --git a/configure.ac b/configure.ac
+index 1111111..2222222 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -76,7 +76,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.44.0
++PANGO_REQUIRED=1.38.0
+ 
+ dnl ===========================================================================
+ 
