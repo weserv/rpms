@@ -12,21 +12,26 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.50.9
+Version:        2.57.3
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.57/librsvg-%{version}.tar.xz
+
+# Use vendored crate dependencies so we can build offline.
+# Created using "cargo vendor"
+Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 # Patch to ensure compat with EL8:
-# - Revert commit afba7f2 and 13c4857.
+# - Revert commit 73c1ee7, 80a72e6, 19f07cd, afba7f2 and 13c4857.
 Patch0:         el-8-compat.patch
 
+BuildRequires:  rust-toolset
 BuildRequires:  chrpath
 BuildRequires:  gcc
-BuildRequires:  git-core
 BuildRequires:  gobject-introspection-devel
+BuildRequires:  make
 BuildRequires:  pkgconfig(cairo) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-gobject) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-png) >= %{cairo_version}
@@ -40,12 +45,7 @@ BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pangoft2)
 BuildRequires:  vala
-%if 0%{?bundled_rust_deps}
-BuildRequires:  cargo
-BuildRequires:  rust
-%else
-BuildRequires:  rust-packaging
-%endif
+BuildRequires:  /usr/bin/rst2man
 
 Requires:       cairo%{?_isa} >= %{cairo_version}
 Requires:       cairo-gobject%{?_isa} >= %{cairo_version}
@@ -72,27 +72,26 @@ This package provides extra utilities based on the librsvg library.
 
 %prep
 %autosetup -p1 -n librsvg-%{version}
-%if 0%{?bundled_rust_deps}
-# Use the bundled deps
-%else
-# No bundled deps
-rm -vrf vendor .cargo Cargo.lock
-pushd rsvg_internals
-  %cargo_prep
-  mv .cargo ..
-popd
-%endif
+
+%cargo_prep %{?bundled_rust_deps:-V 1}
+
+# Ensure we build without --locked, as %%cargo_prep removes
+# the lock file (Cargo.lock), allowing more wiggle room when
+# providing Rust dependencies.
+sed -i 's/--locked //g' Makefile.am
 
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
-pushd rsvg_internals >/dev/null
-  %cargo_generate_buildrequires
-popd >/dev/null
+%cargo_generate_buildrequires
 %endif
 
 %build
+# Replace bare `cargo` with the one used by %%cargo_* macros
+export CARGO="%__cargo"
+
 %configure --disable-static  \
            --disable-gtk-doc \
+           --docdir=%{_pkgdocdir} \
            --enable-introspection \
            --enable-vala
 %make_build
@@ -101,17 +100,12 @@ popd >/dev/null
 %make_install
 find %{buildroot} -type f -name '*.la' -print -delete
 
-%find_lang librsvg
-
 # Remove lib64 rpaths
 chrpath --delete %{buildroot}%{_bindir}/rsvg-convert
 chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
 
-# we install own docs
-rm -vrf %{buildroot}%{_datadir}/doc
-
-%files -f librsvg.lang
-%doc CONTRIBUTING.md README.md
+%files
+%doc code-of-conduct.md NEWS README.md
 %license COPYING.LIB
 %{_libdir}/librsvg-2.so.*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
@@ -129,15 +123,15 @@ rm -vrf %{buildroot}%{_datadir}/doc
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/librsvg-2.0.vapi
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/rsvg-2.0
 
 %files tools
 %{_bindir}/rsvg-convert
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Mon Nov  3 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.57.3-1
+- Update to 2.57.3
+
 * Sun Nov  2 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.50.9-1
 - Update to 2.50.9
 

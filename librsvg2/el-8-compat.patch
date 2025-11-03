@@ -1,124 +1,298 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Tue, 2 Jan 2024 10:00:00 +0100
+Subject: [PATCH 1/6] Revert "(#1019): Fix small-caps and bump the version of Pango
+ required to 1.50.0"
+
+This reverts commit 73c1ee7519555aa90c1c45828ffaa2f573812864.
+
+RHEL 8 doesn't provide Pango 1.50.0.
+
+diff --git a/configure b/configure
+index 1111111..2222222 100755
+--- a/configure
++++ b/configure
+@@ -3580,7 +3580,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.50.0
++PANGO_REQUIRED=1.46.0
+ 
+ 
+ 
+diff --git a/configure.ac b/configure.ac
+index 1111111..2222222 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -66,7 +66,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.50.0
++PANGO_REQUIRED=1.46.0
+ 
+ dnl ===========================================================================
+ 
+diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
+index 1111111..2222222 100644
+--- a/rsvg/Cargo.toml
++++ b/rsvg/Cargo.toml
+@@ -28,15 +28,15 @@ gio = { name = "gio-2.0", version = "2.24" }
+ glib = { name = "glib-2.0", version = "2.50" }
+ harfbuzz = "2.0"
+ libxml2 = { name = "libxml-2.0", fallback-names = ["libxml2"], version = "2.9" }
+-pangocairo = "1.50"
++pangocairo = "1.46"
+ 
+ [package.metadata.system-deps.'cfg(windows)']
+ fontconfig = { version = "1.7", optional = true }
+-pangoft2 = { version = "1.50", optional = true }
++pangoft2 = { version = "1.46", optional = true }
+ 
+ [package.metadata.system-deps.'cfg(not(windows))']
+ fontconfig = { version = "1.7" }
+-pangoft2 = { version = "1.50" }
++pangoft2 = { version = "1.46" }
+ 
+ [features]
+ c-api = []
+diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
+index 1111111..2222222 100644
+--- a/rsvg/src/text.rs
++++ b/rsvg/src/text.rs
+@@ -1282,7 +1282,9 @@ fn add_pango_attributes(
+     font_desc.set_family(props.font_family.as_str());
+     font_desc.set_style(pango::Style::from(props.font_style));
+ 
+-    font_desc.set_variant(pango::Variant::from(props.font_variant));
++    // PANGO_VARIANT_SMALL_CAPS does nothing: https://gitlab.gnome.org/GNOME/pango/-/issues/566
++    // see below for using the "smcp" OpenType feature for fonts that support it.
++    // font_desc.set_variant(pango::Variant::from(props.font_variant));
+ 
+     font_desc.set_weight(pango::Weight::from(props.font_weight));
+     font_desc.set_stretch(pango::Stretch::from(props.font_stretch));
+@@ -1305,6 +1307,13 @@ fn add_pango_attributes(
+         attributes.push(pango::AttrInt::new_strikethrough(true).upcast());
+     }
+ 
++    // FIXME: Using the "smcp" OpenType feature only works for fonts that support it.  We
++    // should query if the font supports small caps, and synthesize them if it doesn't.
++    if props.font_variant == FontVariant::SmallCaps {
++        // smcp - small capitals - https://docs.microsoft.com/en-ca/typography/opentype/spec/features_pt#smcp
++        attributes.push(pango::AttrFontFeatures::new("'smcp' 1").upcast());
++    }
++
+     // Set the range in each attribute
+ 
+     for attr in &mut attributes {
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 3 Nov 2025 10:40:07 +0100
+Subject: [PATCH 2/6] Revert "(#17): Render text-decoration:overline"
+
+This reverts commit 80a72e607443b4b05d28a4387fc994aacb332218.
+
+RHEL 8 doesn't provide Pango 1.46.0.
+
+diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
+index 1111111..2222222 100644
+--- a/rsvg/src/text.rs
++++ b/rsvg/src/text.rs
+@@ -1295,10 +1295,6 @@ fn add_pango_attributes(
+ 
+     attributes.push(pango::AttrInt::new_letter_spacing(letter_spacing.0).upcast());
+ 
+-    if props.text_decoration.overline {
+-        attributes.push(pango::AttrInt::new_overline(pango::Overline::Single).upcast());
+-    }
+-
+     if props.text_decoration.underline {
+         attributes.push(pango::AttrInt::new_underline(pango::Underline::Single).upcast());
+     }
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 3 Nov 2025 10:42:56 +0100
+Subject: [PATCH 3/6] Revert "Require Pango 1.46 for PangoOverline"
+
+This reverts commit 19f07cd73556f138d2b53932cb28d0be800626dc.
+
+RHEL 8 doesn't provide Pango 1.46.0.
+
+diff --git a/configure b/configure
+index 1111111..2222222 100755
+--- a/configure
++++ b/configure
+@@ -3580,7 +3580,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.46.0
++PANGO_REQUIRED=1.44.0
+ 
+ 
+ 
+diff --git a/configure.ac b/configure.ac
+index 1111111..2222222 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -66,7 +66,7 @@ GIO_REQUIRED=2.24.0
+ GLIB_REQUIRED=2.50.0
+ HARFBUZZ_REQUIRED=2.0.0
+ LIBXML_REQUIRED=2.9.0
+-PANGO_REQUIRED=1.46.0
++PANGO_REQUIRED=1.44.0
+ 
+ dnl ===========================================================================
+ 
+diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
+index 1111111..2222222 100644
+--- a/rsvg/Cargo.toml
++++ b/rsvg/Cargo.toml
+@@ -28,15 +28,15 @@ gio = { name = "gio-2.0", version = "2.24" }
+ glib = { name = "glib-2.0", version = "2.50" }
+ harfbuzz = "2.0"
+ libxml2 = { name = "libxml-2.0", fallback-names = ["libxml2"], version = "2.9" }
+-pangocairo = "1.46"
++pangocairo = "1.44"
+ 
+ [package.metadata.system-deps.'cfg(windows)']
+ fontconfig = { version = "1.7", optional = true }
+-pangoft2 = { version = "1.46", optional = true }
++pangoft2 = { version = "1.44", optional = true }
+ 
+ [package.metadata.system-deps.'cfg(not(windows))']
+ fontconfig = { version = "1.7" }
+-pangoft2 = { version = "1.46" }
++pangoft2 = { version = "1.44" }
+ 
+ [features]
+ c-api = []
+@@ -65,7 +65,7 @@ markup5ever = "0.11.0"
+ nalgebra = "0.32.1"
+ num-traits = "0.2"
+ once_cell = "1.2.0"
+-pango = { version = "0.18", features = ["v1_46"] }
++pango = { version = "0.18", features = ["v1_44"] }
+ pangocairo = "0.18"
+ rayon = "1"
+ rctree = "0.5.0"
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Sun, 2 Nov 2025 14:11:07 +0100
-Subject: [PATCH 1/2] Revert "(#730): Incorrect text spacing when the transform
+Subject: [PATCH 4/6] Revert "(#730): Incorrect text spacing when the transform
  is not 1:1"
 
 This reverts commit afba7f2fcae0505113450198f74c8bf95c3cc13c.
 
 RHEL 8 doesn't provide Pango 1.44.0.
 
-diff --git a/rsvg_internals/src/drawing_ctx.rs b/rsvg_internals/src/drawing_ctx.rs
+diff --git a/rsvg/src/drawing_ctx.rs b/rsvg/src/drawing_ctx.rs
 index 1111111..2222222 100644
---- a/rsvg_internals/src/drawing_ctx.rs
-+++ b/rsvg_internals/src/drawing_ctx.rs
-@@ -1,11 +1,8 @@
- //! The main context structure which drives the drawing process.
+--- a/rsvg/src/drawing_ctx.rs
++++ b/rsvg/src/drawing_ctx.rs
+@@ -1871,8 +1871,6 @@ pub fn create_pango_context(font_options: &FontOptions, transform: &Transform) -
+     let font_map = pangocairo::FontMap::default();
+     let context = font_map.create_context();
  
- use float_cmp::approx_eq;
--use glib::translate::*;
--use glib_sys::gboolean;
- use once_cell::sync::Lazy;
- use pango::FontMapExt;
--use pango_sys::PangoContext;
- use regex::{Captures, Regex};
- use std::borrow::Cow;
- use std::cell::RefCell;
-@@ -2060,31 +2057,8 @@ impl From<TextRendering> for cairo::Antialias {
- impl From<&DrawingCtx> for pango::Context {
-     fn from(draw_ctx: &DrawingCtx) -> pango::Context {
-         let cr = draw_ctx.cr.clone();
+-    context.set_round_glyph_positions(false);
 -
--        let mut options = cairo::FontOptions::new();
--        if draw_ctx.testing {
--            options.set_antialias(cairo::Antialias::Gray);
--        }
--
--        options.set_hint_style(cairo::HintStyle::None);
--        options.set_hint_metrics(cairo::HintMetrics::Off);
--
--        cr.set_font_options(&options);
--
-         let font_map = pangocairo::FontMap::get_default().unwrap();
-         let context = font_map.create_context().unwrap();
--
--        unsafe {
--            extern "C" {
--                fn pango_context_set_round_glyph_positions(
--                    context: *mut PangoContext,
--                    round_positions: gboolean,
--                );
--            }
--
--            pango_context_set_round_glyph_positions(context.to_glib_none().0, false.to_glib());
--        }
--
-         pangocairo::functions::update_context(&cr, &context);
- 
-         // Pango says this about pango_cairo_context_set_resolution():
-@@ -2105,6 +2079,16 @@ impl From<&DrawingCtx> for pango::Context {
-         // code.
-         pangocairo::functions::context_set_resolution(&context, 72.0);
- 
-+        if draw_ctx.testing {
-+            let mut options = cairo::FontOptions::new();
-+
-+            options.set_antialias(cairo::Antialias::Gray);
-+            options.set_hint_style(cairo::HintStyle::Full);
-+            options.set_hint_metrics(cairo::HintMetrics::On);
-+
-+            pangocairo::functions::context_set_font_options(&context, Some(&options));
-+        }
-+
-         context
-     }
- }
+     let pango_matrix = PangoMatrix {
+         xx: transform.xx,
+         xy: transform.xy,
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Sun, 2 Nov 2025 14:13:38 +0100
-Subject: [PATCH 2/2] Revert "Bump pango requirement to 1.44"
+Subject: [PATCH 5/6] Revert "Bump pango requirement to 1.44"
 
 This reverts commit 13c48575999aba33aa2e8a2c4cfbc1b701a9970a.
 
 RHEL 8 doesn't provide Pango 1.44.0.
 
-diff --git a/COMPILING.md b/COMPILING.md
-index 1111111..2222222 100644
---- a/COMPILING.md
-+++ b/COMPILING.md
-@@ -44,7 +44,7 @@ minimum version is listed here; you may use a newer version instead.
- * GObject-Introspection 0.10.8
- * Gtk-doc 1.13
- * Libxml2 2.9.0
--* Pango 1.44.0
-+* Pango 1.38.0
- 
- The following sections describe how to install these dependencies on
- several systems.
 diff --git a/configure b/configure
-index 1111111..2222222 100644
+index 1111111..2222222 100755
 --- a/configure
 +++ b/configure
-@@ -7960,7 +7960,7 @@ GIO_REQUIRED=2.24.0
+@@ -3580,7 +3580,7 @@ GIO_REQUIRED=2.24.0
  GLIB_REQUIRED=2.50.0
  HARFBUZZ_REQUIRED=2.0.0
  LIBXML_REQUIRED=2.9.0
 -PANGO_REQUIRED=1.44.0
-+PANGO_REQUIRED=1.38.0
++PANGO_REQUIRED=1.42.0
  
  
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether ln -s works" >&5
+ 
 diff --git a/configure.ac b/configure.ac
 index 1111111..2222222 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -76,7 +76,7 @@ GIO_REQUIRED=2.24.0
+@@ -66,7 +66,7 @@ GIO_REQUIRED=2.24.0
  GLIB_REQUIRED=2.50.0
  HARFBUZZ_REQUIRED=2.0.0
  LIBXML_REQUIRED=2.9.0
 -PANGO_REQUIRED=1.44.0
-+PANGO_REQUIRED=1.38.0
++PANGO_REQUIRED=1.42.0
  
  dnl ===========================================================================
+ 
+diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
+index 1111111..2222222 100644
+--- a/rsvg/Cargo.toml
++++ b/rsvg/Cargo.toml
+@@ -28,15 +28,15 @@ gio = { name = "gio-2.0", version = "2.24" }
+ glib = { name = "glib-2.0", version = "2.50" }
+ harfbuzz = "2.0"
+ libxml2 = { name = "libxml-2.0", fallback-names = ["libxml2"], version = "2.9" }
+-pangocairo = "1.44"
++pangocairo = "1.42"
+ 
+ [package.metadata.system-deps.'cfg(windows)']
+ fontconfig = { version = "1.7", optional = true }
+-pangoft2 = { version = "1.44", optional = true }
++pangoft2 = { version = "1.42", optional = true }
+ 
+ [package.metadata.system-deps.'cfg(not(windows))']
+ fontconfig = { version = "1.7" }
+-pangoft2 = { version = "1.44" }
++pangoft2 = { version = "1.42" }
+ 
+ [features]
+ c-api = []
+@@ -65,7 +65,7 @@ markup5ever = "0.11.0"
+ nalgebra = "0.32.1"
+ num-traits = "0.2"
+ once_cell = "1.2.0"
+-pango = { version = "0.18", features = ["v1_44"] }
++pango = { version = "0.18", features = ["v1_42"] }
+ pangocairo = "0.18"
+ rayon = "1"
+ rctree = "0.5.0"
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 3 Nov 2025 12:35:08 +0100
+Subject: [PATCH 6/6] rsvg-convert: fix build when PDF support is disabled in Cairo
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1151]
+
+diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
+index 1111111..2222222 100644
+--- a/rsvg_convert/src/main.rs
++++ b/rsvg_convert/src/main.rs
+@@ -291,7 +291,11 @@ impl Surface {
+     }
+ 
+     #[cfg(not(system_deps_have_cairo_pdf))]
+-    fn new_for_pdf(_size: Size, _stream: OutputStream) -> Result<Self, Error> {
++    fn new_for_pdf(
++        _size: Size,
++        _stream: OutputStream,
++        _version: Option<cairo::PdfVersion>,
++    ) -> Result<Self, Error> {
+         Err(Error("unsupported format".to_string()))
+     }
  
