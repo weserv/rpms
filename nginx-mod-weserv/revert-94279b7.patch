@@ -445,7 +445,7 @@ index 1111111..2222222 100644
 @@ -1,6 +1,6 @@
  FetchContent_Declare(catch2
          GIT_REPOSITORY https://github.com/catchorg/Catch2.git
--        GIT_TAG v3.10.0
+-        GIT_TAG v3.11.0
 +        GIT_TAG v2.13.10
          )
  
