@@ -1,46 +1,54 @@
 # https://github.com/rust-lang/rust/issues/47714
 %undefine _strict_symbol_defs_build
 
-# We want verbose builds
-%global _configure_disable_silent_rules 1
-
 # Use bundled deps as we don't ship the exact right versions for all the
 # required rust libraries
 %global bundled_rust_deps 1
 
-%global cairo_version 1.16.0
+%global cairo_version 1.17.0
+
+# Disable AVIF support by default to reduce the attack surface
+%bcond_with     avif
+
+# Skip tests, including the reftests related to text rendering,
+# as exact visual matches cannot be guaranteed.
+%bcond_with     tests
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.57.3
+Version:        2.60.0
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.57/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.60/librsvg-%{version}.tar.xz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 # Patch to ensure compat with EL8:
-# - Revert commit 73c1ee7, 80a72e6, 19f07cd, afba7f2 and 13c4857.
+# - Revert commit 73c1ee7, ec5d747, c88987b, 166f74f,
+#   80a72e6, 19f07cd, afba7f2 and 13c4857;
+# - Downgrade the minimum required Meson version to 0.61.5.
 Patch0:         el-8-compat.patch
 
-BuildRequires:  rust-toolset
-BuildRequires:  chrpath
 BuildRequires:  gcc
-BuildRequires:  gobject-introspection-devel
-BuildRequires:  make
+BuildRequires:  meson >= 0.61.5
+BuildRequires:  cargo-c >= 0.9.19
+BuildRequires:  rust-toolset
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(cairo) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-gobject) >= %{cairo_version}
 BuildRequires:  pkgconfig(cairo-png) >= %{cairo_version}
 BuildRequires:  pkgconfig(fontconfig)
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+%if %{with avif}
+BuildRequires:  pkgconfig(dav1d)
+%endif
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(gthread-2.0)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pangoft2)
@@ -49,8 +57,7 @@ BuildRequires:  /usr/bin/rst2man
 
 Requires:       cairo%{?_isa} >= %{cairo_version}
 Requires:       cairo-gobject%{?_isa} >= %{cairo_version}
-# We install a gdk-pixbuf svg loader
-Requires:       gdk-pixbuf2%{?_isa}
+Recommends:     rsvg-pixbuf-loader
 
 %description
 An SVG library based on cairo.
@@ -62,6 +69,14 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description devel
 This package provides the necessary development libraries and include
 files to allow you to develop with librsvg.
+
+%package     -n rsvg-pixbuf-loader
+Summary:        SVG image loader for gdk-pixbuf
+Requires:       gdk-pixbuf2%{?_isa}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description -n rsvg-pixbuf-loader
+This package provides a gdk-pixbuf plugin for loading SVG images in GTK apps.
 
 %package tools
 Summary:        Extra tools for librsvg
@@ -78,41 +93,59 @@ This package provides extra utilities based on the librsvg library.
 # Ensure we build without --locked, as %%cargo_prep removes
 # the lock file (Cargo.lock), allowing more wiggle room when
 # providing Rust dependencies.
-sed -i 's/--locked //g' Makefile.am
+sed -i 's/, "--locked"//g' meson/cargo_wrapper.py
+
+%if 0%{?rhel} <= 9
+# https://bugzilla.redhat.com/show_bug.cgi?id=2109099
+sed -i "s/'gdk-pixbuf-query-loaders')/& + '-%{__isa_bits}'/" gdk-pixbuf-loader/meson.build
+%endif
 
 %if ! 0%{?bundled_rust_deps}
 %generate_buildrequires
-%cargo_generate_buildrequires
+# cargo-c requires all optional dependencies to be available
+%cargo_generate_buildrequires -a
 %endif
 
 %build
-# Replace bare `cargo` with the one used by %%cargo_* macros
-export CARGO="%__cargo"
+%if 0%{?rhel} <= 9
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/#_compiler_flags
+export RUSTFLAGS="%build_rustflags"
+%endif
 
-%configure --disable-static  \
-           --disable-gtk-doc \
-           --docdir=%{_pkgdocdir} \
-           --enable-introspection \
-           --enable-vala
-%make_build
+# gi-docgen is not available on EPEL 8
+%meson \
+%if %{without avif}
+    -Davif=disabled \
+%endif
+    -Ddocs=disabled \
+    %{nil}
+
+%meson_build
+
+%cargo_license_summary
+%{cargo_license} > LICENSE.dependencies
+%if 0%{?bundled_rust_deps}
+%cargo_vendor_manifest
+%endif
 
 %install
-%make_install
-find %{buildroot} -type f -name '*.la' -print -delete
+%meson_install
 
-# Remove lib64 rpaths
-chrpath --delete %{buildroot}%{_bindir}/rsvg-convert
-chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
+%if %{with tests}
+%check
+%meson_test
+%endif
 
 %files
 %doc code-of-conduct.md NEWS README.md
 %license COPYING.LIB
+%license LICENSE.dependencies
+%if 0%{?bundled_rust_deps}
+%license cargo-vendor.txt
+%endif
 %{_libdir}/librsvg-2.so.*
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Rsvg-2.0.typelib
-%dir %{_datadir}/thumbnailers
-%{_datadir}/thumbnailers/librsvg.thumbnailer
 
 %files devel
 %{_libdir}/librsvg-2.so
@@ -123,12 +156,22 @@ chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/librsvg-2.0.vapi
+%{_datadir}/vala/vapi/librsvg-2.0.deps
+
+%files -n rsvg-pixbuf-loader
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader_svg.so
+%dir %{_datadir}/thumbnailers
+%{_datadir}/thumbnailers/librsvg.thumbnailer
 
 %files tools
 %{_bindir}/rsvg-convert
-%{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Sat Nov  8 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.60.0-1
+- Update to 2.60.0
+- Disable AVIF support by default
+- Split gdk-pixbuf loader into a subpackage
+
 * Mon Nov  3 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.57.3-1
 - Update to 2.57.3
 

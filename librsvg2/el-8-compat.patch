@@ -1,67 +1,67 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Tue, 2 Jan 2024 10:00:00 +0100
-Subject: [PATCH 1/6] Revert "(#1019): Fix small-caps and bump the version of Pango
+Subject: [PATCH 01/10] Revert "(#1019): Fix small-caps and bump the version of Pango
  required to 1.50.0"
 
 This reverts commit 73c1ee7519555aa90c1c45828ffaa2f573812864.
 
 RHEL 8 doesn't provide Pango 1.50.0.
 
-diff --git a/configure b/configure
-index 1111111..2222222 100755
---- a/configure
-+++ b/configure
-@@ -3580,7 +3580,7 @@ GIO_REQUIRED=2.24.0
- GLIB_REQUIRED=2.50.0
- HARFBUZZ_REQUIRED=2.0.0
- LIBXML_REQUIRED=2.9.0
--PANGO_REQUIRED=1.50.0
-+PANGO_REQUIRED=1.46.0
- 
- 
- 
-diff --git a/configure.ac b/configure.ac
+diff --git a/devel-docs/_build_dependencies.rst b/devel-docs/_build_dependencies.rst
 index 1111111..2222222 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -66,7 +66,7 @@ GIO_REQUIRED=2.24.0
- GLIB_REQUIRED=2.50.0
- HARFBUZZ_REQUIRED=2.0.0
- LIBXML_REQUIRED=2.9.0
--PANGO_REQUIRED=1.50.0
-+PANGO_REQUIRED=1.46.0
+--- a/devel-docs/_build_dependencies.rst
++++ b/devel-docs/_build_dependencies.rst
+@@ -19,7 +19,7 @@ minimum version is listed here; you may use a newer version instead.
+ * `Freetype2 <https://gitlab.freedesktop.org/freetype/freetype>`_ 2.8.0
+ * `GLib <https://gitlab.gnome.org/GNOME/glib/>`_ 2.50.0
+ * `Libxml2 <https://gitlab.gnome.org/GNOME/libxml2>`_ 2.9.0
+-* `Pango <https://gitlab.gnome.org/GNOME/pango/>`_ 1.50.0
++* `Pango <https://gitlab.gnome.org/GNOME/pango/>`_ 1.46.0
  
- dnl ===========================================================================
+ **Optional dependencies:**
  
+diff --git a/meson.build b/meson.build
+index 1111111..2222222 100644
+--- a/meson.build
++++ b/meson.build
+@@ -55,7 +55,7 @@ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
+ glib_required          = '>= 2.50.0'
+ harfbuzz_required      = '>= 2.0.0'
+ libxml_required        = '>= 2.9.0'
+-pango_required         = '>= 1.50.0'
++pango_required         = '>= 1.46.0'
+ 
+ # Optional dependencies
+ gdk_pixbuf_required    = '>= 2.20'
 diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
 index 1111111..2222222 100644
 --- a/rsvg/Cargo.toml
 +++ b/rsvg/Cargo.toml
-@@ -28,15 +28,15 @@ gio = { name = "gio-2.0", version = "2.24" }
+@@ -27,15 +27,15 @@ gio = { name = "gio-2.0", version = "2.24" }
  glib = { name = "glib-2.0", version = "2.50" }
  harfbuzz = "2.0"
  libxml2 = { name = "libxml-2.0", fallback-names = ["libxml2"], version = "2.9" }
 -pangocairo = "1.50"
 +pangocairo = "1.46"
  
- [package.metadata.system-deps.'cfg(windows)']
+ [package.metadata.system-deps.'cfg(any(target_os = "macos", target_os = "windows"))']
  fontconfig = { version = "1.7", optional = true }
 -pangoft2 = { version = "1.50", optional = true }
 +pangoft2 = { version = "1.46", optional = true }
  
- [package.metadata.system-deps.'cfg(not(windows))']
+ [package.metadata.system-deps.'cfg(all(not(target_os = "macos"), not(target_os = "windows")))']
  fontconfig = { version = "1.7" }
 -pangoft2 = { version = "1.50" }
 +pangoft2 = { version = "1.46" }
  
  [features]
- c-api = []
+ avif = ["image/avif-native"]
 diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/text.rs
 +++ b/rsvg/src/text.rs
-@@ -1282,7 +1282,9 @@ fn add_pango_attributes(
+@@ -1399,7 +1399,9 @@ fn add_pango_attributes(
      font_desc.set_family(props.font_family.as_str());
      font_desc.set_style(pango::Style::from(props.font_style));
  
@@ -72,7 +72,7 @@ index 1111111..2222222 100644
  
      font_desc.set_weight(pango::Weight::from(props.font_weight));
      font_desc.set_stretch(pango::Stretch::from(props.font_stretch));
-@@ -1305,6 +1307,13 @@ fn add_pango_attributes(
+@@ -1422,6 +1424,13 @@ fn add_pango_attributes(
          attributes.push(pango::AttrInt::new_strikethrough(true).upcast());
      }
  
@@ -89,8 +89,255 @@ index 1111111..2222222 100644
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Thu, 15 Aug 2024 14:50:22 +0200
+Subject: [PATCH 02/10] Revert "Bump Cairo requirement to 1.18.0 so we can update
+ gtk-rs"
+
+This reverts commit ec5d747479f4098669bb93901f3008d412e3f62f.
+
+RHEL 8 doesn't provide Cairo 1.18.0.
+
+diff --git a/devel-docs/_build_dependencies.rst b/devel-docs/_build_dependencies.rst
+index 1111111..2222222 100644
+--- a/devel-docs/_build_dependencies.rst
++++ b/devel-docs/_build_dependencies.rst
+@@ -15,7 +15,7 @@ minimum version is listed here; you may use a newer version instead.
+ 
+ **Mandatory dependencies:**
+ 
+-* `Cairo <https://gitlab.freedesktop.org/cairo/cairo>`_ 1.18.0 with PNG support
++* `Cairo <https://gitlab.freedesktop.org/cairo/cairo>`_ 1.17.0 with PNG support
+ * `Freetype2 <https://gitlab.freedesktop.org/freetype/freetype>`_ 2.8.0
+ * `GLib <https://gitlab.gnome.org/GNOME/glib/>`_ 2.50.0
+ * `Libxml2 <https://gitlab.gnome.org/GNOME/libxml2>`_ 2.9.0
+diff --git a/meson.build b/meson.build
+index 1111111..2222222 100644
+--- a/meson.build
++++ b/meson.build
+@@ -48,7 +48,7 @@ py = import('python')
+ python = py.find_installation()
+ 
+ # Required versions for dependencies - Please update _build_dependencies.rst with version numbers if these change
+-cairo_required         = '>= 1.18.0'
++cairo_required         = '>= 1.17.0'
+ dav1d_required         = '>= 1.3.0'
+ ft2_cmake_required     = '>= 2.8.0'   # Actual FreeType version required
+ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
+diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
+index 1111111..2222222 100644
+--- a/rsvg/Cargo.toml
++++ b/rsvg/Cargo.toml
+@@ -16,12 +16,12 @@ rustc-args = ["--cfg", "docsrs"]
+ rustdoc-args = ["--cfg", "docsrs"]
+ 
+ [package.metadata.system-deps]
+-cairo = "1.18"
+-cairo-gobject = "1.18"
+-cairo-png = "1.18"
+-cairo-pdf = { version = "1.18", optional = true }
+-cairo-ps = { version = "1.18", optional = true }
+-cairo-svg = { version = "1.18", optional = true }
++cairo = "1.17"
++cairo-gobject = "1.17"
++cairo-png = "1.17"
++cairo-pdf = { version = "1.17", optional = true }
++cairo-ps = { version = "1.17", optional = true }
++cairo-svg = { version = "1.17", optional = true }
+ freetype2 = "20.0.14"
+ gio = { name = "gio-2.0", version = "2.24" }
+ glib = { name = "glib-2.0", version = "2.50" }
+diff --git a/rsvg_convert/Cargo.toml b/rsvg_convert/Cargo.toml
+index 1111111..2222222 100644
+--- a/rsvg_convert/Cargo.toml
++++ b/rsvg_convert/Cargo.toml
+@@ -13,9 +13,9 @@ rust-version.workspace = true
+ autobins = false
+ 
+ [package.metadata.system-deps]
+-cairo-pdf = { version = "1.18", optional = true }
+-cairo-ps = { version = "1.18", optional = true }
+-cairo-svg = { version = "1.18", optional = true }
++cairo-pdf = { version = "1.17", optional = true }
++cairo-ps = { version = "1.17", optional = true }
++cairo-svg = { version = "1.17", optional = true }
+ 
+ [dependencies]
+ cairo-rs = { workspace = true, features = [
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Thu, 15 Aug 2024 17:17:11 +0200
+Subject: [PATCH 03/10] Revert "add pdf1.7 as additional format"
+
+This reverts commit c88987b77e8cdde51bfd4defbbce47c3b41221eb.
+
+RHEL 8 doesn't provide Cairo 1.18.0.
+
+diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
+index 1111111..2222222 100644
+--- a/rsvg_convert/src/main.rs
++++ b/rsvg_convert/src/main.rs
+@@ -257,7 +257,6 @@ impl Surface {
+         match format {
+             Format::Png => Self::new_for_png(size, stream),
+             Format::Pdf => Self::new_for_pdf(size, stream, None),
+-            Format::Pdf1_7 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_7)),
+             Format::Pdf1_6 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_6)),
+             Format::Pdf1_5 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_5)),
+             Format::Pdf1_4 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_4)),
+@@ -490,7 +489,6 @@ impl std::fmt::Display for Output {
+ enum Format {
+     Png,
+     Pdf,
+-    Pdf1_7,
+     Pdf1_6,
+     Pdf1_5,
+     Pdf1_4,
+@@ -611,7 +609,6 @@ impl Converter {
+                 }
+ 
+                 Format::Pdf
+-                | Format::Pdf1_7
+                 | Format::Pdf1_6
+                 | Format::Pdf1_5
+                 | Format::Pdf1_4
+@@ -808,8 +805,6 @@ fn build_cli() -> clap::Command {
+         #[cfg(system_deps_have_cairo_pdf)]
+         "pdf",
+         #[cfg(system_deps_have_cairo_pdf)]
+-        "pdf1.7",
+-        #[cfg(system_deps_have_cairo_pdf)]
+         "pdf1.6",
+         #[cfg(system_deps_have_cairo_pdf)]
+         "pdf1.5",
+@@ -1086,7 +1081,6 @@ fn parse_args() -> Result<Converter, Error> {
+         format_str,
+         "png" => Format::Png,
+         "pdf" => Format::Pdf,
+-        "pdf1.7" => Format::Pdf1_7,
+         "pdf1.6" => Format::Pdf1_6,
+         "pdf1.5" => Format::Pdf1_5,
+         "pdf1.4" => Format::Pdf1_4,
+diff --git a/rsvg_convert/tests/rsvg_convert.rs b/rsvg_convert/tests/rsvg_convert.rs
+index 1111111..2222222 100644
+--- a/rsvg_convert/tests/rsvg_convert.rs
++++ b/rsvg_convert/tests/rsvg_convert.rs
+@@ -151,16 +151,6 @@ fn output_format_pdf() {
+         .stdout(file::is_pdf());
+ }
+ 
+-#[cfg(system_deps_have_cairo_pdf)]
+-#[test]
+-fn output_format_pdf_1_7() {
+-    RsvgConvert::new_with_input("tests/fixtures/bug521-with-viewbox.svg")
+-        .arg("--format=pdf1.7")
+-        .assert()
+-        .success()
+-        .stdout(file::is_pdf().with_version("1.7"));
+-}
+-
+ #[cfg(system_deps_have_cairo_pdf)]
+ #[test]
+ fn output_format_pdf_1_6() {
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Thu, 15 Aug 2024 17:18:10 +0200
+Subject: [PATCH 04/10] Revert "add PDF version 1.6"
+
+This reverts commit 166f74f593201fea7e95a8cd961cab88cf644bf7.
+
+RHEL 8 doesn't provide Cairo 1.18.0.
+
+diff --git a/rsvg_convert/Cargo.toml b/rsvg_convert/Cargo.toml
+index 1111111..2222222 100644
+--- a/rsvg_convert/Cargo.toml
++++ b/rsvg_convert/Cargo.toml
+@@ -19,7 +19,6 @@ cairo-svg = { version = "1.17", optional = true }
+ 
+ [dependencies]
+ cairo-rs = { workspace = true, features = [
+-    "v1_18",
+     "v1_16",
+     "pdf",
+     "ps",
+diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
+index 1111111..2222222 100644
+--- a/rsvg_convert/src/main.rs
++++ b/rsvg_convert/src/main.rs
+@@ -257,7 +257,6 @@ impl Surface {
+         match format {
+             Format::Png => Self::new_for_png(size, stream),
+             Format::Pdf => Self::new_for_pdf(size, stream, None),
+-            Format::Pdf1_6 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_6)),
+             Format::Pdf1_5 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_5)),
+             Format::Pdf1_4 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_4)),
+             Format::Ps => Self::new_for_ps(size, stream, false),
+@@ -489,7 +488,6 @@ impl std::fmt::Display for Output {
+ enum Format {
+     Png,
+     Pdf,
+-    Pdf1_6,
+     Pdf1_5,
+     Pdf1_4,
+     Ps,
+@@ -608,12 +606,7 @@ impl Converter {
+                     )
+                 }
+ 
+-                Format::Pdf
+-                | Format::Pdf1_6
+-                | Format::Pdf1_5
+-                | Format::Pdf1_4
+-                | Format::Ps
+-                | Format::Eps => {
++                Format::Pdf | Format::Pdf1_5 | Format::Pdf1_4 | Format::Ps | Format::Eps => {
+                     // These surfaces require units in points
+                     unit = LengthUnit::Pt;
+ 
+@@ -805,8 +798,6 @@ fn build_cli() -> clap::Command {
+         #[cfg(system_deps_have_cairo_pdf)]
+         "pdf",
+         #[cfg(system_deps_have_cairo_pdf)]
+-        "pdf1.6",
+-        #[cfg(system_deps_have_cairo_pdf)]
+         "pdf1.5",
+         #[cfg(system_deps_have_cairo_pdf)]
+         "pdf1.4",
+@@ -1081,7 +1072,6 @@ fn parse_args() -> Result<Converter, Error> {
+         format_str,
+         "png" => Format::Png,
+         "pdf" => Format::Pdf,
+-        "pdf1.6" => Format::Pdf1_6,
+         "pdf1.5" => Format::Pdf1_5,
+         "pdf1.4" => Format::Pdf1_4,
+         "ps" => Format::Ps,
+diff --git a/rsvg_convert/tests/rsvg_convert.rs b/rsvg_convert/tests/rsvg_convert.rs
+index 1111111..2222222 100644
+--- a/rsvg_convert/tests/rsvg_convert.rs
++++ b/rsvg_convert/tests/rsvg_convert.rs
+@@ -151,16 +151,6 @@ fn output_format_pdf() {
+         .stdout(file::is_pdf());
+ }
+ 
+-#[cfg(system_deps_have_cairo_pdf)]
+-#[test]
+-fn output_format_pdf_1_6() {
+-    RsvgConvert::new_with_input("tests/fixtures/bug521-with-viewbox.svg")
+-        .arg("--format=pdf1.6")
+-        .assert()
+-        .success()
+-        .stdout(file::is_pdf().with_version("1.6"));
+-}
+-
+ #[cfg(system_deps_have_cairo_pdf)]
+ #[test]
+ fn output_format_pdf_1_5() {
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Mon, 3 Nov 2025 10:40:07 +0100
-Subject: [PATCH 2/6] Revert "(#17): Render text-decoration:overline"
+Subject: [PATCH 05/10] Revert "(#17): Render text-decoration:overline"
 
 This reverts commit 80a72e607443b4b05d28a4387fc994aacb332218.
 
@@ -100,7 +347,7 @@ diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/text.rs
 +++ b/rsvg/src/text.rs
-@@ -1295,10 +1295,6 @@ fn add_pango_attributes(
+@@ -1412,10 +1412,6 @@ fn add_pango_attributes(
  
      attributes.push(pango::AttrInt::new_letter_spacing(letter_spacing.0).upcast());
  
@@ -115,75 +362,75 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Mon, 3 Nov 2025 10:42:56 +0100
-Subject: [PATCH 3/6] Revert "Require Pango 1.46 for PangoOverline"
+Subject: [PATCH 06/10] Revert "Require Pango 1.46 for PangoOverline"
 
 This reverts commit 19f07cd73556f138d2b53932cb28d0be800626dc.
 
 RHEL 8 doesn't provide Pango 1.46.0.
 
-diff --git a/configure b/configure
-index 1111111..2222222 100755
---- a/configure
-+++ b/configure
-@@ -3580,7 +3580,7 @@ GIO_REQUIRED=2.24.0
- GLIB_REQUIRED=2.50.0
- HARFBUZZ_REQUIRED=2.0.0
- LIBXML_REQUIRED=2.9.0
--PANGO_REQUIRED=1.46.0
-+PANGO_REQUIRED=1.44.0
- 
- 
- 
-diff --git a/configure.ac b/configure.ac
+diff --git a/devel-docs/_build_dependencies.rst b/devel-docs/_build_dependencies.rst
 index 1111111..2222222 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -66,7 +66,7 @@ GIO_REQUIRED=2.24.0
- GLIB_REQUIRED=2.50.0
- HARFBUZZ_REQUIRED=2.0.0
- LIBXML_REQUIRED=2.9.0
--PANGO_REQUIRED=1.46.0
-+PANGO_REQUIRED=1.44.0
+--- a/devel-docs/_build_dependencies.rst
++++ b/devel-docs/_build_dependencies.rst
+@@ -19,7 +19,7 @@ minimum version is listed here; you may use a newer version instead.
+ * `Freetype2 <https://gitlab.freedesktop.org/freetype/freetype>`_ 2.8.0
+ * `GLib <https://gitlab.gnome.org/GNOME/glib/>`_ 2.50.0
+ * `Libxml2 <https://gitlab.gnome.org/GNOME/libxml2>`_ 2.9.0
+-* `Pango <https://gitlab.gnome.org/GNOME/pango/>`_ 1.46.0
++* `Pango <https://gitlab.gnome.org/GNOME/pango/>`_ 1.44.0
  
- dnl ===========================================================================
+ **Optional dependencies:**
  
+diff --git a/meson.build b/meson.build
+index 1111111..2222222 100644
+--- a/meson.build
++++ b/meson.build
+@@ -55,7 +55,7 @@ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
+ glib_required          = '>= 2.50.0'
+ harfbuzz_required      = '>= 2.0.0'
+ libxml_required        = '>= 2.9.0'
+-pango_required         = '>= 1.46.0'
++pango_required         = '>= 1.44.0'
+ 
+ # Optional dependencies
+ gdk_pixbuf_required    = '>= 2.20'
 diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
 index 1111111..2222222 100644
 --- a/rsvg/Cargo.toml
 +++ b/rsvg/Cargo.toml
-@@ -28,15 +28,15 @@ gio = { name = "gio-2.0", version = "2.24" }
+@@ -27,15 +27,15 @@ gio = { name = "gio-2.0", version = "2.24" }
  glib = { name = "glib-2.0", version = "2.50" }
  harfbuzz = "2.0"
  libxml2 = { name = "libxml-2.0", fallback-names = ["libxml2"], version = "2.9" }
 -pangocairo = "1.46"
 +pangocairo = "1.44"
  
- [package.metadata.system-deps.'cfg(windows)']
+ [package.metadata.system-deps.'cfg(any(target_os = "macos", target_os = "windows"))']
  fontconfig = { version = "1.7", optional = true }
 -pangoft2 = { version = "1.46", optional = true }
 +pangoft2 = { version = "1.44", optional = true }
  
- [package.metadata.system-deps.'cfg(not(windows))']
+ [package.metadata.system-deps.'cfg(all(not(target_os = "macos"), not(target_os = "windows")))']
  fontconfig = { version = "1.7" }
 -pangoft2 = { version = "1.46" }
 +pangoft2 = { version = "1.44" }
  
  [features]
- c-api = []
-@@ -65,7 +65,7 @@ markup5ever = "0.11.0"
- nalgebra = "0.32.1"
- num-traits = "0.2"
- once_cell = "1.2.0"
--pango = { version = "0.18", features = ["v1_46"] }
-+pango = { version = "0.18", features = ["v1_44"] }
- pangocairo = "0.18"
- rayon = "1"
- rctree = "0.5.0"
+ avif = ["image/avif-native"]
+@@ -64,7 +64,7 @@ locale_config.workspace = true
+ markup5ever.workspace = true
+ nalgebra.workspace = true
+ num-traits.workspace = true
+-pango = { workspace = true, features = ["v1_46"] }
++pango = { workspace = true, features = ["v1_44"] }
+ pangocairo.workspace = true
+ rayon.workspace = true
+ rctree.workspace = true
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Sun, 2 Nov 2025 14:11:07 +0100
-Subject: [PATCH 4/6] Revert "(#730): Incorrect text spacing when the transform
+Subject: [PATCH 07/10] Revert "(#730): Incorrect text spacing when the transform
  is not 1:1"
 
 This reverts commit afba7f2fcae0505113450198f74c8bf95c3cc13c.
@@ -194,7 +441,7 @@ diff --git a/rsvg/src/drawing_ctx.rs b/rsvg/src/drawing_ctx.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/drawing_ctx.rs
 +++ b/rsvg/src/drawing_ctx.rs
-@@ -1871,8 +1871,6 @@ pub fn create_pango_context(font_options: &FontOptions, transform: &Transform) -
+@@ -2045,8 +2045,6 @@ pub fn create_pango_context(font_options: &FontOptions, transform: &Transform) -
      let font_map = pangocairo::FontMap::default();
      let context = font_map.create_context();
  
@@ -207,83 +454,106 @@ index 1111111..2222222 100644
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Sun, 2 Nov 2025 14:13:38 +0100
-Subject: [PATCH 5/6] Revert "Bump pango requirement to 1.44"
+Subject: [PATCH 08/10] Revert "Bump pango requirement to 1.44"
 
 This reverts commit 13c48575999aba33aa2e8a2c4cfbc1b701a9970a.
 
 RHEL 8 doesn't provide Pango 1.44.0.
 
-diff --git a/configure b/configure
-index 1111111..2222222 100755
---- a/configure
-+++ b/configure
-@@ -3580,7 +3580,7 @@ GIO_REQUIRED=2.24.0
- GLIB_REQUIRED=2.50.0
- HARFBUZZ_REQUIRED=2.0.0
- LIBXML_REQUIRED=2.9.0
--PANGO_REQUIRED=1.44.0
-+PANGO_REQUIRED=1.42.0
- 
- 
- 
-diff --git a/configure.ac b/configure.ac
+diff --git a/devel-docs/_build_dependencies.rst b/devel-docs/_build_dependencies.rst
 index 1111111..2222222 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -66,7 +66,7 @@ GIO_REQUIRED=2.24.0
- GLIB_REQUIRED=2.50.0
- HARFBUZZ_REQUIRED=2.0.0
- LIBXML_REQUIRED=2.9.0
--PANGO_REQUIRED=1.44.0
-+PANGO_REQUIRED=1.42.0
+--- a/devel-docs/_build_dependencies.rst
++++ b/devel-docs/_build_dependencies.rst
+@@ -19,7 +19,7 @@ minimum version is listed here; you may use a newer version instead.
+ * `Freetype2 <https://gitlab.freedesktop.org/freetype/freetype>`_ 2.8.0
+ * `GLib <https://gitlab.gnome.org/GNOME/glib/>`_ 2.50.0
+ * `Libxml2 <https://gitlab.gnome.org/GNOME/libxml2>`_ 2.9.0
+-* `Pango <https://gitlab.gnome.org/GNOME/pango/>`_ 1.44.0
++* `Pango <https://gitlab.gnome.org/GNOME/pango/>`_ 1.42.0
  
- dnl ===========================================================================
+ **Optional dependencies:**
  
+diff --git a/meson.build b/meson.build
+index 1111111..2222222 100644
+--- a/meson.build
++++ b/meson.build
+@@ -55,7 +55,7 @@ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
+ glib_required          = '>= 2.50.0'
+ harfbuzz_required      = '>= 2.0.0'
+ libxml_required        = '>= 2.9.0'
+-pango_required         = '>= 1.44.0'
++pango_required         = '>= 1.42.0'
+ 
+ # Optional dependencies
+ gdk_pixbuf_required    = '>= 2.20'
 diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
 index 1111111..2222222 100644
 --- a/rsvg/Cargo.toml
 +++ b/rsvg/Cargo.toml
-@@ -28,15 +28,15 @@ gio = { name = "gio-2.0", version = "2.24" }
+@@ -27,15 +27,15 @@ gio = { name = "gio-2.0", version = "2.24" }
  glib = { name = "glib-2.0", version = "2.50" }
  harfbuzz = "2.0"
  libxml2 = { name = "libxml-2.0", fallback-names = ["libxml2"], version = "2.9" }
 -pangocairo = "1.44"
 +pangocairo = "1.42"
  
- [package.metadata.system-deps.'cfg(windows)']
+ [package.metadata.system-deps.'cfg(any(target_os = "macos", target_os = "windows"))']
  fontconfig = { version = "1.7", optional = true }
 -pangoft2 = { version = "1.44", optional = true }
 +pangoft2 = { version = "1.42", optional = true }
  
- [package.metadata.system-deps.'cfg(not(windows))']
+ [package.metadata.system-deps.'cfg(all(not(target_os = "macos"), not(target_os = "windows")))']
  fontconfig = { version = "1.7" }
 -pangoft2 = { version = "1.44" }
 +pangoft2 = { version = "1.42" }
  
  [features]
- c-api = []
-@@ -65,7 +65,7 @@ markup5ever = "0.11.0"
- nalgebra = "0.32.1"
- num-traits = "0.2"
- once_cell = "1.2.0"
--pango = { version = "0.18", features = ["v1_44"] }
-+pango = { version = "0.18", features = ["v1_42"] }
- pangocairo = "0.18"
- rayon = "1"
- rctree = "0.5.0"
+ avif = ["image/avif-native"]
+@@ -64,7 +64,7 @@ locale_config.workspace = true
+ markup5ever.workspace = true
+ nalgebra.workspace = true
+ num-traits.workspace = true
+-pango = { workspace = true, features = ["v1_44"] }
++pango = { workspace = true, features = ["v1_42"] }
+ pangocairo.workspace = true
+ rayon.workspace = true
+ rctree.workspace = true
+diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
+index 1111111..2222222 100644
+--- a/rsvg/src/text.rs
++++ b/rsvg/src/text.rs
+@@ -302,7 +302,6 @@ fn compute_baseline_offset(
+             let metrics = font.metrics(None);
+             let ascent = metrics.ascent();
+             let descent = metrics.descent();
+-            let height = metrics.height();
+ 
+             match dominant_baseline {
+                 DominantBaseline::Hanging => {
+@@ -319,9 +318,7 @@ fn compute_baseline_offset(
+                     baseline = 0.5 * f64::from(ascent + descent) / f64::from(pango::SCALE);
+                 }
+                 DominantBaseline::TextBeforeEdge | DominantBaseline::TextTop => {
+-                    //baseline -= f64::from(ascent) / f64::from(pango::SCALE);
+-                    // Bit of a klutch, but leads to better results
+-                    baseline -= f64::from(2 * ascent - height) / f64::from(pango::SCALE);
++                    baseline -= f64::from(ascent) / f64::from(pango::SCALE);
+                 }
+                 DominantBaseline::TextAfterEdge | DominantBaseline::TextBottom => {
+                     baseline += f64::from(descent) / f64::from(pango::SCALE);
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kleis Auke Wolthuizen <github@kleisauke.nl>
 Date: Mon, 3 Nov 2025 12:35:08 +0100
-Subject: [PATCH 6/6] rsvg-convert: fix build when PDF support is disabled in Cairo
+Subject: [PATCH 09/10] rsvg-convert: fix build when PDF support is disabled in Cairo
 
-Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1151]
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/librsvg/-/commit/d36afd0e394928933aa0876d0fbb17e114ad7a05]
 
 diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
 index 1111111..2222222 100644
 --- a/rsvg_convert/src/main.rs
 +++ b/rsvg_convert/src/main.rs
-@@ -291,7 +291,11 @@ impl Surface {
+@@ -290,7 +290,11 @@ impl Surface {
      }
  
      #[cfg(not(system_deps_have_cairo_pdf))]
@@ -296,3 +566,69 @@ index 1111111..2222222 100644
          Err(Error("unsupported format".to_string()))
      }
  
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Thu, 15 Aug 2024 15:34:44 +0200
+Subject: [PATCH 10/10] Downgrade minimum required Meson version to 0.61.5
+
+To ensure compat with RHEL 8.
+
+diff --git a/meson.build b/meson.build
+index 1111111..2222222 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1,7 +1,7 @@
+ project('librsvg',
+         'c',
+         version: '2.60.0', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+-        meson_version: '>= 1.3.0',
++        meson_version: '>= 0.61.5',
+         default_options: [
+         ]
+ )
+@@ -358,7 +358,7 @@ if host_system in ['windows', 'linux']
+   endif
+ 
+   foreach i: native_libs.stdout().split()
+-    if 'msvcrt' in i
++    if i.contains('msvcrt')
+       if i.endswith('.lib') # pre Rust 1.83
+         default_overrides = [
+           'b_vscrt=md@0@'.format(i.substring(0, -4).split('msvcrt')[1])
+@@ -460,7 +460,7 @@ else
+ endif
+ 
+ cargo_dylib_prefix = lib_prefix
+-if cc.has_define('__MINGW32__')
++if cc.get_define('__MINGW32__') != ''
+   cargo_dylib_prefix = ''
+ endif
+ 
+diff --git a/meson/query-rustc.py b/meson/query-rustc.py
+index 1111111..2222222 100755
+--- a/meson/query-rustc.py
++++ b/meson/query-rustc.py
+@@ -95,8 +95,9 @@ if __name__ == "__main__":
+ 
+         query_results = subprocess.run(
+             rustc_cmd,
+-            capture_output=True,
+-            text=True,
++            stdout=subprocess.PIPE,
++            stderr=subprocess.PIPE,
++            universal_newlines=True,
+         )
+     finally:
+         os.unlink(dummy_out)
+diff --git a/rsvg/meson.build b/rsvg/meson.build
+index 1111111..2222222 100644
+--- a/rsvg/meson.build
++++ b/rsvg/meson.build
+@@ -362,7 +362,6 @@ if build_gir.allowed()
+     symbol_prefix: [ 'rsvg', 'librsvg' ],
+     dependencies: library_dependencies,
+     includes: gir_includes,
+-    env: extra_env,
+     export_packages: librsvg_pc,
+     header: ['librsvg/rsvg.h'],
+     install: true,
