@@ -13,12 +13,12 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.60.0
+Version:        2.61.3
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.60/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.61/librsvg-%{version}.tar.xz
 
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
@@ -26,7 +26,7 @@ Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  meson >= 1.3.0
-BuildRequires:  cargo-c >= 0.9.19
+BuildRequires:  cargo-c >= 0.10.10
 BuildRequires:  cargo-rpm-macros >= 24
 BuildRequires:  gi-docgen
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
@@ -95,6 +95,7 @@ sed -i 's/, "--locked"//g' meson/cargo_wrapper.py
 
 %build
 %meson \
+    -Dpixbuf-loader=enabled \
 %if %{without avif}
     -Davif=disabled \
 %endif
@@ -110,9 +111,6 @@ sed -i 's/, "--locked"//g' meson/cargo_wrapper.py
 
 %install
 %meson_install
-
-# Not useful in this package.
-rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 
 %if %{with tests}
 %check
@@ -152,6 +150,9 @@ rm -f %{buildroot}%{_pkgdocdir}/COMPILING.md
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Wed Nov 26 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.61.3-1
+- Update to 2.61.3
+
 * Fri May 23 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.60.0-1
 - Update to 2.60.0
 
