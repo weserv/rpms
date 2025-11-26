@@ -61,7 +61,7 @@ diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/text.rs
 +++ b/rsvg/src/text.rs
-@@ -1399,7 +1399,9 @@ fn add_pango_attributes(
+@@ -1391,7 +1391,9 @@ fn add_pango_attributes(
      font_desc.set_family(props.font_family.as_str());
      font_desc.set_style(pango::Style::from(props.font_style));
  
@@ -72,7 +72,7 @@ index 1111111..2222222 100644
  
      font_desc.set_weight(pango::Weight::from(props.font_weight));
      font_desc.set_stretch(pango::Stretch::from(props.font_stretch));
-@@ -1422,6 +1424,13 @@ fn add_pango_attributes(
+@@ -1414,6 +1416,13 @@ fn add_pango_attributes(
          attributes.push(pango::AttrInt::new_strikethrough(true).upcast());
      }
  
@@ -173,35 +173,11 @@ This reverts commit c88987b77e8cdde51bfd4defbbce47c3b41221eb.
 
 RHEL 9 doesn't provide Cairo 1.18.0.
 
-diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
+diff --git a/rsvg_convert/src/lib.rs b/rsvg_convert/src/lib.rs
 index 1111111..2222222 100644
---- a/rsvg_convert/src/main.rs
-+++ b/rsvg_convert/src/main.rs
-@@ -257,7 +257,6 @@ impl Surface {
-         match format {
-             Format::Png => Self::new_for_png(size, stream),
-             Format::Pdf => Self::new_for_pdf(size, stream, None),
--            Format::Pdf1_7 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_7)),
-             Format::Pdf1_6 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_6)),
-             Format::Pdf1_5 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_5)),
-             Format::Pdf1_4 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_4)),
-@@ -490,7 +489,6 @@ impl std::fmt::Display for Output {
- enum Format {
-     Png,
-     Pdf,
--    Pdf1_7,
-     Pdf1_6,
-     Pdf1_5,
-     Pdf1_4,
-@@ -611,7 +609,6 @@ impl Converter {
-                 }
- 
-                 Format::Pdf
--                | Format::Pdf1_7
-                 | Format::Pdf1_6
-                 | Format::Pdf1_5
-                 | Format::Pdf1_4
-@@ -808,8 +805,6 @@ fn build_cli() -> clap::Command {
+--- a/rsvg_convert/src/lib.rs
++++ b/rsvg_convert/src/lib.rs
+@@ -19,8 +19,6 @@ pub fn build_cli() -> clap::Command {
          #[cfg(system_deps_have_cairo_pdf)]
          "pdf",
          #[cfg(system_deps_have_cairo_pdf)]
@@ -210,7 +186,35 @@ index 1111111..2222222 100644
          "pdf1.6",
          #[cfg(system_deps_have_cairo_pdf)]
          "pdf1.5",
-@@ -1086,7 +1081,6 @@ fn parse_args() -> Result<Converter, Error> {
+diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
+index 1111111..2222222 100644
+--- a/rsvg_convert/src/main.rs
++++ b/rsvg_convert/src/main.rs
+@@ -259,7 +259,6 @@ impl Surface {
+         match format {
+             Format::Png => Self::new_for_png(size, stream),
+             Format::Pdf => Self::new_for_pdf(size, stream, None),
+-            Format::Pdf1_7 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_7)),
+             Format::Pdf1_6 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_6)),
+             Format::Pdf1_5 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_5)),
+             Format::Pdf1_4 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_4)),
+@@ -496,7 +495,6 @@ impl std::fmt::Display for Output {
+ enum Format {
+     Png,
+     Pdf,
+-    Pdf1_7,
+     Pdf1_6,
+     Pdf1_5,
+     Pdf1_4,
+@@ -617,7 +615,6 @@ impl Converter {
+                 }
+ 
+                 Format::Pdf
+-                | Format::Pdf1_7
+                 | Format::Pdf1_6
+                 | Format::Pdf1_5
+                 | Format::Pdf1_4
+@@ -893,7 +890,6 @@ fn parse_args() -> Result<Converter, Error> {
          format_str,
          "png" => Format::Png,
          "pdf" => Format::Pdf,
@@ -222,14 +226,17 @@ diff --git a/rsvg_convert/tests/rsvg_convert.rs b/rsvg_convert/tests/rsvg_conver
 index 1111111..2222222 100644
 --- a/rsvg_convert/tests/rsvg_convert.rs
 +++ b/rsvg_convert/tests/rsvg_convert.rs
-@@ -151,16 +151,6 @@ fn output_format_pdf() {
+@@ -321,19 +321,6 @@ fn output_format_pdf() {
          .stdout(file::is_pdf());
  }
  
 -#[cfg(system_deps_have_cairo_pdf)]
 -#[test]
 -fn output_format_pdf_1_7() {
--    RsvgConvert::new_with_input("tests/fixtures/bug521-with-viewbox.svg")
+-    let mut rsvg_convert = RsvgConvert::new_with_input("tests/fixtures/bug521-with-viewbox.svg");
+-
+-    rsvg_convert
+-        .command
 -        .arg("--format=pdf1.7")
 -        .assert()
 -        .success()
@@ -261,11 +268,24 @@ index 1111111..2222222 100644
      "v1_16",
      "pdf",
      "ps",
+diff --git a/rsvg_convert/src/lib.rs b/rsvg_convert/src/lib.rs
+index 1111111..2222222 100644
+--- a/rsvg_convert/src/lib.rs
++++ b/rsvg_convert/src/lib.rs
+@@ -19,8 +19,6 @@ pub fn build_cli() -> clap::Command {
+         #[cfg(system_deps_have_cairo_pdf)]
+         "pdf",
+         #[cfg(system_deps_have_cairo_pdf)]
+-        "pdf1.6",
+-        #[cfg(system_deps_have_cairo_pdf)]
+         "pdf1.5",
+         #[cfg(system_deps_have_cairo_pdf)]
+         "pdf1.4",
 diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
 index 1111111..2222222 100644
 --- a/rsvg_convert/src/main.rs
 +++ b/rsvg_convert/src/main.rs
-@@ -257,7 +257,6 @@ impl Surface {
+@@ -259,7 +259,6 @@ impl Surface {
          match format {
              Format::Png => Self::new_for_png(size, stream),
              Format::Pdf => Self::new_for_pdf(size, stream, None),
@@ -273,7 +293,7 @@ index 1111111..2222222 100644
              Format::Pdf1_5 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_5)),
              Format::Pdf1_4 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_4)),
              Format::Ps => Self::new_for_ps(size, stream, false),
-@@ -489,7 +488,6 @@ impl std::fmt::Display for Output {
+@@ -495,7 +494,6 @@ impl std::fmt::Display for Output {
  enum Format {
      Png,
      Pdf,
@@ -281,7 +301,7 @@ index 1111111..2222222 100644
      Pdf1_5,
      Pdf1_4,
      Ps,
-@@ -608,12 +606,7 @@ impl Converter {
+@@ -614,12 +612,7 @@ impl Converter {
                      )
                  }
  
@@ -295,16 +315,7 @@ index 1111111..2222222 100644
                      // These surfaces require units in points
                      unit = LengthUnit::Pt;
  
-@@ -805,8 +798,6 @@ fn build_cli() -> clap::Command {
-         #[cfg(system_deps_have_cairo_pdf)]
-         "pdf",
-         #[cfg(system_deps_have_cairo_pdf)]
--        "pdf1.6",
--        #[cfg(system_deps_have_cairo_pdf)]
-         "pdf1.5",
-         #[cfg(system_deps_have_cairo_pdf)]
-         "pdf1.4",
-@@ -1081,7 +1072,6 @@ fn parse_args() -> Result<Converter, Error> {
+@@ -890,7 +883,6 @@ fn parse_args() -> Result<Converter, Error> {
          format_str,
          "png" => Format::Png,
          "pdf" => Format::Pdf,
@@ -316,14 +327,17 @@ diff --git a/rsvg_convert/tests/rsvg_convert.rs b/rsvg_convert/tests/rsvg_conver
 index 1111111..2222222 100644
 --- a/rsvg_convert/tests/rsvg_convert.rs
 +++ b/rsvg_convert/tests/rsvg_convert.rs
-@@ -151,16 +151,6 @@ fn output_format_pdf() {
+@@ -321,19 +321,6 @@ fn output_format_pdf() {
          .stdout(file::is_pdf());
  }
  
 -#[cfg(system_deps_have_cairo_pdf)]
 -#[test]
 -fn output_format_pdf_1_6() {
--    RsvgConvert::new_with_input("tests/fixtures/bug521-with-viewbox.svg")
+-    let mut rsvg_convert = RsvgConvert::new_with_input("tests/fixtures/bug521-with-viewbox.svg");
+-
+-    rsvg_convert
+-        .command
 -        .arg("--format=pdf1.6")
 -        .assert()
 -        .success()
@@ -348,13 +362,13 @@ index 1111111..2222222 100644
 @@ -1,7 +1,7 @@
  project('librsvg',
          'c',
-         version: '2.60.0', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+         version: '2.61.3', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
 -        meson_version: '>= 1.3.0',
 +        meson_version: '>= 0.63.3',
          default_options: [
          ]
  )
-@@ -358,7 +358,7 @@ if host_system in ['windows', 'linux']
+@@ -360,7 +370,7 @@ if host_system in ['windows', 'linux']
    endif
  
    foreach i: native_libs.stdout().split()
@@ -363,7 +377,7 @@ index 1111111..2222222 100644
        if i.endswith('.lib') # pre Rust 1.83
          default_overrides = [
            'b_vscrt=md@0@'.format(i.substring(0, -4).split('msvcrt')[1])
-@@ -460,7 +460,7 @@ else
+@@ -462,7 +462,7 @@ else
  endif
  
  cargo_dylib_prefix = lib_prefix
