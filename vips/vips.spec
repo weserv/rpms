@@ -7,10 +7,10 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.17
-%global vips_version %{vips_version_base}.3
+%global vips_version_base 8.18
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc1
+%global vips_prever rc3
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %if 0%{?rhel} >= 9
@@ -26,8 +26,10 @@
 %bcond_without             jxl
 %bcond_without             libcgif
 %bcond_without             libimagequant
-%bcond_without             libspng
 %bcond_without             openjpeg2
+
+# libpng preferred over libspng
+%bcond_with                libspng
 
 # 2 builds needed to get the full stack
 # --without im6 --with im7
@@ -254,23 +256,23 @@ exit 1
 export CFLAGS="%{optflags} -ftree-vectorize"
 export CXXFLAGS="%{optflags} -ftree-vectorize"
 %meson \
-%if %{without jxl}
-    -Djpeg-xl=disabled \
-%endif
 %if %{without heif}
     -Dheif=disabled \
 %endif
-%if %{without libimagequant}
-    -Dimagequant=disabled \
+%if %{without highway}
+    -Dhighway=disabled \
+%endif
+%if %{without jxl}
+    -Djpeg-xl=disabled \
 %endif
 %if %{without libcgif}
     -Dcgif=disabled \
 %endif
+%if %{without libimagequant}
+    -Dimagequant=disabled \
+%endif
 %if %{without openjpeg2}
     -Dopenjpeg=disabled \
-%endif
-%if %{without libspng}
-    -Dspng=disabled \
 %endif
 %if %{with doc}
     -Dcpp-docs=true \
@@ -279,10 +281,8 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %if %{with gm}
     -Dmagick-package=GraphicsMagick \
 %endif
-%if %{with highway}
-    -Dhighway=enabled \
-%else
-    -Dhighway=disabled \
+%if %{with libspng}
+    -Dpng=disabled \
 %endif
     -Dmagick-features=load \
     -Dcfitsio=disabled \
@@ -292,6 +292,8 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
     -Dopenexr=disabled \
     -Dpdfium=disabled \
     -Dquantizr=disabled \
+    -Draw=disabled \
+    -Duhdr=disabled \
     %{nil}
 
 %meson_build
@@ -368,6 +370,11 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Thu Dec 11 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.18.0~rc3-1
+- Update to 8.18.0-rc3
+- Switch from libspng to libpng (preferred upstream)
+- Disable new uhdr and raw features
+
 * Fri Oct 31 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.17.3-1
 - Update to 8.17.3
 
