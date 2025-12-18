@@ -10,7 +10,7 @@
 %global vips_version_base 8.18
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc3
+#global vips_prever rc3
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %bcond_without             doc
@@ -365,6 +365,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Thu Dec 18 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.18.0-1
+- Update to 8.18.0
+
 * Thu Dec 11 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.18.0~rc3-1
 - Update to 8.18.0-rc3
 - Switch from libspng to libpng (preferred upstream)
