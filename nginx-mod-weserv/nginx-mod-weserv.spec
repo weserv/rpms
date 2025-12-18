@@ -1,5 +1,5 @@
-%global commit a4dd91e157258c0e01065348e1718aed1c5a8a36
-%global commitdate 20251107
+%global commit 0f029b475c0ace517205ff88a967449aea0b2c41
+%global commitdate 20251218
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           nginx-mod-weserv
@@ -11,15 +11,10 @@ License:        BSD-3-Clause
 URL:            https://github.com/weserv/images
 Source0:        %{url}/archive/%{commit}/images-%{shortcommit}.tar.gz
 
-%if 0%{?rhel} < 9
-# Revert 94279b7 for compat with EL8
-Patch0:         revert-94279b7.patch
-%endif
-
 BuildRequires:  gcc-c++
-BuildRequires:  cmake
+BuildRequires:  meson >= 0.63
 BuildRequires:  nginx-mod-devel
-BuildRequires:  cmake(Catch2) >= 2.7.1
+BuildRequires:  pkgconfig(catch2) >= 3.0.1
 BuildRequires:  pkgconfig(vips-cpp) >= 8.12.0
 
 %description
@@ -45,19 +40,19 @@ API library of %{name}.
 %autosetup -p1 -n images-%{commit}
 
 %build
-%cmake -DINSTALL_NGX_MODULE=OFF \
-       -DBUILD_TESTS=ON \
-       -DBUILD_TOOLS=ON
-%cmake_build
+%meson -Dcli=true -Dtests=true
+%meson_build
 
+# Let nginx find the built (but not yet installed) API library
+RPM_LD_FLAGS="$RPM_LD_FLAGS -L../%{_vpath_builddir}/src/api"
 %nginx_modconfigure --with-http_ssl_module
 %nginx_modbuild
 
 %check
-%ctest
+%meson_test
 
 %install
-%cmake_install
+%meson_install
 
 pushd %{_vpath_builddir}
 install -dm 0755 %{buildroot}%{nginx_moddir}
@@ -86,6 +81,9 @@ echo 'load_module "%{nginx_moddir}/ngx_weserv_module.so";' \
 
 
 %changelog
+* Thu Dec 18 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20251218git0f029b4
+- Update to weserv/images@0f029b4
+
 * Fri Nov  7 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20251107gita4dd91e
 - Update to weserv/images@a4dd91e
 
