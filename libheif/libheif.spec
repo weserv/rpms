@@ -1,6 +1,6 @@
 Name:           libheif
 Epoch:          1
-Version:        1.20.2
+Version:        1.21.2
 Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
@@ -94,6 +94,9 @@ rm -rf third-party/
 
 
 %changelog
+* Tue Mar 10 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.21.2-1
+- Update to 1.21.2
+
 * Sat Aug  9 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.20.2-1
 - Update to 1.20.2
 
