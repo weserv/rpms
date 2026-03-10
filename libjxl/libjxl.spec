@@ -2,8 +2,8 @@
 
 Name:           libjxl
 Epoch:          1
-Version:        0.11.1
-Release:        3%{?dist}
+Version:        0.11.2
+Release:        1%{?dist}
 Summary:        JPEG XL image format reference implementation
 
 License:        BSD-3-Clause
@@ -157,6 +157,9 @@ sed -i "/JPEGXL_SO_MINOR_VERSION/s/11/10/" lib/CMakeLists.txt
 
 
 %changelog
+* Tue Mar 10 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:0.11.2-1
+- Update to 0.11.2
+
 * Sat Jun 21 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:0.11.1-3
 - Import from Fedora
 - Keep SONAME at 0.10 for compat
