@@ -1,5 +1,5 @@
 Name:           libde265
-Version:        1.0.16
+Version:        1.0.17
 Release:        1%{?dist}
 Summary:        Open H.265 video codec implementation
 
@@ -7,10 +7,8 @@ License:        LGPL-3.0-or-later
 URL:            https://www.libde265.org/
 Source0:        https://github.com/strukturag/libde265/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  autoconf
-BuildRequires:  automake
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  libtool
 
 %description
 libde265 is an open source implementation of the H.265 video codec.
@@ -34,41 +32,31 @@ are provided by this package.
 %autosetup -p1
 
 %build
-%configure \
- --disable-silent-rules \
- --disable-static \
- --disable-dec265 \
- --disable-sherlock265 \
- --enable-shared
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DENABLE_DECODER=OFF
 
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-%make_build
+%cmake_build
 
 %install
-%make_install
-find %buildroot -name '*.la' -or -name '*.a' | xargs rm -f
-# Don't package internal development tools.
-rm -f %{buildroot}%{_bindir}/bjoentegaard
-rm -f %{buildroot}%{_bindir}/block-rate-estim
-rm -f %{buildroot}%{_bindir}/gen-enc-table
-rm -f %{buildroot}%{_bindir}/hdrcopy
-rm -f %{buildroot}%{_bindir}/rd-curves
-rm -f %{buildroot}%{_bindir}/tests
-rm -f %{buildroot}%{_bindir}/yuv-distortion
+%cmake_install
 
 %files
 %doc AUTHORS README.md
 %license COPYING
-%{_libdir}/*.so.*
+%{_libdir}/*.so.0*
 
 %files devel
-%{_includedir}/libde265/
+%{_includedir}/%{name}/
+%{_libdir}/cmake/%{name}/
+%{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/*.so
-%{_libdir}/pkgconfig/*.pc
 
 
 %changelog
+* Wed Mar 18 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.17-1
+- Update to 1.0.17
+- Migrate build to CMake
+
 * Mon May  5 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.0.16-1
 - Update to 1.0.16
 - Remove examples subpackage
