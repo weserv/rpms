@@ -6,7 +6,7 @@
 
 Name:           redis-rate-limiter
 Version:        0.0.1
-Release:        2.%{commitdate}git%{shortcommit}%{?dist}
+Release:        3.%{commitdate}git%{shortcommit}%{?dist}
 Summary:        C implementation of the GCR Algorithm for key-value stores
 
 License:        MIT
@@ -17,7 +17,7 @@ BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  valkey-devel >= 8.1
 
-Requires:       valkey >= 8.1
+Requires:       valkey >= %{valkey_version}
 Requires:       valkey(modules_abi)%{?_isa} = %{valkey_modules_abi}
 
 %description
@@ -51,6 +51,9 @@ install -Dpm640 %{module}.conf %{buildroot}%{valkey_modules_cfg}/%{module}.conf
 
 
 %changelog
+* Tue Jun  2 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1-3.20220715gitde3bced
+- Rebuild for Valkey 9.1
+
 * Sat Aug  9 2025 Kleis Auke Wolthuizen <info@kleisauke.nl> - 0.0.1-2.20220715gitde3bced
 - Ensure installed module is loaded by default
 
