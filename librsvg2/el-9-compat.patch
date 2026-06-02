@@ -25,7 +25,7 @@ diff --git a/meson.build b/meson.build
 index 1111111..2222222 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -55,7 +55,7 @@ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
+@@ -56,7 +56,7 @@ freetype2_required     = '>= 20.0.14' # Corresponds to ft2_cmake_required
  glib_required          = '>= 2.50.0'
  harfbuzz_required      = '>= 2.0.0'
  libxml_required        = '>= 2.9.0'
@@ -114,7 +114,7 @@ diff --git a/meson.build b/meson.build
 index 1111111..2222222 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -48,7 +48,7 @@ py = import('python')
+@@ -49,7 +49,7 @@ py = import('python')
  python = py.find_installation()
  
  # Required versions for dependencies - Please update _build_dependencies.rst with version numbers if these change
@@ -190,7 +190,7 @@ diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
 index 1111111..2222222 100644
 --- a/rsvg_convert/src/main.rs
 +++ b/rsvg_convert/src/main.rs
-@@ -259,7 +259,6 @@ impl Surface {
+@@ -260,7 +260,6 @@ impl Surface {
          match format {
              Format::Png => Self::new_for_png(size, stream),
              Format::Pdf => Self::new_for_pdf(size, stream, None),
@@ -198,7 +198,7 @@ index 1111111..2222222 100644
              Format::Pdf1_6 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_6)),
              Format::Pdf1_5 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_5)),
              Format::Pdf1_4 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_4)),
-@@ -496,7 +495,6 @@ impl std::fmt::Display for Output {
+@@ -497,7 +496,6 @@ impl std::fmt::Display for Output {
  enum Format {
      Png,
      Pdf,
@@ -206,7 +206,7 @@ index 1111111..2222222 100644
      Pdf1_6,
      Pdf1_5,
      Pdf1_4,
-@@ -617,7 +615,6 @@ impl Converter {
+@@ -618,7 +616,6 @@ impl Converter {
                  }
  
                  Format::Pdf
@@ -214,7 +214,7 @@ index 1111111..2222222 100644
                  | Format::Pdf1_6
                  | Format::Pdf1_5
                  | Format::Pdf1_4
-@@ -893,7 +890,6 @@ fn parse_args() -> Result<Converter, Error> {
+@@ -899,7 +896,6 @@ fn parse_args() -> Result<Converter, Error> {
          format_str,
          "png" => Format::Png,
          "pdf" => Format::Pdf,
@@ -285,7 +285,7 @@ diff --git a/rsvg_convert/src/main.rs b/rsvg_convert/src/main.rs
 index 1111111..2222222 100644
 --- a/rsvg_convert/src/main.rs
 +++ b/rsvg_convert/src/main.rs
-@@ -259,7 +259,6 @@ impl Surface {
+@@ -260,7 +260,6 @@ impl Surface {
          match format {
              Format::Png => Self::new_for_png(size, stream),
              Format::Pdf => Self::new_for_pdf(size, stream, None),
@@ -293,7 +293,7 @@ index 1111111..2222222 100644
              Format::Pdf1_5 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_5)),
              Format::Pdf1_4 => Self::new_for_pdf(size, stream, Some(cairo::PdfVersion::_1_4)),
              Format::Ps => Self::new_for_ps(size, stream, false),
-@@ -495,7 +494,6 @@ impl std::fmt::Display for Output {
+@@ -496,7 +495,6 @@ impl std::fmt::Display for Output {
  enum Format {
      Png,
      Pdf,
@@ -301,7 +301,7 @@ index 1111111..2222222 100644
      Pdf1_5,
      Pdf1_4,
      Ps,
-@@ -614,12 +612,7 @@ impl Converter {
+@@ -615,12 +613,7 @@ impl Converter {
                      )
                  }
  
@@ -315,7 +315,7 @@ index 1111111..2222222 100644
                      // These surfaces require units in points
                      unit = LengthUnit::Pt;
  
-@@ -890,7 +883,6 @@ fn parse_args() -> Result<Converter, Error> {
+@@ -896,7 +889,6 @@ fn parse_args() -> Result<Converter, Error> {
          format_str,
          "png" => Format::Png,
          "pdf" => Format::Pdf,
@@ -362,13 +362,13 @@ index 1111111..2222222 100644
 @@ -1,7 +1,7 @@
  project('librsvg',
          'c',
-         version: '2.61.3', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+         version: '2.62.2', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
 -        meson_version: '>= 1.3.0',
 +        meson_version: '>= 0.63.3',
          default_options: [
          ]
  )
-@@ -360,7 +370,7 @@ if host_system in ['windows', 'linux']
+@@ -361,7 +361,7 @@ if host_system in ['windows', 'linux']
    endif
  
    foreach i: native_libs.stdout().split()
@@ -377,7 +377,7 @@ index 1111111..2222222 100644
        if i.endswith('.lib') # pre Rust 1.83
          default_overrides = [
            'b_vscrt=md@0@'.format(i.substring(0, -4).split('msvcrt')[1])
-@@ -462,7 +462,7 @@ else
+@@ -463,7 +463,7 @@ else
  endif
  
  cargo_dylib_prefix = lib_prefix
