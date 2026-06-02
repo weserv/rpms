@@ -1,4 +1,4 @@
-FROM fedora:43 AS build
+FROM fedora:44 AS build
 LABEL maintainer="Kleis Auke Wolthuizen <info@kleisauke.nl>"
 
 RUN dnf update -y \
