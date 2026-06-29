@@ -1,6 +1,6 @@
 Name:           libheif
 Epoch:          1
-Version:        1.23.0
+Version:        1.23.1
 Release:        1%{?dist}
 Summary:        HEIF and AVIF file format decoder and encoder
 
@@ -61,6 +61,8 @@ rm -rf third-party/
        -DWITH_SvtEnc=ON \
        -DWITH_SvtEnc_PLUGIN=OFF \
        -DWITH_X265=OFF \
+       -DWITH_X264=OFF \
+       -DWITH_OpenH264_DECODER=OFF \
        -DWITH_AOM_DECODER=OFF \
        -DWITH_AOM_ENCODER=OFF
 
@@ -92,6 +94,9 @@ rm -rf third-party/
 
 
 %changelog
+* Mon Jun 29 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.23.1-1
+- Update to 1.23.1
+
 * Tue Jun  2 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:1.23.0-1
 - Update to 1.23.0
 
