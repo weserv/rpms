@@ -2,7 +2,7 @@
 
 Name:           libjxl
 Epoch:          1
-Version:        0.11.2
+Version:        0.12.0
 Release:        1%{?dist}
 Summary:        JPEG XL image format reference implementation
 
@@ -76,12 +76,11 @@ This package provides the documentation for %{name}.
 %autosetup -p1
 
 # Avoid SONAME bump
-sed -i "/JPEGXL_SO_MINOR_VERSION/s/11/10/" lib/CMakeLists.txt
+sed -i "/JPEGXL_SO_MINOR_VERSION/s/12/10/" lib/CMakeLists.txt
 
 %build
 %cmake -DBUILD_TESTING=OFF \
        -DJPEGXL_ENABLE_BENCHMARK=OFF \
-       -DJPEGXL_ENABLE_PLUGIN_GIMP210=OFF \
        -DJPEGXL_ENABLE_SJPEG=OFF \
        -DJPEGXL_ENABLE_SKCMS=OFF \
        -DJPEGXL_ENABLE_PLUGINS=ON \
@@ -123,6 +122,7 @@ sed -i "/JPEGXL_SO_MINOR_VERSION/s/11/10/" lib/CMakeLists.txt
 %{_bindir}/cjxl
 %{_bindir}/djxl
 %{_bindir}/jxlinfo
+%{_bindir}/jxltran
 %{_mandir}/man1/cjxl.1*
 %{_mandir}/man1/djxl.1*
 
@@ -152,11 +152,14 @@ sed -i "/JPEGXL_SO_MINOR_VERSION/s/11/10/" lib/CMakeLists.txt
 
 %files doc
 %doc doc/*.md
-%doc %{_vpath_builddir}/html
+%doc %{_vpath_builddir}/doc/html
 %license LICENSE
 
 
 %changelog
+* Thu Jul  2 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:0.12.0-1
+- Update to 0.12.0
+
 * Tue Mar 10 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:0.11.2-1
 - Update to 0.11.2
 
