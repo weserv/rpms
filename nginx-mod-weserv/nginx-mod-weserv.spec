@@ -1,21 +1,17 @@
-%global commit 80a20bf318e8a68152cf6e10887811baf5864de7
-%global commitdate 20260410
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
 Name:           nginx-mod-weserv
-Version:        5.0.0
-Release:        1.%{commitdate}git%{shortcommit}%{?dist}
+Version:        5.1.0
+Release:        1%{?dist}
 Summary:        Nginx weserv module
 
 License:        BSD-3-Clause
 URL:            https://github.com/weserv/images
-Source0:        %{url}/archive/%{commit}/images-%{shortcommit}.tar.gz
+Source0:        %{url}/archive/v%{version}/images-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  meson >= 0.63
 BuildRequires:  nginx-mod-devel
 BuildRequires:  pkgconfig(catch2) >= 3.0.1
-BuildRequires:  pkgconfig(vips-cpp) >= 8.12.0
+BuildRequires:  pkgconfig(vips-cpp) >= 8.13
 
 %description
 %{summary}.
@@ -37,7 +33,7 @@ The %{name}-tools package provides command-line tools based on the
 API library of %{name}.
 
 %prep
-%autosetup -p1 -n images-%{commit}
+%autosetup -p1 -n images-%{version}
 
 %build
 %meson -Dcli=true -Dtests=true
@@ -81,6 +77,9 @@ echo 'load_module "%{nginx_moddir}/ngx_weserv_module.so";' \
 
 
 %changelog
+* Tue Sep  1 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.1.0-1
+- Update to 5.1.0
+
 * Fri Apr 10 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.0.0-1.20260410git80a20bf
 - Update to weserv/images@80a20bf
 
