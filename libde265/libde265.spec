@@ -1,5 +1,5 @@
 Name:           libde265
-Version:        1.1.1
+Version:        1.1.2
 Release:        1%{?dist}
 Summary:        Open H.265 video codec implementation
 
@@ -53,6 +53,9 @@ are provided by this package.
 
 
 %changelog
+* Mon Sep  7 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.1.2-1
+- Update to 1.1.2
+
 * Sat Jun 13 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1.1.1-1
 - Update to 1.1.1
 
