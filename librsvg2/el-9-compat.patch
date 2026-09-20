@@ -61,7 +61,7 @@ diff --git a/rsvg/src/text.rs b/rsvg/src/text.rs
 index 1111111..2222222 100644
 --- a/rsvg/src/text.rs
 +++ b/rsvg/src/text.rs
-@@ -1391,7 +1391,9 @@ fn add_pango_attributes(
+@@ -1436,7 +1436,9 @@ fn add_pango_attributes(
      font_desc.set_family(props.font_family.as_str());
      font_desc.set_style(pango::Style::from(props.font_style));
  
@@ -72,7 +72,7 @@ index 1111111..2222222 100644
  
      font_desc.set_weight(pango::Weight::from(props.font_weight));
      font_desc.set_stretch(pango::Stretch::from(props.font_stretch));
-@@ -1414,6 +1416,13 @@ fn add_pango_attributes(
+@@ -1459,6 +1461,13 @@ fn add_pango_attributes(
          attributes.push(pango::AttrInt::new_strikethrough(true).upcast());
      }
  
@@ -362,7 +362,7 @@ index 1111111..2222222 100644
 @@ -1,7 +1,7 @@
  project('librsvg',
          'c',
-         version: '2.62.2', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
+         version: '2.63.2', # Keep this in sync with Cargo.toml, doc/librsvg.toml, rsvg/Cargo.toml
 -        meson_version: '>= 1.3.0',
 +        meson_version: '>= 0.63.3',
          default_options: [
