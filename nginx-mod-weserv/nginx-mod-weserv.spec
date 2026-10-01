@@ -1,5 +1,5 @@
 Name:           nginx-mod-weserv
-Version:        5.1.0
+Version:        5.1.1
 Release:        1%{?dist}
 Summary:        Nginx weserv module
 
@@ -40,7 +40,7 @@ API library of %{name}.
 %meson_build
 
 # Let nginx find the built (but not yet installed) API library
-RPM_LD_FLAGS="$RPM_LD_FLAGS -L../%{_vpath_builddir}/src/api"
+PKG_CONFIG_PATH="../%{_vpath_builddir}/meson-uninstalled"
 %nginx_modconfigure --with-http_ssl_module
 %nginx_modbuild
 
@@ -77,6 +77,9 @@ echo 'load_module "%{nginx_moddir}/ngx_weserv_module.so";' \
 
 
 %changelog
+* Thu Oct  1 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.1.1-1
+- Update to 5.1.1
+
 * Tue Sep  1 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.1.0-1
 - Update to 5.1.0
 
