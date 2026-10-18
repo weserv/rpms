@@ -13,7 +13,7 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.63.2
+Version:        2.63.3
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
@@ -23,9 +23,6 @@ Source0:        https://download.gnome.org/sources/librsvg/2.63/librsvg-%{versio
 # Use vendored crate dependencies so we can build offline.
 # Created using "cargo vendor"
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
-
-# https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1215
-Patch0:         mr-1215.patch
 
 BuildRequires:  gcc
 BuildRequires:  meson >= 1.3.0
@@ -153,6 +150,9 @@ sed -i 's/, "--locked"//g' meson/cargo_wrapper.py
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Sun Oct 18 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.63.3-1
+- Update to 2.63.3
+
 * Sun Sep 20 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.63.2-1
 - Update to 2.63.2
 
