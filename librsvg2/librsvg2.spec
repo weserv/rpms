@@ -13,7 +13,7 @@
 
 Name:           librsvg2
 Summary:        An SVG library based on cairo
-Version:        2.63.2
+Version:        2.63.3
 Release:        1%{?dist}
 
 License:        LGPL-2.1-or-later
@@ -24,13 +24,10 @@ Source0:        https://download.gnome.org/sources/librsvg/2.63/librsvg-%{versio
 # Created using "cargo vendor"
 Source1:        https://rpms.wsrv.nl/sources/%{name}-%{version}-vendor.tar.xz
 
-# https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1215
-Patch0:         mr-1215.patch
-
 # Patch to ensure compat with EL9:
 # - Revert commit 73c1ee7, ec5d747, c88987b and 166f74f;
 # - Downgrade the minimum required Meson version to 0.63.3.
-Patch1:         el-9-compat.patch
+Patch0:         el-9-compat.patch
 
 BuildRequires:  gcc
 BuildRequires:  meson >= 0.63.3
@@ -168,6 +165,9 @@ export RUSTFLAGS="%build_rustflags"
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Sun Oct 18 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.63.3-1
+- Update to 2.63.3
+
 * Sun Sep 20 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 2.63.2-1
 - Update to 2.63.2
 
