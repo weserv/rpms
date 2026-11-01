@@ -1,5 +1,5 @@
 Name:           nginx-mod-weserv
-Version:        5.1.1
+Version:        5.1.2
 Release:        1%{?dist}
 Summary:        Nginx weserv module
 
@@ -77,6 +77,9 @@ echo 'load_module "%{nginx_moddir}/ngx_weserv_module.so";' \
 
 
 %changelog
+* Sun Nov  1 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.1.2-1
+- Update to 5.1.2
+
 * Thu Oct  1 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 5.1.1-1
 - Update to 5.1.1
 
