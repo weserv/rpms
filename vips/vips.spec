@@ -7,10 +7,10 @@
 #
 # Please preserve changelog entries
 #
-%global vips_version_base 8.18
-%global vips_version %{vips_version_base}.7
+%global vips_version_base 8.19
+%global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-#global vips_prever rc3
+%global vips_prever rc1
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %bcond_without             doc
@@ -62,13 +62,13 @@ BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  pkgconfig(libwebp) >= 0.6
 BuildRequires:  pkgconfig(libexif)
-BuildRequires:  pkgconfig(libarchive) >= 3
+BuildRequires:  pkgconfig(libarchive) >= 3.2.0
 BuildRequires:  pkgconfig(librsvg-2.0) >= 2.50.0
 BuildRequires:  pkgconfig(libjpeg) > 1.5.3
 %if %{with libspng}
 BuildRequires:  pkgconfig(spng) >= 0.7
 %else
-BuildRequires:  pkgconfig(libpng) >= 1.2.9
+BuildRequires:  pkgconfig(libpng) >= 1.4.0
 %endif
 %if %{with openjpeg2}
 BuildRequires:  pkgconfig(libopenjp2) >= 2.4
@@ -365,6 +365,9 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Sun Nov  8 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.19.0~rc1-1
+- Update to 8.19.0-rc1
+
 * Tue Sep 29 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.18.7-1
 - Update to 8.18.7
 
