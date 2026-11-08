@@ -1,4 +1,4 @@
-FROM fedora:44 AS build
+FROM fedora:45 AS build
 LABEL maintainer="Kleis Auke Wolthuizen <info@kleisauke.nl>"
 
 RUN dnf update -y \
@@ -6,6 +6,9 @@ RUN dnf update -y \
     && dnf clean all
 
 VOLUME ["/rpmbuild", "/rpms"]
+
+# https://fedoraproject.org/wiki/Changes/Enforcing_signature_checking_by_default
+RUN echo '%_pkgverify_level digest' > /etc/rpm/macros.verify
 
 COPY .mock /etc/mock
 
