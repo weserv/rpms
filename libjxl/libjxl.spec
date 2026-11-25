@@ -2,7 +2,7 @@
 
 Name:           libjxl
 Epoch:          1
-Version:        0.12.0
+Version:        0.13.0
 Release:        1%{?dist}
 Summary:        JPEG XL image format reference implementation
 
@@ -76,7 +76,7 @@ This package provides the documentation for %{name}.
 %autosetup -p1
 
 # Avoid SONAME bump
-sed -i "/JPEGXL_SO_MINOR_VERSION/s/12/10/" lib/CMakeLists.txt
+sed -i "/JPEGXL_SO_MINOR_VERSION/s/13/10/" lib/CMakeLists.txt
 
 %build
 %cmake -DBUILD_TESTING=OFF \
@@ -157,6 +157,9 @@ sed -i "/JPEGXL_SO_MINOR_VERSION/s/12/10/" lib/CMakeLists.txt
 
 
 %changelog
+* Wed Nov 25 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:0.13.0-1
+- Update to 0.13.0
+
 * Thu Jul  2 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:0.12.0-1
 - Update to 0.12.0
 
