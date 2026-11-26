@@ -10,7 +10,7 @@
 %global vips_version_base 8.19
 %global vips_version %{vips_version_base}.0
 %global vips_soname_major 42
-%global vips_prever rc1
+%global vips_prever rc3
 %global vips_tagver %{vips_version}%{?vips_prever:-%{vips_prever}}
 
 %bcond_without             doc
@@ -26,12 +26,10 @@
 # libpng preferred over libspng
 %bcond_with                libspng
 
-# 1-2 builds needed to get the full stack (im6 only for EL8, EL9)
-# --without im7 --with im6
+# 2 builds needed to get the full stack
 # --without im7 --with gm
 
 %bcond_without             im7
-%bcond_with                im6
 %bcond_with                gm
 
 Name:           vips
@@ -57,7 +55,9 @@ BuildRequires:  pkgconfig(libhwy) >= 1.0.5
 BuildRequires:  pkgconfig(orc-0.4) >= 0.4.11
 %endif
 BuildRequires:  pkgconfig(lcms2)
-BuildRequires:  pkgconfig(pangoft2)
+BuildRequires:  pkgconfig(pangoft2) >= 1.38.0
+BuildRequires:  pkgconfig(pangocairo) >= 1.38.0
+BuildRequires:  pkgconfig(cairo) >= 1.2
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  pkgconfig(libwebp) >= 0.6
@@ -86,6 +86,7 @@ BuildRequires:  bc
 
 # Not available as system library
 Provides:       bundled(libnsgif)
+Provides:       bundled(qoi)
 
 Suggests:   %{name}-openslide
 Suggests:   %{name}-magick-im7
@@ -108,7 +109,6 @@ Additional image formats are supported in additional optional packages:
 * %{name}-heif
 * %{name}-openslide
 * %{name}-poppler
-* %{name}-magick-im6 using ImageMagick version 6
 * %{name}-magick-im7 using ImageMagick version 7
 * %{name}-magick-gm  using GraphicsMagick
 
@@ -182,32 +182,14 @@ Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 %description poppler
 The %{name}-poppler package contains the Poppler module for VIPS.
 
-%if %{with im6}
-%package magick-im6
-Summary:       Magick support for %{name} using ImageMagick6
-BuildRequires: ImageMagick6-devel
-Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
-%if 0%{?fedora} >= 34
-Obsoletes:     %{name}-magick         < %{epoch}:%{version}-%{release}
-%endif
-Provides:      %{name}-magick         = %{epoch}:%{version}-%{release}
-Provides:      %{name}-magick%{?_isa} = %{epoch}:%{version}-%{release}
-Conflicts:     %{name}-magick-im7
-Conflicts:     %{name}-magick-gm
-
-%description magick-im6
-The %{name}-magick-im6 package contains the Magick module for VIPS
-using ImageMagick version 6.
-%endif
-
 %if %{with im7}
 %package magick-im7
-Summary:       Magick support for %{name} using ImageMagick7
+Summary:       Magick support for %{name} using ImageMagick 7
 BuildRequires: ImageMagick7-devel
 Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Provides:      %{name}-magick         = %{epoch}:%{version}-%{release}
 Provides:      %{name}-magick%{?_isa} = %{epoch}:%{version}-%{release}
-Conflicts:     %{name}-magick-im6
+Obsoletes:     %{name}-magick-im6     < %{epoch}:%{version}-%{release}
 Conflicts:     %{name}-magick-gm
 
 %description magick-im7
@@ -235,10 +217,6 @@ using GraphicsMagick.
 %if %{with gm}
 %if %{with im7}
 : Cannot enable GraphicsMagick and ImageMagick7
-exit 1
-%endif
-%if %{with im6}
-: Cannot enable GraphicsMagick and ImageMagick6
 exit 1
 %endif
 %endif
@@ -348,11 +326,6 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 %{_libdir}/vips-modules-%{vips_version_base}/vips-heif.so
 %endif
 
-%if %{with im6}
-%files magick-im6
-%{_libdir}/vips-modules-%{vips_version_base}/vips-magick.so
-%endif
-
 %if %{with im7}
 %files magick-im7
 %{_libdir}/vips-modules-%{vips_version_base}/vips-magick.so
@@ -365,6 +338,11 @@ export CXXFLAGS="%{optflags} -ftree-vectorize"
 
 
 %changelog
+* Thu Nov 26 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.19.0~rc3-1
+- Update to 8.19.0-rc3
+- Drop support for ImageMagick version 6
+- vips-magick-im7 obsoletes vips-magick-im6
+
 * Sun Nov  8 2026 Kleis Auke Wolthuizen <info@kleisauke.nl> - 1:8.19.0~rc1-1
 - Update to 8.19.0-rc1
 
